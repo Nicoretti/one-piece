@@ -1,4 +1,8 @@
 [workspace]
 
 members = [
+    "xxd",
+    "tobytes",
+    "preidolia",
+    "bricks",
 ]
