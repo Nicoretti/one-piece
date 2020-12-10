@@ -1,0 +1,33 @@
+[package]
+name = "bricks"
+authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
+license-file = "LICENSE"
+readme = "README.md"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+futures = "0.1.26"
+tokio-process = "0.2.3"
+tokio = "0.1.18"
+structopt = "0.2.15"
+clap = "2.33.0"
+failure = "0.1.5"
+human-panic = "1.0.1"
+
+[[bin]]
+name = "trailing"
+path = "src/bin/trailing.rs"
+
+[[bin]]
+name = "spaces"
+path = "src/bin/spaces.rs"
+
+[[bin]]
+name = "timeout"
+path = "src/bin/timeout.rs"
+
+[lib]
+name = "bricks"
+path = "src/lib.rs"
+
