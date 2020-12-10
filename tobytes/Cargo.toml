@@ -1,0 +1,11 @@
+[package]
+name = "tobytes"
+version = "0.1.0"
+authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
+edition = "2018"
+readme = "README.md"
+description = "A small crate to simplfy type to bytes encoding"
+repository = "https://github.com/Nicoretti/tobytes"
+license-file = "LICENSE-MIT"
+keywords = ["bytes", "encoding"]
+
