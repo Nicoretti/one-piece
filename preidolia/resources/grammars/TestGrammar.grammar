@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ufwb version="1.17">
+    <grammar name="TestGrammar" start="id:1" author="Nicola Coretti" email="nico.coretti@gmail.com" complete="yes">
+        <description>Some  basic grammar</description>
+        <structure name="Grammar" id="1" encoding="ISO_8859-1:1987" endian="big" signed="no">
+            <structure name="Foo" id="2"/>
+            <number name="&lt;new number&gt;" id="5" type="float" length="8"/>
+            <string name="&lt;new string&gt;" id="6" type="pascal"/>
+        </structure>
+    </grammar>
+</ufwb>

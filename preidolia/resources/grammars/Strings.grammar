@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ufwb version="1.17">
+    <grammar name="Strings" start="id:1" author="Nicola Coretti" email="nico.coretti@gmail.com" complete="yes">
+        <description>Grammar containing different kind of strings</description>
+        <structure name="Strings" id="1" encoding="ISO_8859-1:1987" endian="big" signed="no">
+            <string name="FixedLengthString" id="8" type="fixed-length" length="10"/>
+            <string name="ZeroTerminated" id="10" type="zero-terminated"/>
+            <string name="DelimiterTerminated" id="11" type="delimiter-terminated" delimiter="0A0A"/>
+            <string name="LengthPrefixed" id="13" type="pascal"/>
+        </structure>
+    </grammar>
+</ufwb>

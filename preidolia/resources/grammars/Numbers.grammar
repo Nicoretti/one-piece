@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ufwb version="1.17">
+    <grammar name="Numbers" start="id:1" author="Nicola Coretti" complete="yes">
+        <description>grammar containing different  number types and structures</description>
+        <structure name="Numbers" id="1" encoding="UTF-8" endian="big" signed="no">
+            <number name="IntegerWithByteLenght1" id="3" type="integer" length="1"/>
+            <number name="IntegerWithByteLenght2" id="4" type="integer" length="2"/>
+            <number name="IntegerWithByteLenght3" id="5" type="integer" length="3"/>
+            <number name="IntegerWithByteLenght4" id="8" type="integer" length="4"/>
+            <number name="IntegerWithByteLenght8" id="9" type="integer" length="8"/>
+            <number name="IntegerWithBitLength8" id="10" type="integer" length="8" lengthunit="bit"/>
+            <number name="IntegerWithBitLength16" id="11" type="integer" length="16" lengthunit="bit"/>
+            <number name="IntegerWithBitLength24" id="12" type="integer" length="24" lengthunit="bit"/>
+            <number name="IntegerWithBitLength32" id="13" type="integer" length="32" lengthunit="bit"/>
+            <number name="IntegerWithBitLength64" id="14" type="integer" length="64" lengthunit="bit"/>
+            <number name="FloatingPointByteLength2" id="15" type="float" length="2"/>
+            <number name="FloatingPointByteLength4" id="16" type="float" length="4"/>
+            <number name="FloatingPointByteLength8" id="17" type="float" length="8"/>
+            <number name="FloatingPointBitLength16" id="18" type="float" length="16" lengthunit="bit"/>
+            <number name="FloatingPointBitLength32" id="19" type="float" length="32" lengthunit="bit"/>
+            <number name="FloatingPointBitLength64" id="20" type="float" length="64" lengthunit="bit"/>
+        </structure>
+    </grammar>
+</ufwb>
