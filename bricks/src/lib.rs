@@ -130,8 +130,6 @@ mod tests {
     fn report_trailing_whitespaces() {
         let mut reader = Cursor::new(b"aa\n    a   \t\n".to_vec());
         let mut writer = Cursor::new(vec![0; 0]);
-        let expected_data: Vec<u8> =
-            b"Trailing whitespace detected, File: f.txt, Line: 2\n".to_vec();
         let reporter = reporter::FileReporter::new("f.txt");
         let result = process(&mut reader, &mut writer, |mut reader, mut writer| {
             let reported_items = reporter.report_trailing_whitespaces(&mut reader, &mut writer)?;
