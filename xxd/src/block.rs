@@ -110,24 +110,4 @@ impl<'a> fmt::Octal for Block<'a> {
 #[cfg(test)]
 mod tests {
 
-    #[test]
-    fn test_block_fmt_lower_hex() {
-        assert!(false);
-    }
-    #[test]
-    fn test_block_fmt_binary() {
-        assert!(false);
-    }
-    #[test]
-    fn test_block_fmt_octal() {
-        assert!(false);
-    }
-    #[test]
-    fn test_block_fmt_upper_hex() {
-        assert!(false);
-    }
-    #[test]
-    fn test_block_fmt_decimal() {
-        assert!(false);
-    }
 }
