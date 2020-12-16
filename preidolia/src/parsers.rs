@@ -143,22 +143,4 @@ mod tests {
         assert!(r.is_ok());
         assert_eq!(expected, r.unwrap())
     }
-
-    #[test]
-    fn test_parser_function() {
-        // Not Implemented yet
-        assert!(false);
-    }
-
-    #[test]
-    fn test_parser_struct() {
-        // Not Implemented yet
-        assert!(false);
-    }
-
-    #[test]
-    fn test_parser_iterator() {
-        // Not Implemented yet
-        assert!(false);
-    }
 }
