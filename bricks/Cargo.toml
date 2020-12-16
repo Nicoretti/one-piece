@@ -7,13 +7,13 @@ version = "0.1.0"
 edition = "2018"
 
 [dependencies]
+structopt = "0.3.21"
+human-panic = "1.0.3"
+clap = "2.33.*"
 futures = "0.1.26"
 tokio-process = "0.2.3"
 tokio = "0.1.18"
-structopt = "0.2.15"
-clap = "2.33.0"
 failure = "0.1.5"
-human-panic = "1.0.1"
 
 [[bin]]
 name = "trailing"

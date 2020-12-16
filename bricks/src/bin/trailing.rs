@@ -15,7 +15,7 @@ mod cli {
 
     #[derive(structopt::StructOpt, Debug)]
     #[structopt(about = "Remove trailing whitespaces")]
-    #[structopt(raw(setting = "structopt::clap::AppSettings::ColoredHelp"))]
+    #[structopt(setting = structopt::clap::AppSettings::ColoredHelp)]
     pub struct Trailing {
         #[structopt(
             name = "file",

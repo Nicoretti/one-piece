@@ -12,7 +12,7 @@ mod cli {
 
     #[derive(structopt::StructOpt, Debug)]
     #[structopt(about = "Replace tabs with spaces")]
-    #[structopt(raw(setting = "structopt::clap::AppSettings::ColoredHelp"))]
+    #[structopt(setting = structopt::clap::AppSettings::ColoredHelp)]
     pub struct Spaces {
         #[structopt(
             name = "file",
