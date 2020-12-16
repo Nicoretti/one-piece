@@ -1,5 +1,5 @@
 use crate::byte::{Byte, ByteBuilder};
-use crate::{Color, ColorMap, NoColorMap};
+use crate::{ColorMap, NoColorMap};
 use std::fmt;
 
 pub struct Block<'a> {

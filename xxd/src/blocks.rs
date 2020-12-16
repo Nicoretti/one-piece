@@ -1,5 +1,5 @@
 use crate::{Block, NoColorMap};
-use crate::{Color, ColorMap};
+use crate::ColorMap;
 use std::fmt;
 
 pub struct Blocks<'a> {
