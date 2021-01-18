@@ -5,7 +5,7 @@ authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
 edition = "2018"
 readme = "README.md"
 description = "A small crate to simplfy type to bytes encoding"
-repository = "https://github.com/Nicoretti/tobytes"
+repository = "https://github.com/Nicoretti/spica"
 license-file = "LICENSE-MIT"
 keywords = ["bytes", "encoding"]
 
