@@ -33,23 +33,63 @@ pub mod adobe {
     }
 
     #[derive(Debug, Serialize, Deserialize, PartialEq)]
+    pub struct Cmyk {
+        cyan: f32,
+        magenta: f32,
+        yellow: f32,
+        key: f32,
+    }
+
+    impl Cmyk {
+        pub fn new(cyan: f32, magenta: f32, yellow: f32, key: f32) -> Self {
+            Cmyk {
+                cyan,
+                magenta,
+                yellow,
+                key,
+            }
+        }
+    }
+
+    impl ByteView for Cmyk {
+        fn byte_at(&self, index: usize) -> Option<u8> {
+            match index {
+                0 => Some('C' as u8),
+                1 => Some('M' as u8),
+                2 => Some('Y' as u8),
+                3 => Some('K' as u8),
+                4..=7 => Some(self.cyan.to_be_bytes()[index - 4]),
+                8..=11 => Some(self.magenta.to_be_bytes()[index - 8]),
+                12..=15 => Some(self.yellow.to_be_bytes()[index - 12]),
+                16..=19 => Some(self.key.to_be_bytes()[index - 16]),
+                _ => None,
+            }
+        }
+
+        fn byte_size(&self) -> usize {
+            4 + 4 * core::mem::size_of::<f32>()
+        }
+    }
+
+    #[derive(Debug, Serialize, Deserialize, PartialEq)]
+    pub struct Rgb {
+        red: f32,
+        green: f32,
+        blue: f32,
+    }
+
+    #[derive(Debug, Serialize, Deserialize, PartialEq)]
+    pub struct Lab {
+        l: f32,
+        a: f32,
+        b: f32,
+    }
+
+    #[derive(Debug, Serialize, Deserialize, PartialEq)]
     pub enum ColorModel {
-        CMYK {
-            cyan: f32,
-            magenta: f32,
-            yellow: f32,
-            key: f32,
-        },
-        RGB {
-            red: f32,
-            green: f32,
-            blue: f32,
-        },
-        LAB {
-            l: f32,
-            a: f32,
-            b: f32,
-        },
+        CMYK(Cmyk),
+        RGB(Rgb),
+        LAB(Lab),
         Grey(f32),
     }
 
@@ -145,6 +185,7 @@ pub mod adobe {
 mod tests {
 
     use super::adobe::Version;
+    use crate::adobe::Cmyk;
     use tobytes::ToBytes;
 
     #[test]
@@ -152,5 +193,19 @@ mod tests {
         let version = Version::new(10, 1);
         let bytes: Vec<u8> = version.to_bytes().collect();
         assert_eq!(vec![0x00u8, 0x0Au8, 0x00u8, 0x01u8], bytes)
+    }
+
+    #[test]
+    fn cmyk_as_bytes() {
+        let color = Cmyk::new(1.0, 2.0, 3.0, 4.0);
+        let bytes: Vec<u8> = color.to_bytes().collect();
+        assert_eq!(
+            vec![
+                'C' as u8, 'M' as u8, 'Y' as u8, 'K' as u8, 0x00u8, 0x00u8, 0x00u8, 0x01u8, 0x00u8,
+                0x00u8, 0x00u8, 0x02u8, 0x00u8, 0x00u8, 0x00u8, 0x03u8, 0x00u8, 0x00u8, 0x00u8,
+                0x04u8
+            ],
+            bytes
+        )
     }
 }
