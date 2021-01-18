@@ -1,12 +1,35 @@
-use serde::{Deserialize, Serialize};
-
-pub mod Adobe {
+pub mod adobe {
+    use serde::{Deserialize, Serialize};
     use tobytes::ByteView;
 
     #[derive(Debug, Serialize, Deserialize, PartialEq)]
     pub struct Version {
-        major: usize,
-        minor: usize,
+        major: u16,
+        minor: u16,
+    }
+
+    impl Version {
+        pub fn new(major: u16, minor: u16) -> Self {
+            Version { major, minor }
+        }
+    }
+
+    impl ByteView for Version {
+        fn byte_at(&self, index: usize) -> Option<u8> {
+            if index < ByteView::byte_size(self) {
+                match index {
+                    0..=1 => Some(self.major.to_be_bytes()[index]),
+                    2..=3 => Some(self.minor.to_be_bytes()[index - 2]),
+                    _ => None,
+                }
+            } else {
+                None
+            }
+        }
+
+        fn byte_size(&self) -> usize {
+            core::mem::size_of::<u16>() + core::mem::size_of::<u16>()
+        }
     }
 
     #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -50,7 +73,13 @@ pub mod Adobe {
         length: usize,
         name: String,
         color_model: ColorModel,
-        color_type: Type,
+        color_type: ColorType,
+    }
+
+    impl Block {
+        fn size(&self) -> usize {
+            0
+        }
     }
 
     /// Reference: http://www.selapa.net/swatches/colors/fileformats.php#adobe_ase
@@ -71,7 +100,6 @@ pub mod Adobe {
     impl ByteView for AdobeSwatchExchange {
         fn byte_at(&self, index: usize) -> Option<u8> {
             let size = ByteView::byte_size(self);
-            let last_index = size - 1;
             if index < size {
                 match index {
                     // file signature
@@ -87,9 +115,14 @@ pub mod Adobe {
                     10 => Some(0),
                     11 => Some(0),
                     // blocks
-                    12..=last_index => Some(0),
-                    // catch everything else
-                    _ => None,
+                    _ => {
+                        if index < size {
+                            // blocks
+                            Some(0)
+                        } else {
+                            None
+                        }
+                    }
                 }
             } else {
                 None
@@ -100,15 +133,24 @@ pub mod Adobe {
             const FILE_SIGNATURE_SIZE: usize = 4;
             const VERSION_SIZE: usize = 4;
             const BLOCKS_SIZE: usize = 4;
-            FILE_SIGNATURE_SIZE + VERSION_SIZE + BLOCKS_SIZE + self.size_of(&self.blocks)
+            FILE_SIGNATURE_SIZE
+                + VERSION_SIZE
+                + BLOCKS_SIZE
+                + AdobeSwatchExchange::size_of(&self.blocks)
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
+
+    use super::adobe::Version;
+    use tobytes::ToBytes;
+
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    fn version_as_bytes() {
+        let version = Version::new(10, 1);
+        let bytes: Vec<u8> = version.to_bytes().collect();
+        assert_eq!(vec![0x00u8, 0x0Au8, 0x00u8, 0x01u8], bytes)
     }
 }
