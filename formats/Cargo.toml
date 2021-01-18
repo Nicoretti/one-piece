@@ -1,0 +1,13 @@
+[package]
+name = "formats"
+version = "0.1.0"
+authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = { version = "1.0.105", features = ["derive"]}
+serde_json = "1.0.51"
+nom = "6.0.1"
+tobytes = {path = "../tobytes"}

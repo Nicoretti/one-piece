@@ -5,4 +5,5 @@ members = [
     "tobytes",
     "preidolia",
     "bricks",
+    "formats",
 ]
