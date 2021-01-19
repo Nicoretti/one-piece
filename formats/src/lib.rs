@@ -1,7 +1,7 @@
 pub mod adobe {
     use nom::AsBytes;
     use serde::{Deserialize, Serialize};
-    use tobytes::{ByteView, ToBytes};
+    use tobytes::{ByteView, Bytes, ToBytes};
 
     #[derive(Debug, Serialize, Deserialize, PartialEq)]
     pub struct Version {
@@ -11,29 +11,27 @@ pub mod adobe {
 
     impl Version {
         pub fn new(major: u16, minor: u16) -> Self {
-            Version { major, minor }
+            Self { major, minor }
         }
     }
 
     impl ByteView for Version {
         fn byte_at(&self, index: usize) -> Option<u8> {
-            if index < ByteView::byte_size(self) {
-                match index {
-                    0..=1 => Some(self.major.to_be_bytes()[index]),
-                    2..=3 => Some(self.minor.to_be_bytes()[index - 2]),
-                    _ => None,
-                }
-            } else {
-                None
-            }
+            self.major
+                .to_be_bytes()
+                .iter()
+                .chain(self.minor.to_be_bytes().iter())
+                .skip(index)
+                .next()
+                .cloned()
         }
 
         fn byte_size(&self) -> usize {
-            core::mem::size_of::<u16>() + core::mem::size_of::<u16>()
+            ToBytes::to_bytes(self).count()
         }
     }
 
-    #[derive(Debug, Serialize, Deserialize, PartialEq)]
+    #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
     pub struct Cmyk {
         cyan: f32,
         magenta: f32,
@@ -43,7 +41,7 @@ pub mod adobe {
 
     impl Cmyk {
         pub fn new(cyan: f32, magenta: f32, yellow: f32, key: f32) -> Self {
-            Cmyk {
+            Self {
                 cyan,
                 magenta,
                 yellow,
@@ -54,113 +52,125 @@ pub mod adobe {
 
     impl ByteView for Cmyk {
         fn byte_at(&self, index: usize) -> Option<u8> {
-            match index {
-                0 => Some('C' as u8),
-                1 => Some('M' as u8),
-                2 => Some('Y' as u8),
-                3 => Some('K' as u8),
-                4..=7 => Some(self.cyan.to_be_bytes()[index - 4]),
-                8..=11 => Some(self.magenta.to_be_bytes()[index - 8]),
-                12..=15 => Some(self.yellow.to_be_bytes()[index - 12]),
-                16..=19 => Some(self.key.to_be_bytes()[index - 16]),
-                _ => None,
-            }
+            ['C' as u8, 'M' as u8, 'Y' as u8, 'K' as u8]
+                .iter()
+                .chain(self.cyan.to_be_bytes().to_owned().iter())
+                .chain(self.magenta.to_be_bytes().iter())
+                .chain(self.yellow.to_be_bytes().iter())
+                .chain(self.key.to_be_bytes().iter())
+                .skip(index)
+                .next()
+                .cloned()
         }
 
         fn byte_size(&self) -> usize {
-            4 + 4 * core::mem::size_of::<f32>()
+            ToBytes::to_bytes(self).count()
         }
     }
 
-    #[derive(Debug, Serialize, Deserialize, PartialEq)]
+    #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
     pub struct Rgb {
         red: f32,
         green: f32,
         blue: f32,
     }
 
-    impl ByteView for Rgb {
-        fn byte_at(&self, index: usize) -> Option<u8> {
-            match index {
-                0 => Some('R' as u8),
-                1 => Some('G' as u8),
-                2 => Some('B' as u8),
-                3 => Some(0u8),
-                4..=7 => Some(self.red.to_be_bytes()[index - 4]),
-                8..=11 => Some(self.green.to_be_bytes()[index - 8]),
-                12..=15 => Some(self.blue.to_be_bytes()[index - 12]),
-                _ => None,
-            }
-        }
-
-        fn byte_size(&self) -> usize {
-            4 + 3 * core::mem::size_of::<f32>()
+    impl Rgb {
+        pub fn new(red: f32, green: f32, blue: f32) -> Self {
+            Self { red, green, blue }
         }
     }
 
-    #[derive(Debug, Serialize, Deserialize, PartialEq)]
+    impl ByteView for Rgb {
+        fn byte_at(&self, index: usize) -> Option<u8> {
+            ['R' as u8, 'G' as u8, 'B' as u8, 0u8]
+                .iter()
+                .chain(self.red.to_be_bytes().to_owned().iter())
+                .chain(self.green.to_be_bytes().iter())
+                .chain(self.blue.to_be_bytes().iter())
+                .skip(index)
+                .next()
+                .cloned()
+        }
+
+        fn byte_size(&self) -> usize {
+            ToBytes::to_bytes(self).count()
+        }
+    }
+
+    #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
     pub struct Lab {
         l: f32,
         a: f32,
         b: f32,
     }
 
-    impl ByteView for Lab {
-        fn byte_at(&self, index: usize) -> Option<u8> {
-            match index {
-                0 => Some('L' as u8),
-                1 => Some('A' as u8),
-                2 => Some('B' as u8),
-                3 => Some(0u8),
-                4..=7 => Some(self.l.to_be_bytes()[index - 4]),
-                8..=11 => Some(self.a.to_be_bytes()[index - 8]),
-                12..=15 => Some(self.b.to_be_bytes()[index - 12]),
-                _ => None,
-            }
-        }
-
-        fn byte_size(&self) -> usize {
-            4 + 3 * core::mem::size_of::<f32>()
+    impl Lab {
+        pub fn new(l: f32, a: f32, b: f32) -> Self {
+            Self { l, a, b }
         }
     }
 
-    #[derive(Debug, Serialize, Deserialize, PartialEq)]
+    impl ByteView for Lab {
+        fn byte_at(&self, index: usize) -> Option<u8> {
+            ['L' as u8, 'A' as u8, 'B' as u8, 0u8]
+                .iter()
+                .chain(self.l.to_be_bytes().to_owned().iter())
+                .chain(self.a.to_be_bytes().iter())
+                .chain(self.b.to_be_bytes().iter())
+                .skip(index)
+                .next()
+                .cloned()
+        }
+
+        fn byte_size(&self) -> usize {
+            ToBytes::to_bytes(self).count()
+        }
+    }
+
+    #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
     pub struct Grey {
         grey: f32,
     }
 
-    impl ByteView for Grey {
-        fn byte_at(&self, index: usize) -> Option<u8> {
-            match index {
-                0 => Some('G' as u8),
-                1 => Some('R' as u8),
-                2 => Some('E' as u8),
-                3 => Some('Y' as u8),
-                4..=7 => Some(self.grey.to_be_bytes()[index - 4]),
-                _ => None,
-            }
-        }
-
-        fn byte_size(&self) -> usize {
-            4 + core::mem::size_of::<f32>()
+    impl Grey {
+        pub fn new(grey: f32) -> Self {
+            Self { grey }
         }
     }
 
-    #[derive(Debug, Serialize, Deserialize, PartialEq)]
+    impl ByteView for Grey {
+        fn byte_at(&self, index: usize) -> Option<u8> {
+            ['G' as u8, 'R' as u8, 'E' as u8, 'Y' as u8]
+                .iter()
+                .chain(self.grey.to_be_bytes().to_owned().iter())
+                .skip(index)
+                .next()
+                .cloned()
+        }
+
+        fn byte_size(&self) -> usize {
+            ToBytes::to_bytes(self).count()
+        }
+    }
+
+    #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
     pub enum ColorModel {
         CMYK(Cmyk),
         RGB(Rgb),
         LAB(Lab),
-        Grey(f32),
+        GREY(Grey),
     }
 
+    // TODO: consider moving the prefix information 'CMYK', 'RGB', ... into
+    //       this structre and keep only the color information bit in the struct(s) Cmyk, Rgb, ..
     impl ByteView for ColorModel {
         fn byte_at(&self, index: usize) -> Option<u8> {
             match self {
                 ColorModel::CMYK(cmyk) => cmyk.byte_at(index),
                 ColorModel::RGB(rgb) => rgb.byte_at(index),
                 ColorModel::LAB(lab) => lab.byte_at(index),
-                ColorModel::Grey(grey) => grey.byte_at(index),
+                ColorModel::GREY(grey) => grey.byte_at(index),
             }
         }
 
@@ -169,12 +179,12 @@ pub mod adobe {
                 ColorModel::CMYK(cmyk) => cmyk.byte_size(),
                 ColorModel::RGB(rgb) => rgb.byte_size(),
                 ColorModel::LAB(lab) => lab.byte_size(),
-                ColorModel::Grey(grey) => grey.byte_size(),
+                ColorModel::GREY(grey) => grey.byte_size(),
             }
         }
     }
 
-    #[derive(Debug, Serialize, Deserialize, PartialEq)]
+    #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
     pub enum ColorType {
         Global,
         Spot,
@@ -183,23 +193,24 @@ pub mod adobe {
 
     impl ByteView for ColorType {
         fn byte_at(&self, index: usize) -> Option<u8> {
-            let value: u16 = match self {
-                ColorType::Global => 0,
-                ColorType::Spot => 1,
-                ColorType::Normal => 2,
-            };
-            match index {
-                0..=1 => Some(value.to_be_bytes()[index]),
-                _ => None,
+            match self {
+                ColorType::Global => 0u16,
+                ColorType::Spot => 1u16,
+                ColorType::Normal => 2u16,
             }
+            .to_be_bytes()
+            .iter()
+            .skip(index)
+            .next()
+            .cloned()
         }
 
         fn byte_size(&self) -> usize {
-            core::mem::size_of::<u16>()
+            ToBytes::to_bytes(self).count()
         }
     }
 
-    #[derive(Debug, Serialize, Deserialize, PartialEq)]
+    #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
     pub enum BlockType {
         GroupStart,
         GroupEnd,
@@ -208,29 +219,48 @@ pub mod adobe {
 
     impl ByteView for BlockType {
         fn byte_at(&self, index: usize) -> Option<u8> {
-            let value: u16 = match self {
-                BlockType::GroupStart => 0xc001,
-                BlockType::GroupEnd => 0xc002,
-                BlockType::ColorEntry => 0x0001,
-            };
-            match index {
-                0..=1 => Some(value.to_be_bytes()[index]),
-                _ => None,
+            match self {
+                BlockType::GroupStart => 0xc001u16,
+                BlockType::GroupEnd => 0xc002u16,
+                BlockType::ColorEntry => 0x0001u16,
             }
+            .to_be_bytes()
+            .iter()
+            .skip(index)
+            .next()
+            .cloned()
         }
 
         fn byte_size(&self) -> usize {
-            core::mem::size_of::<u16>()
+            ToBytes::to_bytes(self).count()
         }
     }
 
     #[derive(Debug, Serialize, Deserialize, PartialEq)]
     pub struct Block {
         block_type: BlockType,
-        length: usize,
+        length: u32,
         name: String,
         color_model: ColorModel,
         color_type: ColorType,
+    }
+
+    impl Block {
+        pub fn new(
+            block_type: BlockType,
+            length: u32,
+            name: &str,
+            color_model: ColorModel,
+            color_type: ColorType,
+        ) -> Self {
+            Self {
+                block_type,
+                length,
+                name: String::from(name),
+                color_model,
+                color_type,
+            }
+        }
     }
 
     impl ByteView for Block {
@@ -238,6 +268,7 @@ pub mod adobe {
             self.block_type
                 .to_bytes()
                 .chain(self.length.to_be_bytes().iter().cloned())
+                .chain((self.name.len() as u32).to_be_bytes().iter().cloned())
                 .chain(self.name.as_bytes().iter().cloned())
                 .chain(std::iter::once(0u8))
                 .chain(self.color_model.to_bytes())
@@ -247,11 +278,7 @@ pub mod adobe {
         }
 
         fn byte_size(&self) -> usize {
-            self.block_type.byte_size()
-                + core::mem::size_of::<u32>()
-                + (self.name.as_bytes().len() + 1)
-                + self.color_model.byte_size()
-                + self.color_type.byte_size()
+            ToBytes::to_bytes(self).count()
         }
     }
 
@@ -260,6 +287,12 @@ pub mod adobe {
     pub struct AdobeSwatchExchange {
         version: Version,
         blocks: Vec<Block>,
+    }
+
+    impl AdobeSwatchExchange {
+        pub fn new(version: Version, blocks: Vec<Block>) -> Self {
+            Self { version, blocks }
+        }
     }
 
     impl AdobeSwatchExchange {
@@ -277,20 +310,14 @@ pub mod adobe {
                 .iter()
                 .cloned()
                 .chain(self.version.to_bytes())
-                .chain(self.blocks.len().to_be_bytes().iter().cloned())
+                .chain((self.blocks.len() as u32).to_be_bytes().iter().cloned())
                 .chain(self.blocks.iter().map(|block| block.to_bytes()).flatten())
                 .skip(index)
                 .next()
         }
 
         fn byte_size(&self) -> usize {
-            const FILE_SIGNATURE_SIZE: usize = 4;
-            const VERSION_SIZE: usize = 4;
-            const BLOCKS_SIZE: usize = 4;
-            FILE_SIGNATURE_SIZE
-                + VERSION_SIZE
-                + BLOCKS_SIZE
-                + AdobeSwatchExchange::size_of(&self.blocks)
+            ToBytes::to_bytes(self).count()
         }
     }
 }
@@ -299,6 +326,11 @@ pub mod adobe {
 mod tests {
 
     use super::adobe::Version;
+    use crate::adobe::Rgb;
+    use crate::adobe::{AdobeSwatchExchange, Block};
+    use crate::adobe::{BlockType, Lab};
+    use crate::adobe::{Cmyk, ColorModel};
+    use crate::adobe::{ColorType, Grey};
     use tobytes::ToBytes;
 
     #[test]
@@ -310,55 +342,231 @@ mod tests {
 
     #[test]
     fn Cmyk_as_bytes() {
-        // Todo: Implement
-        assert!(false)
+        let c: f32 = 100.0;
+        let m: f32 = 200.0;
+        let y: f32 = 300.0;
+        let k: f32 = 10.0;
+        let mut expected: Vec<u8> = vec!['C' as u8, 'M' as u8, 'Y' as u8, 'K' as u8];
+        expected.extend(c.to_be_bytes().iter());
+        expected.extend(m.to_be_bytes().iter());
+        expected.extend(y.to_be_bytes().iter());
+        expected.extend(k.to_be_bytes().iter());
+
+        let cmyk = Cmyk::new(c, m, y, k);
+        let bytes: Vec<u8> = cmyk.to_bytes().collect();
+
+        assert_eq!(expected, bytes)
     }
 
     #[test]
     fn Rgb_as_bytes() {
-        // Todo: Implement
-        assert!(false)
+        let r: f32 = 100.0;
+        let g: f32 = 200.0;
+        let b: f32 = 240.0;
+        let mut expected: Vec<u8> = vec!['R' as u8, 'G' as u8, 'B' as u8, 0x00];
+        expected.extend(r.to_be_bytes().iter());
+        expected.extend(g.to_be_bytes().iter());
+        expected.extend(b.to_be_bytes().iter());
+
+        let rgb = Rgb::new(r, g, b);
+        let bytes: Vec<u8> = rgb.to_bytes().collect();
+
+        assert_eq!(expected, bytes)
     }
 
     #[test]
     fn Lab_as_bytes() {
-        // Todo: Implement
-        assert!(false)
+        let l: f32 = 100.0;
+        let a: f32 = 200.0;
+        let b: f32 = 240.0;
+        let mut expected: Vec<u8> = vec!['L' as u8, 'A' as u8, 'B' as u8, 0x00];
+        expected.extend(l.to_be_bytes().iter());
+        expected.extend(a.to_be_bytes().iter());
+        expected.extend(b.to_be_bytes().iter());
+
+        let lab = Lab::new(l, a, b);
+        let bytes: Vec<u8> = lab.to_bytes().collect();
+
+        assert_eq!(expected, bytes)
     }
 
     #[test]
     fn Grey_as_bytes() {
-        // Todo: Implement
-        assert!(false)
+        let g: f32 = 100.0;
+        let mut expected: Vec<u8> = vec!['G' as u8, 'R' as u8, 'E' as u8, 'Y' as u8];
+        expected.extend(g.to_be_bytes().iter());
+
+        let grey = Grey::new(g);
+        let bytes: Vec<u8> = grey.to_bytes().collect();
+
+        assert_eq!(expected, bytes)
     }
 
     #[test]
     fn ColorModel_as_bytes() {
-        // Todo: Implement
-        assert!(false)
+        {
+            let c: f32 = 100.0;
+            let m: f32 = 200.0;
+            let y: f32 = 300.0;
+            let k: f32 = 10.0;
+            let mut expected: Vec<u8> = vec!['C' as u8, 'M' as u8, 'Y' as u8, 'K' as u8];
+            expected.extend(c.to_be_bytes().iter());
+            expected.extend(m.to_be_bytes().iter());
+            expected.extend(y.to_be_bytes().iter());
+            expected.extend(k.to_be_bytes().iter());
+
+            let cmyk = ColorModel::CMYK(Cmyk::new(c, m, y, k));
+            let bytes: Vec<u8> = cmyk.to_bytes().collect();
+
+            assert_eq!(expected, bytes)
+        }
+        {
+            let r: f32 = 100.0;
+            let g: f32 = 200.0;
+            let b: f32 = 240.0;
+            let mut expected: Vec<u8> = vec!['R' as u8, 'G' as u8, 'B' as u8, 0x00];
+            expected.extend(r.to_be_bytes().iter());
+            expected.extend(g.to_be_bytes().iter());
+            expected.extend(b.to_be_bytes().iter());
+
+            let rgb = ColorModel::RGB(Rgb::new(r, g, b));
+            let bytes: Vec<u8> = rgb.to_bytes().collect();
+
+            assert_eq!(expected, bytes)
+        }
+        {
+            let l: f32 = 100.0;
+            let a: f32 = 200.0;
+            let b: f32 = 240.0;
+            let mut expected: Vec<u8> = vec!['L' as u8, 'A' as u8, 'B' as u8, 0x00];
+            expected.extend(l.to_be_bytes().iter());
+            expected.extend(a.to_be_bytes().iter());
+            expected.extend(b.to_be_bytes().iter());
+
+            let lab = ColorModel::LAB(Lab::new(l, a, b));
+            let bytes: Vec<u8> = lab.to_bytes().collect();
+
+            assert_eq!(expected, bytes)
+        }
+        {
+            let g: f32 = 100.0;
+            let mut expected: Vec<u8> = vec!['G' as u8, 'R' as u8, 'E' as u8, 'Y' as u8];
+            expected.extend(g.to_be_bytes().iter());
+
+            let grey = ColorModel::GREY(Grey::new(g));
+            let bytes: Vec<u8> = grey.to_bytes().collect();
+
+            assert_eq!(expected, bytes)
+        }
     }
 
     #[test]
     fn ColorType_as_bytes() {
-        // Todo: Implement
-        assert!(false)
+        {
+            let mut expected: Vec<u8> = vec![0x00, 0x00];
+            let c_type = ColorType::Global;
+            let bytes: Vec<u8> = c_type.to_bytes().collect();
+            assert_eq!(expected, bytes)
+        }
+        {
+            let mut expected: Vec<u8> = vec![0x00, 0x01];
+            let c_type = ColorType::Spot;
+            let bytes: Vec<u8> = c_type.to_bytes().collect();
+            assert_eq!(expected, bytes)
+        }
+        {
+            let mut expected: Vec<u8> = vec![0x00, 0x02];
+            let c_type = ColorType::Normal;
+            let bytes: Vec<u8> = c_type.to_bytes().collect();
+            assert_eq!(expected, bytes)
+        }
     }
 
     #[test]
     fn BlockType_as_bytes() {
-        // Todo: Implement
-        assert!(false)
+        {
+            let mut expected: Vec<u8> = vec![0xc0, 0x01];
+            let b_type = BlockType::GroupStart;
+            let bytes: Vec<u8> = b_type.to_bytes().collect();
+            assert_eq!(expected, bytes)
+        }
+        {
+            let mut expected: Vec<u8> = vec![0xc0, 0x02];
+            let b_type = BlockType::GroupEnd;
+            let bytes: Vec<u8> = b_type.to_bytes().collect();
+            assert_eq!(expected, bytes)
+        }
+        {
+            let mut expected: Vec<u8> = vec![0x00, 0x01];
+            let b_type = BlockType::ColorEntry;
+            let bytes: Vec<u8> = b_type.to_bytes().collect();
+            assert_eq!(expected, bytes)
+        }
     }
 
     #[test]
     fn Block_as_bytes() {
-        // Todo: Implement
-        assert!(false)
+        let block_type = BlockType::ColorEntry;
+        let length = 1u32;
+        let name = "myname";
+        let color_model = ColorModel::GREY(Grey::new(10.0));
+        let color_type = ColorType::Normal;
+
+        let mut expected: Vec<u8> = vec![];
+        expected.extend(
+            block_type.to_bytes().chain(
+                length
+                    .to_be_bytes()
+                    .iter()
+                    .cloned()
+                    .chain((name.len() as u32).to_be_bytes().iter().cloned())
+                    .chain(name.as_bytes().iter().cloned())
+                    .chain(std::iter::once(0u8))
+                    .chain(color_model.to_bytes())
+                    .chain(color_type.to_bytes()),
+            ),
+        );
+        let block = Block::new(block_type, length, name, color_model, color_type);
+
+        let bytes: Vec<u8> = block.to_bytes().collect();
+        assert_eq!(expected, bytes)
     }
 
     #[test]
     fn AdobeSwatchExchange_as_bytes() {
-        // Todo: Implement
-        assert!(false)
+        let version = Version::new(1, 0);
+        let block_type = BlockType::ColorEntry;
+        let length = 1u32;
+        let name = "myname";
+        let color_model = ColorModel::GREY(Grey::new(10.0));
+        let color_type = ColorType::Normal;
+        let block = Block::new(
+            block_type.clone(),
+            length,
+            name,
+            color_model.clone(),
+            color_type.clone(),
+        );
+        let blocks = vec![Block::new(
+            block_type,
+            length,
+            name,
+            color_model,
+            color_type,
+        )];
+        let ase = AdobeSwatchExchange::new(Version::new(1, 0), blocks);
+
+        let mut expected: Vec<u8> = vec![];
+        expected.extend(
+            [0x41u8, 0x53u8, 0x45u8, 0x46u8]
+                .iter()
+                .cloned()
+                .chain(version.to_bytes())
+                .chain((1u32).to_be_bytes().iter().cloned())
+                .chain(block.to_bytes()),
+        );
+
+        let bytes: Vec<u8> = ase.to_bytes().collect();
+        assert_eq!(expected, bytes)
     }
 }
