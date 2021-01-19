@@ -1,6 +1,7 @@
 pub mod adobe {
+    use nom::AsBytes;
     use serde::{Deserialize, Serialize};
-    use tobytes::ByteView;
+    use tobytes::{ByteView, ToBytes};
 
     #[derive(Debug, Serialize, Deserialize, PartialEq)]
     pub struct Version {
@@ -78,11 +79,71 @@ pub mod adobe {
         blue: f32,
     }
 
+    impl ByteView for Rgb {
+        fn byte_at(&self, index: usize) -> Option<u8> {
+            match index {
+                0 => Some('R' as u8),
+                1 => Some('G' as u8),
+                2 => Some('B' as u8),
+                3 => Some(0u8),
+                4..=7 => Some(self.red.to_be_bytes()[index - 4]),
+                8..=11 => Some(self.green.to_be_bytes()[index - 8]),
+                12..=15 => Some(self.blue.to_be_bytes()[index - 12]),
+                _ => None,
+            }
+        }
+
+        fn byte_size(&self) -> usize {
+            4 + 3 * core::mem::size_of::<f32>()
+        }
+    }
+
     #[derive(Debug, Serialize, Deserialize, PartialEq)]
     pub struct Lab {
         l: f32,
         a: f32,
         b: f32,
+    }
+
+    impl ByteView for Lab {
+        fn byte_at(&self, index: usize) -> Option<u8> {
+            match index {
+                0 => Some('L' as u8),
+                1 => Some('A' as u8),
+                2 => Some('B' as u8),
+                3 => Some(0u8),
+                4..=7 => Some(self.l.to_be_bytes()[index - 4]),
+                8..=11 => Some(self.a.to_be_bytes()[index - 8]),
+                12..=15 => Some(self.b.to_be_bytes()[index - 12]),
+                _ => None,
+            }
+        }
+
+        fn byte_size(&self) -> usize {
+            4 + 3 * core::mem::size_of::<f32>()
+        }
+    }
+
+    #[derive(Debug, Serialize, Deserialize, PartialEq)]
+    pub struct Grey {
+        grey: f32,
+    }
+
+    impl ByteView for Grey {
+        fn byte_at(&self, index: usize) -> Option<u8> {
+            match index {
+                0 => Some('G' as u8),
+                1 => Some('R' as u8),
+                2 => Some('E' as u8),
+                3 => Some('Y' as u8),
+                4..=7 => Some(self.grey.to_be_bytes()[index - 4]),
+                _ => None,
+            }
+        }
+
+        fn byte_size(&self) -> usize {
+            4 + core::mem::size_of::<f32>()
+        }
     }
 
     #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -93,6 +154,26 @@ pub mod adobe {
         Grey(f32),
     }
 
+    impl ByteView for ColorModel {
+        fn byte_at(&self, index: usize) -> Option<u8> {
+            match self {
+                ColorModel::CMYK(cmyk) => cmyk.byte_at(index),
+                ColorModel::RGB(rgb) => rgb.byte_at(index),
+                ColorModel::LAB(lab) => lab.byte_at(index),
+                ColorModel::Grey(grey) => grey.byte_at(index),
+            }
+        }
+
+        fn byte_size(&self) -> usize {
+            match self {
+                ColorModel::CMYK(cmyk) => cmyk.byte_size(),
+                ColorModel::RGB(rgb) => rgb.byte_size(),
+                ColorModel::LAB(lab) => lab.byte_size(),
+                ColorModel::Grey(grey) => grey.byte_size(),
+            }
+        }
+    }
+
     #[derive(Debug, Serialize, Deserialize, PartialEq)]
     pub enum ColorType {
         Global,
@@ -100,11 +181,47 @@ pub mod adobe {
         Normal,
     }
 
+    impl ByteView for ColorType {
+        fn byte_at(&self, index: usize) -> Option<u8> {
+            let value: u16 = match self {
+                ColorType::Global => 0,
+                ColorType::Spot => 1,
+                ColorType::Normal => 2,
+            };
+            match index {
+                0..=1 => Some(value.to_be_bytes()[index]),
+                _ => None,
+            }
+        }
+
+        fn byte_size(&self) -> usize {
+            core::mem::size_of::<u16>()
+        }
+    }
+
     #[derive(Debug, Serialize, Deserialize, PartialEq)]
     pub enum BlockType {
         GroupStart,
         GroupEnd,
         ColorEntry,
+    }
+
+    impl ByteView for BlockType {
+        fn byte_at(&self, index: usize) -> Option<u8> {
+            let value: u16 = match self {
+                BlockType::GroupStart => 0xc001,
+                BlockType::GroupEnd => 0xc002,
+                BlockType::ColorEntry => 0x0001,
+            };
+            match index {
+                0..=1 => Some(value.to_be_bytes()[index]),
+                _ => None,
+            }
+        }
+
+        fn byte_size(&self) -> usize {
+            core::mem::size_of::<u16>()
+        }
     }
 
     #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -116,9 +233,25 @@ pub mod adobe {
         color_type: ColorType,
     }
 
-    impl Block {
-        fn size(&self) -> usize {
-            0
+    impl ByteView for Block {
+        fn byte_at(&self, index: usize) -> Option<u8> {
+            self.block_type
+                .to_bytes()
+                .chain(self.length.to_be_bytes().iter().cloned())
+                .chain(self.name.as_bytes().iter().cloned())
+                .chain(std::iter::once(0u8))
+                .chain(self.color_model.to_bytes())
+                .chain(self.color_type.to_bytes())
+                .skip(index)
+                .next()
+        }
+
+        fn byte_size(&self) -> usize {
+            self.block_type.byte_size()
+                + core::mem::size_of::<u32>()
+                + (self.name.as_bytes().len() + 1)
+                + self.color_model.byte_size()
+                + self.color_type.byte_size()
         }
     }
 
@@ -133,40 +266,21 @@ pub mod adobe {
         const FILE_SIGNATURE: [u8; 4] = [0x41, 0x53, 0x45, 0x46];
 
         fn size_of(blocks: &[Block]) -> usize {
-            blocks.into_iter().map(|block| block.size()).sum()
+            blocks.into_iter().map(|block| block.byte_size()).sum()
         }
     }
 
     impl ByteView for AdobeSwatchExchange {
         fn byte_at(&self, index: usize) -> Option<u8> {
-            let size = ByteView::byte_size(self);
-            if index < size {
-                match index {
-                    // file signature
-                    0..=3 => Some(AdobeSwatchExchange::FILE_SIGNATURE[index]),
-                    // version
-                    4 => Some(0),
-                    5 => Some(0),
-                    6 => Some(0),
-                    7 => Some(0),
-                    // blocks size
-                    8 => Some(0),
-                    9 => Some(0),
-                    10 => Some(0),
-                    11 => Some(0),
-                    // blocks
-                    _ => {
-                        if index < size {
-                            // blocks
-                            Some(0)
-                        } else {
-                            None
-                        }
-                    }
-                }
-            } else {
-                None
-            }
+            AdobeSwatchExchange::FILE_SIGNATURE
+                .as_bytes()
+                .iter()
+                .cloned()
+                .chain(self.version.to_bytes())
+                .chain(self.blocks.len().to_be_bytes().iter().cloned())
+                .chain(self.blocks.iter().map(|block| block.to_bytes()).flatten())
+                .skip(index)
+                .next()
         }
 
         fn byte_size(&self) -> usize {
@@ -185,7 +299,6 @@ pub mod adobe {
 mod tests {
 
     use super::adobe::Version;
-    use crate::adobe::Cmyk;
     use tobytes::ToBytes;
 
     #[test]
@@ -196,16 +309,56 @@ mod tests {
     }
 
     #[test]
-    fn cmyk_as_bytes() {
-        let color = Cmyk::new(1.0, 2.0, 3.0, 4.0);
-        let bytes: Vec<u8> = color.to_bytes().collect();
-        assert_eq!(
-            vec![
-                'C' as u8, 'M' as u8, 'Y' as u8, 'K' as u8, 0x00u8, 0x00u8, 0x00u8, 0x01u8, 0x00u8,
-                0x00u8, 0x00u8, 0x02u8, 0x00u8, 0x00u8, 0x00u8, 0x03u8, 0x00u8, 0x00u8, 0x00u8,
-                0x04u8
-            ],
-            bytes
-        )
+    fn Cmyk_as_bytes() {
+        // Todo: Implement
+        assert!(false)
+    }
+
+    #[test]
+    fn Rgb_as_bytes() {
+        // Todo: Implement
+        assert!(false)
+    }
+
+    #[test]
+    fn Lab_as_bytes() {
+        // Todo: Implement
+        assert!(false)
+    }
+
+    #[test]
+    fn Grey_as_bytes() {
+        // Todo: Implement
+        assert!(false)
+    }
+
+    #[test]
+    fn ColorModel_as_bytes() {
+        // Todo: Implement
+        assert!(false)
+    }
+
+    #[test]
+    fn ColorType_as_bytes() {
+        // Todo: Implement
+        assert!(false)
+    }
+
+    #[test]
+    fn BlockType_as_bytes() {
+        // Todo: Implement
+        assert!(false)
+    }
+
+    #[test]
+    fn Block_as_bytes() {
+        // Todo: Implement
+        assert!(false)
+    }
+
+    #[test]
+    fn AdobeSwatchExchange_as_bytes() {
+        // Todo: Implement
+        assert!(false)
     }
 }
