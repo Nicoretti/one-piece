@@ -356,7 +356,7 @@ mod tests {
     }
 
     #[test]
-    fn Cmyk_as_bytes() {
+    fn cmyk_as_bytes() {
         let c: f32 = 100.0;
         let m: f32 = 200.0;
         let y: f32 = 300.0;
@@ -374,7 +374,7 @@ mod tests {
     }
 
     #[test]
-    fn Rgb_as_bytes() {
+    fn rgb_as_bytes() {
         let r: f32 = 100.0;
         let g: f32 = 200.0;
         let b: f32 = 240.0;
@@ -390,7 +390,7 @@ mod tests {
     }
 
     #[test]
-    fn Lab_as_bytes() {
+    fn lab_as_bytes() {
         let l: f32 = 100.0;
         let a: f32 = 200.0;
         let b: f32 = 240.0;
@@ -406,7 +406,7 @@ mod tests {
     }
 
     #[test]
-    fn Grey_as_bytes() {
+    fn grey_as_bytes() {
         let g: f32 = 100.0;
         let mut expected: Vec<u8> = vec![];
         expected.extend(g.to_be_bytes().iter());
@@ -418,7 +418,7 @@ mod tests {
     }
 
     #[test]
-    fn ColorModel_as_bytes() {
+    fn colormodel_as_bytes() {
         {
             let c: f32 = 100.0;
             let m: f32 = 200.0;
@@ -476,7 +476,7 @@ mod tests {
     }
 
     #[test]
-    fn ColorType_as_bytes() {
+    fn colortype_as_bytes() {
         {
             let expected: Vec<u8> = vec![0x00, 0x00];
             let c_type = ColorType::Global;
@@ -498,7 +498,7 @@ mod tests {
     }
 
     #[test]
-    fn BlockType_as_bytes() {
+    fn blocktype_as_bytes() {
         {
             let expected: Vec<u8> = vec![0xc0, 0x01];
             let b_type = BlockType::GroupStart;
@@ -520,7 +520,7 @@ mod tests {
     }
 
     #[test]
-    fn Block_as_bytes() {
+    fn block_as_bytes() {
         let block_type = BlockType::ColorEntry;
         let length = 1u32;
         let name = "myname";
@@ -548,7 +548,7 @@ mod tests {
     }
 
     #[test]
-    fn AdobeSwatchExchange_as_bytes() {
+    fn adobeswatchexchange_as_bytes() {
         let version = Version::new(1, 0);
         let block_type = BlockType::ColorEntry;
         let length = 1u32;
