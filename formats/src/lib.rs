@@ -267,11 +267,17 @@ pub mod adobe {
     impl Block {
         pub fn new(
             block_type: BlockType,
-            length: u32,
             name: &str,
             color_model: ColorModel,
             color_type: ColorType,
         ) -> Self {
+            let length = match block_type {
+                BlockType::GroupStart => name.len() + 2,
+                BlockType::ColorEntry => {
+                    name.len() + 2 + color_model.byte_size() + color_type.byte_size()
+                }
+                BlockType::GroupEnd => 0,
+            } as u32;
             Self {
                 block_type,
                 length,
@@ -289,6 +295,7 @@ pub mod adobe {
                 .chain(self.length.to_be_bytes().iter().cloned())
                 .chain((self.name.len() as u32).to_be_bytes().iter().cloned())
                 .chain(self.name.as_bytes().iter().cloned())
+                .chain(std::iter::once(0u8))
                 .chain(std::iter::once(0u8))
                 .chain(self.color_model.to_bytes())
                 .chain(self.color_type.to_bytes())
@@ -346,7 +353,7 @@ mod tests {
     use crate::adobe::{BlockType, Lab};
     use crate::adobe::{Cmyk, ColorModel};
     use crate::adobe::{ColorType, Grey};
-    use tobytes::ToBytes;
+    use tobytes::{ByteView, ToBytes};
 
     #[test]
     fn version_as_bytes() {
@@ -522,10 +529,10 @@ mod tests {
     #[test]
     fn block_as_bytes() {
         let block_type = BlockType::ColorEntry;
-        let length = 1u32;
         let name = "myname";
         let color_model = ColorModel::GREY(Grey::new(10.0));
         let color_type = ColorType::Normal;
+        let length = (name.len() + 2 + 8 + 2) as u32;
 
         let mut expected: Vec<u8> = vec![];
         expected.extend(
@@ -537,11 +544,12 @@ mod tests {
                     .chain((name.len() as u32).to_be_bytes().iter().cloned())
                     .chain(name.as_bytes().iter().cloned())
                     .chain(std::iter::once(0u8))
+                    .chain(std::iter::once(0u8))
                     .chain(color_model.to_bytes())
                     .chain(color_type.to_bytes()),
             ),
         );
-        let block = Block::new(block_type, length, name, color_model, color_type);
+        let block = Block::new(block_type, name, color_model, color_type);
 
         let bytes: Vec<u8> = block.to_bytes().collect();
         assert_eq!(expected, bytes)
@@ -557,18 +565,11 @@ mod tests {
         let color_type = ColorType::Normal;
         let block = Block::new(
             block_type.clone(),
-            length,
             name,
             color_model.clone(),
             color_type.clone(),
         );
-        let blocks = vec![Block::new(
-            block_type,
-            length,
-            name,
-            color_model,
-            color_type,
-        )];
+        let blocks = vec![Block::new(block_type, name, color_model, color_type)];
         let ase = AdobeSwatchExchange::new(Version::new(1, 0), blocks);
 
         let mut expected: Vec<u8> = vec![];
