@@ -160,6 +160,7 @@ pub trait ByteView {
 }
 
 /// Implements an iterator over the bytes of a ByteView.
+#[derive(Debug, Clone)]
 pub struct Bytes<'a, T: ByteView> {
     pos: usize,
     view: &'a T,
