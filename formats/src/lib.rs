@@ -1,9 +1,8 @@
 pub mod adobe {
     use nom::AsBytes;
-    use serde::{Deserialize, Serialize};
     use tobytes::{ByteView, ToBytes};
 
-    #[derive(Debug, Serialize, Deserialize, PartialEq)]
+    #[derive(Debug, PartialEq)]
     pub struct Version {
         major: u16,
         minor: u16,
@@ -31,7 +30,7 @@ pub mod adobe {
         }
     }
 
-    #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+    #[derive(Debug, PartialEq, Clone)]
     pub struct Cmyk {
         cyan: f32,
         magenta: f32,
@@ -69,7 +68,7 @@ pub mod adobe {
         }
     }
 
-    #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+    #[derive(Debug, PartialEq, Clone)]
     pub struct Rgb {
         red: f32,
         green: f32,
@@ -100,7 +99,7 @@ pub mod adobe {
         }
     }
 
-    #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+    #[derive(Debug, PartialEq, Clone)]
     pub struct Lab {
         l: f32,
         a: f32,
@@ -131,7 +130,7 @@ pub mod adobe {
         }
     }
 
-    #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+    #[derive(Debug, PartialEq, Clone)]
     pub struct Grey {
         grey: f32,
     }
@@ -158,7 +157,7 @@ pub mod adobe {
         }
     }
 
-    #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+    #[derive(Debug, PartialEq, Clone)]
     pub enum ColorModel {
         CMYK(Cmyk),
         RGB(Rgb),
@@ -203,7 +202,7 @@ pub mod adobe {
         }
     }
 
-    #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+    #[derive(Debug, PartialEq, Clone)]
     pub enum ColorType {
         Global,
         Spot,
@@ -229,7 +228,7 @@ pub mod adobe {
         }
     }
 
-    #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+    #[derive(Debug, PartialEq, Clone)]
     pub enum BlockType {
         GroupStart,
         GroupEnd,
@@ -255,7 +254,7 @@ pub mod adobe {
         }
     }
 
-    #[derive(Debug, Serialize, Deserialize, PartialEq)]
+    #[derive(Debug, PartialEq)]
     pub struct Block {
         block_type: BlockType,
         length: u32,
@@ -309,7 +308,7 @@ pub mod adobe {
     }
 
     /// Reference: http://www.selapa.net/swatches/colors/fileformats.php#adobe_ase
-    #[derive(Debug, Serialize, Deserialize, PartialEq)]
+    #[derive(Debug, PartialEq)]
     pub struct AdobeSwatchExchange {
         version: Version,
         blocks: Vec<Block>,
@@ -353,7 +352,7 @@ mod tests {
     use crate::adobe::{BlockType, Lab};
     use crate::adobe::{Cmyk, ColorModel};
     use crate::adobe::{ColorType, Grey};
-    use tobytes::{ByteView, ToBytes};
+    use tobytes::ToBytes;
 
     #[test]
     fn version_as_bytes() {
@@ -559,7 +558,6 @@ mod tests {
     fn adobeswatchexchange_as_bytes() {
         let version = Version::new(1, 0);
         let block_type = BlockType::ColorEntry;
-        let length = 1u32;
         let name = "myname";
         let color_model = ColorModel::GREY(Grey::new(10.0));
         let color_type = ColorType::Normal;
