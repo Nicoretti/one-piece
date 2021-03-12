@@ -1,5 +1,4 @@
 pub mod adobe {
-    use nom::AsBytes;
     use tobytes::{ByteView, ToBytes};
 
     #[derive(Debug, PartialEq)]
@@ -327,7 +326,6 @@ pub mod adobe {
     impl ByteView for AdobeSwatchExchange {
         fn byte_at(&self, index: usize) -> Option<u8> {
             AdobeSwatchExchange::FILE_SIGNATURE
-                .as_bytes()
                 .iter()
                 .cloned()
                 .chain(self.version.to_bytes())
