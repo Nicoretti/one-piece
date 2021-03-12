@@ -4,10 +4,18 @@ version = "0.1.0"
 authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "encode-ase"
+path = "src/bin/encode-ase.rs"
+
+[[bin]]
+name = "decode-ase"
+path = "src/bin/decode-ase.rs"
 
 [dependencies]
 serde = { version = "1.0.105", features = ["derive"]}
 serde_json = "1.0.51"
 nom = "6.0.1"
 tobytes = {path = "../tobytes"}
+anyhow = "1.0.38"
+
