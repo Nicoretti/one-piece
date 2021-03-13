@@ -18,13 +18,6 @@ pub mod adobe {
         }
     }
 
-    pub fn parse_version(input: &[u8]) -> nom::IResult<&[u8], Version> {
-        do_parse!(
-            input,
-            major: be_u16 >> minor: be_u16 >> (Version { major, minor })
-        )
-    }
-
     impl ByteView for Version {
         fn byte_at(&self, index: usize) -> Option<u8> {
             self.major
@@ -60,22 +53,6 @@ pub mod adobe {
         }
     }
 
-    pub fn parse_cmyk(input: &[u8]) -> IResult<&[u8], Cmyk> {
-        do_parse!(
-            input,
-            cyan: be_f32
-                >> magenta: be_f32
-                >> yellow: be_f32
-                >> key: be_f32
-                >> (Cmyk {
-                    cyan,
-                    magenta,
-                    yellow,
-                    key
-                })
-        )
-    }
-
     impl ByteView for Cmyk {
         fn byte_at(&self, index: usize) -> Option<u8> {
             self.cyan
@@ -100,13 +77,6 @@ pub mod adobe {
         red: f32,
         green: f32,
         blue: f32,
-    }
-
-    pub fn parse_rgb(input: &[u8]) -> IResult<&[u8], Rgb> {
-        do_parse!(
-            input,
-            red: be_f32 >> green: be_f32 >> blue: be_f32 >> (Rgb { red, green, blue })
-        )
     }
 
     impl Rgb {
@@ -146,13 +116,6 @@ pub mod adobe {
         }
     }
 
-    pub fn parse_lab(input: &[u8]) -> IResult<&[u8], Lab> {
-        do_parse!(
-            input,
-            l: be_f32 >> a: be_f32 >> b: be_f32 >> (Lab { l, a, b })
-        )
-    }
-
     impl ByteView for Lab {
         fn byte_at(&self, index: usize) -> Option<u8> {
             self.l
@@ -180,10 +143,6 @@ pub mod adobe {
         pub fn new(grey: f32) -> Self {
             Self { grey }
         }
-    }
-
-    pub fn parse_grey(input: &[u8]) -> IResult<&[u8], Grey> {
-        do_parse!(input, grey: be_f32 >> (Grey { grey }))
     }
 
     impl ByteView for Grey {
@@ -385,6 +344,137 @@ pub mod adobe {
             ToBytes::to_bytes(self).count()
         }
     }
+
+    pub mod parsers {
+
+        use super::{Cmyk, Grey, Lab, Rgb, Version};
+        use nom::do_parse;
+        use nom::number::streaming::{be_f32, be_u16};
+        use nom::IResult;
+
+        pub fn version(input: &[u8]) -> nom::IResult<&[u8], Version> {
+            do_parse!(
+                input,
+                major: be_u16 >> minor: be_u16 >> (Version { major, minor })
+            )
+        }
+
+        pub fn cmyk(input: &[u8]) -> IResult<&[u8], Cmyk> {
+            do_parse!(
+                input,
+                cyan: be_f32
+                    >> magenta: be_f32
+                    >> yellow: be_f32
+                    >> key: be_f32
+                    >> (Cmyk {
+                        cyan,
+                        magenta,
+                        yellow,
+                        key
+                    })
+            )
+        }
+
+        pub fn rgb(input: &[u8]) -> IResult<&[u8], Rgb> {
+            do_parse!(
+                input,
+                red: be_f32 >> green: be_f32 >> blue: be_f32 >> (Rgb { red, green, blue })
+            )
+        }
+
+        pub fn grey(input: &[u8]) -> IResult<&[u8], Grey> {
+            do_parse!(input, grey: be_f32 >> (Grey { grey }))
+        }
+
+        pub fn lab(input: &[u8]) -> IResult<&[u8], Lab> {
+            do_parse!(
+                input,
+                l: be_f32 >> a: be_f32 >> b: be_f32 >> (Lab { l, a, b })
+            )
+        }
+
+        #[cfg(test)]
+        mod tests {
+            use super::*;
+
+            #[test]
+            fn test_parse_version() {
+                let input = vec![0x00u8, 0x0Au8, 0x00u8, 0x01u8];
+                let expected = (&[] as &[u8], Version::new(10, 1));
+
+                let r = version(&input);
+
+                assert!(r.is_ok());
+                assert_eq!(expected, r.unwrap())
+            }
+
+            #[test]
+            fn test_parse_cymk() {
+                let c: f32 = 100.0;
+                let m: f32 = 200.0;
+                let y: f32 = 300.0;
+                let k: f32 = 10.0;
+                let mut input: Vec<u8> = vec![];
+                input.extend(c.to_be_bytes().iter());
+                input.extend(m.to_be_bytes().iter());
+                input.extend(y.to_be_bytes().iter());
+                input.extend(k.to_be_bytes().iter());
+                let expected = (&[] as &[u8], Cmyk::new(c, m, y, k));
+
+                let r = cmyk(&input);
+
+                assert!(r.is_ok());
+                assert_eq!(expected, r.unwrap())
+            }
+
+            #[test]
+            fn parse_rgb() {
+                let r: f32 = 100.0;
+                let g: f32 = 200.0;
+                let b: f32 = 240.0;
+                let mut input: Vec<u8> = vec![];
+                input.extend(r.to_be_bytes().iter());
+                input.extend(g.to_be_bytes().iter());
+                input.extend(b.to_be_bytes().iter());
+                let expected = (&[] as &[u8], Rgb::new(r, g, b));
+
+                let r = rgb(&input);
+
+                assert!(r.is_ok());
+                assert_eq!(expected, r.unwrap())
+            }
+
+            #[test]
+            fn parse_lab() {
+                let l: f32 = 100.0;
+                let a: f32 = 200.0;
+                let b: f32 = 240.0;
+                let mut input: Vec<u8> = vec![];
+                input.extend(l.to_be_bytes().iter());
+                input.extend(a.to_be_bytes().iter());
+                input.extend(b.to_be_bytes().iter());
+
+                let expected = (&[] as &[u8], Lab::new(l, a, b));
+                let r = lab(&input);
+
+                assert!(r.is_ok());
+                assert_eq!(expected, r.unwrap())
+            }
+
+            #[test]
+            fn parse_grey() {
+                let g: f32 = 100.0;
+                let mut input: Vec<u8> = vec![];
+                input.extend(g.to_be_bytes().iter());
+
+                let expected = (&[] as &[u8], Grey::new(g));
+                let r = grey(&input);
+
+                assert!(r.is_ok());
+                assert_eq!(expected, r.unwrap())
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -403,36 +493,6 @@ mod tests {
         let version = Version::new(10, 1);
         let bytes: Vec<u8> = version.to_bytes().collect();
         assert_eq!(vec![0x00u8, 0x0Au8, 0x00u8, 0x01u8], bytes)
-    }
-
-    #[test]
-    fn parse_version() {
-        let input = vec![0x00u8, 0x0Au8, 0x00u8, 0x01u8];
-        let expected = (&[] as &[u8], Version::new(10, 1));
-
-        let r = super::adobe::parse_version(&input);
-
-        assert!(r.is_ok());
-        assert_eq!(expected, r.unwrap())
-    }
-
-    #[test]
-    fn parse_cymk() {
-        let c: f32 = 100.0;
-        let m: f32 = 200.0;
-        let y: f32 = 300.0;
-        let k: f32 = 10.0;
-        let mut input: Vec<u8> = vec![];
-        input.extend(c.to_be_bytes().iter());
-        input.extend(m.to_be_bytes().iter());
-        input.extend(y.to_be_bytes().iter());
-        input.extend(k.to_be_bytes().iter());
-        let expected = (&[] as &[u8], Cmyk::new(c, m, y, k));
-
-        let r = super::adobe::parse_cmyk(&input);
-
-        assert!(r.is_ok());
-        assert_eq!(expected, r.unwrap())
     }
 
     #[test]
@@ -470,23 +530,6 @@ mod tests {
     }
 
     #[test]
-    fn parse_rgb() {
-        let r: f32 = 100.0;
-        let g: f32 = 200.0;
-        let b: f32 = 240.0;
-        let mut input: Vec<u8> = vec![];
-        input.extend(r.to_be_bytes().iter());
-        input.extend(g.to_be_bytes().iter());
-        input.extend(b.to_be_bytes().iter());
-        let expected = (&[] as &[u8], Rgb::new(r, g, b));
-
-        let r = super::adobe::parse_rgb(&input);
-
-        assert!(r.is_ok());
-        assert_eq!(expected, r.unwrap())
-    }
-
-    #[test]
     fn lab_as_bytes() {
         let l: f32 = 100.0;
         let a: f32 = 200.0;
@@ -501,24 +544,6 @@ mod tests {
 
         assert_eq!(expected, bytes)
     }
-
-    #[test]
-    fn parse_lab() {
-        let l: f32 = 100.0;
-        let a: f32 = 200.0;
-        let b: f32 = 240.0;
-        let mut input: Vec<u8> = vec![];
-        input.extend(l.to_be_bytes().iter());
-        input.extend(a.to_be_bytes().iter());
-        input.extend(b.to_be_bytes().iter());
-
-        let expected = (&[] as &[u8], Lab::new(l, a, b));
-        let r = super::adobe::parse_lab(&input);
-
-        assert!(r.is_ok());
-        assert_eq!(expected, r.unwrap())
-    }
-
     #[test]
     fn grey_as_bytes() {
         let g: f32 = 100.0;
@@ -529,19 +554,6 @@ mod tests {
         let bytes: Vec<u8> = grey.to_bytes().collect();
 
         assert_eq!(expected, bytes)
-    }
-
-    #[test]
-    fn parse_grey() {
-        let g: f32 = 100.0;
-        let mut input: Vec<u8> = vec![];
-        input.extend(g.to_be_bytes().iter());
-
-        let expected = (&[] as &[u8], Grey::new(g));
-        let r = super::adobe::parse_grey(&input);
-
-        assert!(r.is_ok());
-        assert_eq!(expected, r.unwrap())
     }
 
     #[test]
