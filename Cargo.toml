@@ -6,4 +6,5 @@ members = [
     "preidolia",
     "bricks",
     "formats",
+    "protocols"
 ]
