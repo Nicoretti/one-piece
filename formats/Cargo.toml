@@ -13,9 +13,9 @@ name = "decode-ase"
 path = "src/bin/decode-ase.rs"
 
 [dependencies]
-serde = { version = "1.0.105", features = ["derive"]}
-serde_json = "1.0.51"
-nom = "6.0.1"
+serde = { version = "1.0.124", features = ["derive"] }
+serde_json = "1.0.64"
+nom = "6.1.2"
 tobytes = {path = "../tobytes"}
 anyhow = "1.0.38"
 
