@@ -1,4 +1,3 @@
-use std::str::from_utf8;
 use tobytes::{ByteView, ToBytes};
 
 /// Tftp transfer modes
@@ -25,11 +24,8 @@ impl ByteView for Mode {
         match self {
             Mode::Octet => "octet\0".as_bytes(),
             Mode::Netascii => "netascii\0".as_bytes(),
-            _ => panic!(),
         }
-        .iter()
-        .skip(index)
-        .next()
+        .get(index)
         .cloned()
     }
 
@@ -75,8 +71,7 @@ impl ByteView for Error {
             .iter()
             .chain(msg.as_bytes().iter())
             .chain(std::iter::once(&0u8))
-            .skip(index)
-            .next()
+            .nth(index)
             .cloned()
     }
 
@@ -112,8 +107,7 @@ impl ByteView for TftpPacket {
                 .chain(filename.as_bytes().iter().cloned())
                 .chain(std::iter::once(0u8))
                 .chain(mode.to_bytes())
-                .skip(index)
-                .next(),
+                .nth(index),
             TftpPacket::WriteRequest { filename, mode } => 2u16
                 .to_be_bytes()
                 .iter()
@@ -121,30 +115,26 @@ impl ByteView for TftpPacket {
                 .chain(filename.as_bytes().iter().cloned())
                 .chain(std::iter::once(0u8))
                 .chain(mode.to_bytes())
-                .skip(index)
-                .next(),
+                .nth(index),
             TftpPacket::Data { block, data } => 3u16
                 .to_be_bytes()
                 .iter()
                 .cloned()
                 .chain(block.to_be_bytes().iter().cloned())
                 .chain(data.iter().cloned())
-                .skip(index)
-                .next(),
+                .nth(index),
             TftpPacket::Ack { block } => 4u16
                 .to_be_bytes()
                 .iter()
                 .chain(block.to_be_bytes().iter())
-                .skip(index)
-                .next()
+                .nth(index)
                 .cloned(),
             TftpPacket::Error { error } => 5u16
                 .to_be_bytes()
                 .iter()
                 .cloned()
                 .chain(error.to_bytes())
-                .skip(index)
-                .next(),
+                .nth(index),
         }
     }
 
@@ -238,11 +228,9 @@ mod tests {
 
 mod parsers {
     use super::{Error, Mode, TftpPacket};
-    use nom::combinator::rest;
-    use nom::multi::many0_count;
-    use nom::number::streaming::{be_u16, be_u8};
-    use nom::IResult;
-    use nom::{do_parse, many0, map, map_res, named, switch, take, take_until, take_while};
+    use nom::number::complete::be_u8;
+    use nom::number::streaming::be_u16;
+    use nom::{do_parse, many0, map, map_res, named, switch, take, take_until};
 
     named!(string<&[u8], &str>,
         do_parse!(
@@ -253,7 +241,7 @@ mod parsers {
     );
 
     // FIXME: either parse 512 byte or to the enf if < 512
-    named!(data<&[u8], Vec<u8>>, many0!(nom::number::complete::be_u8));
+    named!(data<&[u8], Vec<u8>>, many0!(be_u8));
     named!(opcode<&[u8], u16>, do_parse!(value: be_u16 >> (value)));
     named!(block<&[u8], u16>, do_parse!(value: be_u16 >> (value)));
     named!(error_code<&[u8], u16>, do_parse!( value: be_u16 >> (value)));
@@ -295,6 +283,7 @@ mod parsers {
     #[cfg(test)]
     mod tests {
         use super::*;
+        use nom::IResult;
 
         #[test]
         fn parse_string() {
@@ -316,34 +305,34 @@ mod parsers {
 
         #[test]
         fn parse_opcode() {
-            assert_eq!(opcode(&vec![0x00, 0x00]), IResult::Ok((&b""[..], 0)));
-            assert_eq!(opcode(&vec![0x00, 0x01]), IResult::Ok((&b""[..], 1)));
-            assert_eq!(opcode(&vec![0x00, 0x02]), IResult::Ok((&b""[..], 2)));
-            assert_eq!(opcode(&vec![0x00, 0x03]), IResult::Ok((&b""[..], 3)));
-            assert_eq!(opcode(&vec![0x00, 0x04]), IResult::Ok((&b""[..], 4)));
-            assert_eq!(opcode(&vec![0x00, 0x05]), IResult::Ok((&b""[..], 5)));
+            assert_eq!(opcode(&[0x00, 0x00]), IResult::Ok((&b""[..], 0)));
+            assert_eq!(opcode(&[0x00, 0x01]), IResult::Ok((&b""[..], 1)));
+            assert_eq!(opcode(&[0x00, 0x02]), IResult::Ok((&b""[..], 2)));
+            assert_eq!(opcode(&[0x00, 0x03]), IResult::Ok((&b""[..], 3)));
+            assert_eq!(opcode(&[0x00, 0x04]), IResult::Ok((&b""[..], 4)));
+            assert_eq!(opcode(&[0x00, 0x05]), IResult::Ok((&b""[..], 5)));
         }
 
         #[test]
         fn parse_block() {
-            assert_eq!(block(&vec![0x01, 0x00]), IResult::Ok((&b""[..], 0x0100)));
-            assert_eq!(block(&vec![0x10, 0x01]), IResult::Ok((&b""[..], 0x1001)));
-            assert_eq!(block(&vec![0x00, 0x02]), IResult::Ok((&b""[..], 0x0002)));
-            assert_eq!(block(&vec![0xF0, 0x03]), IResult::Ok((&b""[..], 0xF003)));
-            assert_eq!(block(&vec![0x00, 0xFF]), IResult::Ok((&b""[..], 0x00FF)));
-            assert_eq!(block(&vec![0x00, 0x05]), IResult::Ok((&b""[..], 0x0005)));
+            assert_eq!(block(&[0x01, 0x00]), IResult::Ok((&b""[..], 0x0100)));
+            assert_eq!(block(&[0x10, 0x01]), IResult::Ok((&b""[..], 0x1001)));
+            assert_eq!(block(&[0x00, 0x02]), IResult::Ok((&b""[..], 0x0002)));
+            assert_eq!(block(&[0xF0, 0x03]), IResult::Ok((&b""[..], 0xF003)));
+            assert_eq!(block(&[0x00, 0xFF]), IResult::Ok((&b""[..], 0x00FF)));
+            assert_eq!(block(&[0x00, 0x05]), IResult::Ok((&b""[..], 0x0005)));
         }
 
         #[test]
         fn parse_error_code() {
-            assert_eq!(error_code(&vec![0x00, 0x00]), IResult::Ok((&b""[..], 0)));
-            assert_eq!(error_code(&vec![0x00, 0x01]), IResult::Ok((&b""[..], 1)));
-            assert_eq!(error_code(&vec![0x00, 0x02]), IResult::Ok((&b""[..], 2)));
-            assert_eq!(error_code(&vec![0x00, 0x03]), IResult::Ok((&b""[..], 3)));
-            assert_eq!(error_code(&vec![0x00, 0x04]), IResult::Ok((&b""[..], 4)));
-            assert_eq!(error_code(&vec![0x00, 0x05]), IResult::Ok((&b""[..], 5)));
-            assert_eq!(error_code(&vec![0x00, 0x06]), IResult::Ok((&b""[..], 6)));
-            assert_eq!(error_code(&vec![0x00, 0x07]), IResult::Ok((&b""[..], 7)));
+            assert_eq!(error_code(&[0x00, 0x00]), IResult::Ok((&b""[..], 0)));
+            assert_eq!(error_code(&[0x00, 0x01]), IResult::Ok((&b""[..], 1)));
+            assert_eq!(error_code(&[0x00, 0x02]), IResult::Ok((&b""[..], 2)));
+            assert_eq!(error_code(&[0x00, 0x03]), IResult::Ok((&b""[..], 3)));
+            assert_eq!(error_code(&[0x00, 0x04]), IResult::Ok((&b""[..], 4)));
+            assert_eq!(error_code(&[0x00, 0x05]), IResult::Ok((&b""[..], 5)));
+            assert_eq!(error_code(&[0x00, 0x06]), IResult::Ok((&b""[..], 6)));
+            assert_eq!(error_code(&[0x00, 0x07]), IResult::Ok((&b""[..], 7)));
         }
 
         #[test]

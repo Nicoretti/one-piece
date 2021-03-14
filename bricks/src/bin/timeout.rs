@@ -86,7 +86,7 @@ fn main() {
                             ERROR
                         }
                     };
-                    exit(i32::from(exit_code));
+                    exit(exit_code);
                 });
             tokio::run(future);
         }

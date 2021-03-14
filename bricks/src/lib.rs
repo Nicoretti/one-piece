@@ -97,7 +97,7 @@ pub mod transformations {
         let mut bytes_written = 0usize;
         for line in std::io::BufReader::new(reader).lines() {
             let mut output_line = String::from(line?.trim_end());
-            output_line.push_str("\n");
+            output_line.push('\n');
             writer.write_all(output_line.as_bytes())?;
             bytes_written += output_line.len();
         }

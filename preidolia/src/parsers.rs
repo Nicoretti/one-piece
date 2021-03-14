@@ -37,13 +37,11 @@ struct Parser<'a, O: Sized> {
 
 impl<'a, O: Sized> Parser<'a, O> {
     fn new(parser: &'a dyn Fn(&[u8]) -> nom::IResult<&[u8], O>) -> Self {
-        Parser {
-            parser,
-        }
+        Parser { parser }
     }
 
     fn parse<I: Read>(&mut self, input: &mut I) -> Result<O> {
-        let mut buf : Vec<u8> = Vec::new();
+        let mut buf: Vec<u8> = Vec::new();
         parse_from_read(self.parser, &mut buf, input)
     }
 }
@@ -111,8 +109,8 @@ mod tests {
     fn test_parse_u32() {
         let input: Vec<u8> = vec![0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02];
 
-        let mut cursor = std::io::Cursor::new(input);
-        let mut parser: Parser<u32> = Parser::new(&parse_u32);
+        let cursor = std::io::Cursor::new(input);
+        let parser: Parser<u32> = Parser::new(&parse_u32);
         let mut iter = ParsingIterator::new(parser, cursor);
         assert_eq!(iter.next(), Some(1));
         // FIXME: Looks like bytes read from input are not consumed

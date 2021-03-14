@@ -15,7 +15,7 @@ pub struct Color {
     color: ColorModel,
 }
 
-fn main() -> () {
+fn main() {
     {
         let c = Color {
             pallet: String::from("MyPallet"),

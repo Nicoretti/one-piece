@@ -21,8 +21,7 @@ impl ByteView for Version {
             .to_be_bytes()
             .iter()
             .chain(self.minor.to_be_bytes().iter())
-            .skip(index)
-            .next()
+            .nth(index)
             .cloned()
     }
 
@@ -59,8 +58,7 @@ impl ByteView for Cmyk {
             .chain(self.magenta.to_be_bytes().to_owned().iter())
             .chain(self.yellow.to_be_bytes().to_owned().iter())
             .chain(self.key.to_be_bytes().to_owned().iter())
-            .skip(index)
-            .next()
+            .nth(index)
             .cloned()
     }
 
@@ -90,8 +88,7 @@ impl ByteView for Rgb {
             .iter()
             .chain(self.green.to_be_bytes().to_owned().iter())
             .chain(self.blue.to_be_bytes().to_owned().iter())
-            .skip(index)
-            .next()
+            .nth(index)
             .cloned()
     }
 
@@ -121,8 +118,7 @@ impl ByteView for Lab {
             .iter()
             .chain(self.a.to_be_bytes().to_owned().iter())
             .chain(self.b.to_be_bytes().to_owned().iter())
-            .skip(index)
-            .next()
+            .nth(index)
             .cloned()
     }
 
@@ -148,8 +144,7 @@ impl ByteView for Grey {
             .to_be_bytes()
             .to_owned()
             .iter()
-            .skip(index)
-            .next()
+            .nth(index)
             .cloned()
     }
 
@@ -171,30 +166,26 @@ pub enum ColorModel {
 impl ByteView for ColorModel {
     fn byte_at(&self, index: usize) -> Option<u8> {
         match self {
-            ColorModel::CMYK(cmyk) => ['C' as u8, 'M' as u8, 'Y' as u8, 'K' as u8]
+            ColorModel::CMYK(cmyk) => [b'C', b'M', b'Y', b'K']
                 .iter()
                 .cloned()
                 .chain(cmyk.to_bytes())
-                .skip(index)
-                .next(),
-            ColorModel::RGB(rgb) => ['R' as u8, 'G' as u8, 'B' as u8, 0u8]
+                .nth(index),
+            ColorModel::RGB(rgb) => [b'R', b'G', b'B', b'\0']
                 .iter()
                 .cloned()
                 .chain(rgb.to_bytes())
-                .skip(index)
-                .next(),
-            ColorModel::LAB(lab) => ['L' as u8, 'A' as u8, 'B' as u8, 0u8]
+                .nth(index),
+            ColorModel::LAB(lab) => [b'L', b'A', b'B', b'\0']
                 .iter()
                 .cloned()
                 .chain(lab.to_bytes())
-                .skip(index)
-                .next(),
-            ColorModel::GREY(grey) => ['G' as u8, 'R' as u8, 'E' as u8, 'Y' as u8]
+                .nth(index),
+            ColorModel::GREY(grey) => [b'G', b'R', b'E', b'Y']
                 .iter()
                 .cloned()
                 .chain(grey.to_bytes())
-                .skip(index)
-                .next(),
+                .nth(index),
         }
     }
 
@@ -219,8 +210,7 @@ impl ByteView for ColorType {
         }
         .to_be_bytes()
         .iter()
-        .skip(index)
-        .next()
+        .nth(index)
         .cloned()
     }
 
@@ -245,8 +235,7 @@ impl ByteView for BlockType {
         }
         .to_be_bytes()
         .iter()
-        .skip(index)
-        .next()
+        .nth(index)
         .cloned()
     }
 
@@ -299,8 +288,7 @@ impl ByteView for Block {
             .chain(std::iter::once(0u8))
             .chain(self.color_model.to_bytes())
             .chain(self.color_type.to_bytes())
-            .skip(index)
-            .next()
+            .nth(index)
     }
 
     fn byte_size(&self) -> usize {
@@ -332,8 +320,7 @@ impl ByteView for AdobeSwatchExchange {
             .chain(self.version.to_bytes())
             .chain((self.blocks.len() as u32).to_be_bytes().iter().cloned())
             .chain(self.blocks.iter().map(|block| block.to_bytes()).flatten())
-            .skip(index)
-            .next()
+            .nth(index)
     }
 
     fn byte_size(&self) -> usize {
@@ -346,7 +333,7 @@ pub mod parsers {
     use super::{Cmyk, ColorModel, ColorType, Grey, Lab, Rgb, Version};
     use nom::number::streaming::{be_f32, be_u16};
     use nom::IResult;
-    use nom::{call, do_parse, named, switch, take};
+    use nom::{call, do_parse, switch, take};
 
     pub fn version(input: &[u8]) -> nom::IResult<&[u8], Version> {
         do_parse!(
@@ -418,7 +405,6 @@ pub mod parsers {
     #[cfg(test)]
     mod tests {
         use super::*;
-        use crate::adobe::ase::BlockType::ColorEntry;
         use crate::adobe::ase::ColorType;
         use tobytes::ToBytes;
 
@@ -435,16 +421,16 @@ pub mod parsers {
 
         #[test]
         fn test_parse_cymk() {
-            let c: f32 = 100.0;
-            let m: f32 = 200.0;
-            let y: f32 = 300.0;
-            let k: f32 = 10.0;
+            let cyan: f32 = 100.0;
+            let magenta: f32 = 200.0;
+            let yellow: f32 = 300.0;
+            let key: f32 = 10.0;
             let mut input: Vec<u8> = vec![];
-            input.extend(c.to_be_bytes().iter());
-            input.extend(m.to_be_bytes().iter());
-            input.extend(y.to_be_bytes().iter());
-            input.extend(k.to_be_bytes().iter());
-            let expected = (&[] as &[u8], Cmyk::new(c, m, y, k));
+            input.extend(cyan.to_be_bytes().iter());
+            input.extend(magenta.to_be_bytes().iter());
+            input.extend(yellow.to_be_bytes().iter());
+            input.extend(key.to_be_bytes().iter());
+            let expected = (&[] as &[u8], Cmyk::new(cyan, magenta, yellow, key));
 
             let r = cmyk(&input);
 
@@ -521,7 +507,7 @@ pub mod parsers {
                 }),
             ];
             for m in models {
-                let mut input: Vec<u8> = m.to_bytes().collect();
+                let input: Vec<u8> = m.to_bytes().collect();
 
                 let expected = (&[] as &[u8], m);
                 let r = color_model(&input);
@@ -535,7 +521,7 @@ pub mod parsers {
             {
                 let types = vec![ColorType::Global, ColorType::Normal, ColorType::Spot];
                 for t in types {
-                    let mut input: Vec<u8> = t.to_bytes().collect();
+                    let input: Vec<u8> = t.to_bytes().collect();
 
                     let expected = (&[] as &[u8], t);
                     let r = color_type(&input);
@@ -545,7 +531,7 @@ pub mod parsers {
                 }
             }
             {
-                let mut input: Vec<u8> = vec![0, 8, 2, 3];
+                let input: Vec<u8> = vec![0, 8, 2, 3];
                 let remains = &input.as_slice()[2..];
 
                 let error = nom::error::Error::new(remains, nom::error::ErrorKind::Digit);
@@ -645,7 +631,7 @@ mod tests {
             let m: f32 = 200.0;
             let y: f32 = 300.0;
             let k: f32 = 10.0;
-            let mut expected: Vec<u8> = vec!['C' as u8, 'M' as u8, 'Y' as u8, 'K' as u8];
+            let mut expected: Vec<u8> = vec![b'C', b'M', b'Y', b'K'];
             expected.extend(c.to_be_bytes().iter());
             expected.extend(m.to_be_bytes().iter());
             expected.extend(y.to_be_bytes().iter());
@@ -660,7 +646,7 @@ mod tests {
             let r: f32 = 100.0;
             let g: f32 = 200.0;
             let b: f32 = 240.0;
-            let mut expected: Vec<u8> = vec!['R' as u8, 'G' as u8, 'B' as u8, 0x00];
+            let mut expected: Vec<u8> = vec![b'R', b'G', b'B', b'\0'];
             expected.extend(r.to_be_bytes().iter());
             expected.extend(g.to_be_bytes().iter());
             expected.extend(b.to_be_bytes().iter());
@@ -674,7 +660,7 @@ mod tests {
             let l: f32 = 100.0;
             let a: f32 = 200.0;
             let b: f32 = 240.0;
-            let mut expected: Vec<u8> = vec!['L' as u8, 'A' as u8, 'B' as u8, 0x00];
+            let mut expected: Vec<u8> = vec![b'L', b'A', b'B', b'\0'];
             expected.extend(l.to_be_bytes().iter());
             expected.extend(a.to_be_bytes().iter());
             expected.extend(b.to_be_bytes().iter());
@@ -686,7 +672,7 @@ mod tests {
         }
         {
             let g: f32 = 100.0;
-            let mut expected: Vec<u8> = vec!['G' as u8, 'R' as u8, 'E' as u8, 'Y' as u8];
+            let mut expected: Vec<u8> = vec![b'G', b'R', b'E', b'Y'];
             expected.extend(g.to_be_bytes().iter());
 
             let grey = ColorModel::GREY(Grey::new(g));
