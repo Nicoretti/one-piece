@@ -343,10 +343,10 @@ impl ByteView for AdobeSwatchExchange {
 
 pub mod parsers {
 
-    use super::{Cmyk, Grey, Lab, Rgb, Version};
-    use nom::do_parse;
+    use super::{Cmyk, ColorModel, Grey, Lab, Rgb, Version};
     use nom::number::streaming::{be_f32, be_u16};
     use nom::IResult;
+    use nom::{call, do_parse, named, switch, take};
 
     pub fn version(input: &[u8]) -> nom::IResult<&[u8], Version> {
         do_parse!(
@@ -378,10 +378,6 @@ pub mod parsers {
         )
     }
 
-    pub fn grey(input: &[u8]) -> IResult<&[u8], Grey> {
-        do_parse!(input, grey: be_f32 >> (Grey { grey }))
-    }
-
     pub fn lab(input: &[u8]) -> IResult<&[u8], Lab> {
         do_parse!(
             input,
@@ -389,9 +385,28 @@ pub mod parsers {
         )
     }
 
+    pub fn grey(input: &[u8]) -> IResult<&[u8], Grey> {
+        do_parse!(input, grey: be_f32 >> (Grey { grey }))
+    }
+
+    pub fn color_model(input: &[u8]) -> IResult<&[u8], ColorModel> {
+        do_parse!(
+            input,
+            model:
+                switch!(take!(4),
+                    b"CMYK"  => do_parse!(v: cmyk >> (ColorModel::CMYK(v))) |
+                    b"GREY"  => do_parse!(v: grey >> (ColorModel::GREY(v))) |
+                    b"RGB\0"  => do_parse!(v: rgb >> (ColorModel::RGB(v))) |
+                    b"LAB\0"  => do_parse!(v: lab >> (ColorModel::LAB(v)))
+                )
+                >> (model)
+        )
+    }
+
     #[cfg(test)]
     mod tests {
         use super::*;
+        use tobytes::ToBytes;
 
         #[test]
         fn test_parse_version() {
@@ -468,6 +483,38 @@ pub mod parsers {
 
             assert!(r.is_ok());
             assert_eq!(expected, r.unwrap())
+        }
+
+        #[test]
+        fn test_parse_color_model() {
+            let models = vec![
+                ColorModel::CMYK(Cmyk {
+                    cyan: 10.0,
+                    magenta: 11.0,
+                    yellow: 22.0,
+                    key: 30.0,
+                }),
+                ColorModel::GREY(Grey { grey: 10.0 }),
+                ColorModel::RGB(Rgb {
+                    red: 10.0,
+                    green: 11.0,
+                    blue: 22.0,
+                }),
+                ColorModel::LAB(Lab {
+                    l: 10.0,
+                    a: 11.0,
+                    b: 22.0,
+                }),
+            ];
+            for m in models {
+                let mut input: Vec<u8> = m.to_bytes().collect();
+
+                let expected = (&[] as &[u8], m);
+                let r = color_model(&input);
+
+                assert!(r.is_ok());
+                assert_eq!(expected, r.unwrap())
+            }
         }
     }
 }
