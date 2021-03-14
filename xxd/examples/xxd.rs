@@ -1,5 +1,3 @@
-use xxd;
-
 fn main() {
     let mut v: Vec<u8> = Vec::new();
     for i in 0..255 {

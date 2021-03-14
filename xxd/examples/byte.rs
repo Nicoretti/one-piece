@@ -1,8 +1,7 @@
-use xxd;
 use xxd::DefaultBgColorMap;
 use xxd::DefaultFgColorMap;
 
-fn main() -> () {
+fn main() {
     let values: [u8; 10] = [0, 33, 48, 58, 65, 91, 97, 123, 126, 128];
     let fg_color_map = DefaultFgColorMap::new();
     let bg_color_map = DefaultBgColorMap::new();
