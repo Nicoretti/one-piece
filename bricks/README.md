@@ -15,4 +15,5 @@ for developers (e.g. trailing whitespaces).
 - [ ] **seek**: skip/select only parts of a file (similar to `head` and `tail`).
 - [ ] **mixed**: checks if the file uses mixed intendation (tabs and spaces).
 - [ ] **inplace**:helper tool "execute" changes to a file "inplace".
+- [ ] **xcat**: socat like tool written in rust.
 
