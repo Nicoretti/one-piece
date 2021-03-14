@@ -343,7 +343,7 @@ impl ByteView for AdobeSwatchExchange {
 
 pub mod parsers {
 
-    use super::{Cmyk, ColorModel, Grey, Lab, Rgb, Version};
+    use super::{Cmyk, ColorModel, ColorType, Grey, Lab, Rgb, Version};
     use nom::number::streaming::{be_f32, be_u16};
     use nom::IResult;
     use nom::{call, do_parse, named, switch, take};
@@ -402,10 +402,24 @@ pub mod parsers {
                 >> (model)
         )
     }
+    pub fn color_type(input: &[u8]) -> IResult<&[u8], ColorType> {
+        let (input, id) = call!(input, be_u16)?;
+        match id {
+            0u16 => IResult::Ok((input, ColorType::Global)),
+            1u16 => IResult::Ok((input, ColorType::Spot)),
+            2u16 => IResult::Ok((input, ColorType::Normal)),
+            _ => IResult::Err(nom::Err::Error(nom::error::Error::new(
+                input,
+                nom::error::ErrorKind::Digit,
+            ))),
+        }
+    }
 
     #[cfg(test)]
     mod tests {
         use super::*;
+        use crate::adobe::ase::BlockType::ColorEntry;
+        use crate::adobe::ase::ColorType;
         use tobytes::ToBytes;
 
         #[test]
@@ -514,6 +528,32 @@ pub mod parsers {
 
                 assert!(r.is_ok());
                 assert_eq!(expected, r.unwrap())
+            }
+        }
+        #[test]
+        fn test_parse_color_type() {
+            {
+                let types = vec![ColorType::Global, ColorType::Normal, ColorType::Spot];
+                for t in types {
+                    let mut input: Vec<u8> = t.to_bytes().collect();
+
+                    let expected = (&[] as &[u8], t);
+                    let r = color_type(&input);
+
+                    assert!(r.is_ok());
+                    assert_eq!(expected, r.unwrap())
+                }
+            }
+            {
+                let mut input: Vec<u8> = vec![0, 8, 2, 3];
+                let remains = &input.as_slice()[2..];
+
+                let error = nom::error::Error::new(remains, nom::error::ErrorKind::Digit);
+                let expected = IResult::Err(nom::Err::Error(error));
+                let r = color_type(&input);
+
+                assert!(r.is_err());
+                assert_eq!(expected, r)
             }
         }
     }
