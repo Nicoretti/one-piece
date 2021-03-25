@@ -1,17 +1,9 @@
-#[macro_use]
-use clap::{value_t};
+use clap::value_t;
 use human_panic::setup_panic;
-use tokio;
-use tokio::process::Child;
-use tokio::runtime;
 use tokio::time::timeout;
-use tokio_process;
 
-use std::process::{exit, Command};
+use std::process::exit;
 use std::time::Duration;
-
-use std::future::Future;
-use tokio_process::CommandExt;
 
 pub const SUCCESS: i32 = 0;
 pub const TIMEOUT: i32 = 1;
@@ -68,7 +60,7 @@ async fn main() {
         }
         Ok(child) => {
             let timed_command = timeout(Duration::from_secs(duration), child.wait_with_output());
-            let future = timed_command
+            timed_command
                 .await
                 .map(|r| {
                     // TODO NiCo: find a good alterantive for the unwrap
@@ -82,7 +74,7 @@ async fn main() {
                         exit(ERROR);
                     })
                 })
-                .map_err(|e| {
+                .map_err(|_e| {
                     eprintln!("Timeout, command did not finish in time");
                     exit(TIMEOUT);
                 });
