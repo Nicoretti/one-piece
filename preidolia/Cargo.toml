@@ -25,3 +25,4 @@ serde = { version = "1.0.124", features = ["derive"] }
 serde_json = "1.0.64"
 anyhow = "1.0.38"
 nom = "6.1.2"
+bricks = {path= "../bricks", version="0.1.0"}

@@ -13,6 +13,80 @@
 use std::io::Read;
 use std::io::Write;
 
+pub mod cli {
+
+    use anyhow::{anyhow, Error};
+    use std::{
+        convert::Into,
+        path::{Path, PathBuf},
+        str::FromStr,
+    };
+
+    #[derive(Debug)]
+    pub enum Input {
+        Stdin,
+        File { path: PathBuf },
+    }
+
+    #[derive(Debug)]
+    pub enum Output {
+        Stdout,
+        File { path: PathBuf },
+    }
+
+    impl Into<Box<dyn std::io::Read>> for Input {
+        fn into(self) -> Box<dyn std::io::Read> {
+            match self {
+                Input::Stdin => Box::new(std::io::stdin()),
+                Input::File { path } => Box::new(std::fs::File::open(path).unwrap()),
+            }
+        }
+    }
+
+    impl Into<Box<dyn std::io::Write>> for Output {
+        fn into(self) -> Box<dyn std::io::Write> {
+            match self {
+                Output::Stdout => Box::new(std::io::stdout()),
+                Output::File { path } => Box::new(std::fs::File::open(path).unwrap()),
+            }
+        }
+    }
+
+    impl FromStr for Input {
+        type Err = Error;
+        fn from_str(s: &str) -> Result<Self, Self::Err> {
+            match s.to_lowercase().as_ref() {
+                "-" => Ok(Input::Stdin),
+                _ => {
+                    let path = Path::new(s).to_path_buf();
+                    if path.exists() {
+                        Ok(Input::File { path })
+                    } else {
+                        Err(anyhow!("Could not find file {:?}", path))
+                    }
+                }
+            }
+        }
+    }
+
+    impl FromStr for Output {
+        type Err = Error;
+        fn from_str(s: &str) -> Result<Self, Self::Err> {
+            match s.to_lowercase().as_ref() {
+                "-" => Ok(Output::Stdout),
+                _ => {
+                    let path = Path::new(s).to_path_buf();
+                    if !path.exists() {
+                        Ok(Output::File { path })
+                    } else {
+                        Err(anyhow!("File already exists {:?}", path))
+                    }
+                }
+            }
+        }
+    }
+}
+
 pub fn create_reader(path: &str) -> std::io::Result<Box<dyn std::io::Read>> {
     match path {
         "stdin" => Ok(Box::new(std::io::stdin())),
