@@ -1,11 +1,15 @@
+use serde::{Deserialize, Serialize};
 use tobytes::{ByteView, ToBytes};
 
 /// Tftp transfer modes
-#[derive(PartialEq, Debug, Eq)]
+#[derive(PartialEq, Debug, Eq, Serialize, Deserialize)]
+#[serde(rename = "mode")]
 pub enum Mode {
     /// Ascii mode see also telnet
+    #[serde(rename = "netascii")]
     Netascii,
     /// also called binary in older implementations
+    #[serde(rename = "octet")]
     Octet,
 }
 
@@ -34,24 +38,33 @@ impl ByteView for Mode {
     }
 }
 
-#[derive(PartialEq, Debug, Eq)]
+#[derive(PartialEq, Debug, Eq, Serialize, Deserialize)]
 /// Tftp error codes
+#[serde(rename = "error")]
 pub enum Error {
     /// 0: Not defined, see error message (if any)
+    #[serde(rename = "undefined")]
     Undefinied { message: String },
     /// 1: File not found
+    #[serde(rename = "file_not_found")]
     FileNotFound { message: String },
     /// 2: Access violation
+    #[serde(rename = "access_violation")]
     AccessViolation { message: String },
     /// 3: Disk full or allocation exceeded
+    #[serde(rename = "disk_full")]
     DiskFull { message: String },
     /// 4: Illegal TFTP operation
+    #[serde(rename = "illegal_tftp_operation")]
     IllegalTftpOperation { message: String },
     /// 5: Unknown transfer ID
+    #[serde(rename = "unkown_transfer_id")]
     UnkownTransferId { message: String },
     /// 6: File already exists.
+    #[serde(rename = "file_already_exists")]
     FileAlreadyExists { message: String },
     /// 7: No such user
+    #[serde(rename = "no_such_user")]
     NoSuchUser { message: String },
 }
 
@@ -83,17 +96,31 @@ impl ByteView for Error {
 // TODO NiCo: add mode for rrq and wrq -> right now it allways will be octett
 // TODO NiCo: optimize memory efficiency -> String -> &str, Vec<u8> -> &[u8]
 /// Defines all available types of tftp packets
-#[derive(PartialEq, Debug, Eq)]
+#[derive(PartialEq, Debug, Eq, Serialize, Deserialize)]
+#[serde(rename = "tftp_packet")]
 pub enum TftpPacket {
     /// Opcode 0x01
-    ReadRequest { filename: String, mode: Mode },
+    #[serde(rename = "read_request")]
+    ReadRequest {
+        #[serde(rename = "file_name")]
+        filename: String,
+        mode: Mode,
+    },
     /// Opcode 0x02
-    WriteRequest { filename: String, mode: Mode },
+    #[serde(rename = "write_request")]
+    WriteRequest {
+        #[serde(rename = "file_name")]
+        filename: String,
+        mode: Mode,
+    },
     /// Opcode 0x03
+    #[serde(rename = "data")]
     Data { block: u16, data: Vec<u8> }, // make data a slice -> ref so it does not need allocate memory by itself
     /// Opcode 0x04
+    #[serde(rename = "ack")]
     Ack { block: u16 },
     /// Opcode 0x05
+    #[serde(rename = "error")]
     Error { error: Error },
 }
 
@@ -147,6 +174,7 @@ impl ByteView for TftpPacket {
 mod tests {
 
     use super::*;
+
     #[test]
     fn serialize_read_request() {
         let rrq = TftpPacket::ReadRequest {
@@ -226,7 +254,7 @@ mod tests {
     }
 }
 
-mod parsers {
+pub mod parsers {
     use super::{Error, Mode, TftpPacket};
     use nom::number::complete::be_u8;
     use nom::number::streaming::be_u16;
