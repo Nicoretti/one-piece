@@ -4,15 +4,19 @@ version = "0.1.0"
 authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [[bin]]
 name = "tftp-encode"
 path = "src/bin/tftp-encode.rs"
+
+[[bin]]
+name = "tftp-decode"
+path = "src/bin/tftp-decode.rs"
 
 [dependencies]
 nom = "6.1.2"
 tobytes = { path = "../tobytes" }
 bricks = { path = "../bricks" }
+preidolia = { path = "../preidolia" }
 structopt = "0.3.21"
 anyhow = "1.0.40"
 human-panic = "1.0.3"

@@ -1,5 +1,6 @@
+use anyhow::{anyhow, Result};
 use nom::*;
-use std::io::{Error, ErrorKind, Read, Result};
+use std::io::Read;
 
 fn parse_from_read<I: Read, O: Sized>(
     parser: &dyn Fn(&[u8]) -> nom::IResult<&[u8], O>,
@@ -16,27 +17,35 @@ fn parse_from_read<I: Read, O: Sized>(
                         Ok(_) => {
                             buffer.append(&mut buf);
                         }
-                        Err(e) => return Err(e),
+                        Err(e) => return Err(anyhow::Error::new(e)),
                     };
                 }
-                // TODO: add more helpful error
-                _ => {
-                    return Err(Error::new(
-                        ErrorKind::Other,
-                        "Failed to parse, TBD add better message",
-                    ));
+                Err::Incomplete(Needed::Unknown) => {
+                    let mut buf: Vec<u8> = vec![0; 1];
+                    match input.read_exact(&mut buf) {
+                        Ok(_) => {
+                            buffer.append(&mut buf);
+                        }
+                        Err(e) => return Err(anyhow::Error::new(e)),
+                    };
+                }
+                Err::Error(e) => {
+                    return Err(anyhow!("Failed to parse, {:?}", e));
+                }
+                Err::Failure(e) => {
+                    return Err(anyhow!("Failed to parse, {:?}", e));
                 }
             },
         }
     }
 }
 
-struct Parser<'a, O: Sized> {
+pub struct Parser<'a, O: Sized> {
     parser: &'a dyn Fn(&[u8]) -> nom::IResult<&[u8], O>,
 }
 
 impl<'a, O: Sized> Parser<'a, O> {
-    fn new(parser: &'a dyn Fn(&[u8]) -> nom::IResult<&[u8], O>) -> Self {
+    pub fn new(parser: &'a dyn Fn(&[u8]) -> nom::IResult<&[u8], O>) -> Self {
         Parser { parser }
     }
 
@@ -46,24 +55,30 @@ impl<'a, O: Sized> Parser<'a, O> {
     }
 }
 
-struct ParsingIterator<'a, R: Read, O: Sized> {
+pub struct ParsingIterator<'a, R: Read, O: Sized> {
     input: R,
     parser: Parser<'a, O>,
 }
 
 impl<'a, R: Read, O: Sized> ParsingIterator<'a, R, O> {
-    fn new(parser: Parser<'a, O>, input: R) -> Self {
+    pub fn new(parser: Parser<'a, O>, input: R) -> Self {
         ParsingIterator { input, parser }
     }
 }
 
 impl<'a, R: Read, O> Iterator for ParsingIterator<'a, R, O> {
-    type Item = O;
+    type Item = Result<O>;
 
-    fn next(&mut self) -> Option<O> {
+    fn next(&mut self) -> Option<Result<O>> {
         match self.parser.parse(&mut self.input) {
-            Ok(value) => Some(value),
-            Err(_e) => None,
+            Ok(value) => Some(Ok(value)),
+            Err(e) => match e.root_cause().downcast_ref::<std::io::Error>() {
+                Some(io_error) => match io_error.kind() {
+                    std::io::ErrorKind::UnexpectedEof => None,
+                    _ => Some(Err(e)),
+                },
+                _ => Some(Err(e)),
+            }, //Some(Err(e)),
         }
     }
 }
@@ -112,10 +127,27 @@ mod tests {
         let cursor = std::io::Cursor::new(input);
         let parser: Parser<u32> = Parser::new(&parse_u32);
         let mut iter = ParsingIterator::new(parser, cursor);
-        assert_eq!(iter.next(), Some(1));
-        // FIXME: Looks like bytes read from input are not consumed
-        assert_eq!(iter.next(), Some(2));
-        assert_eq!(iter.next(), None);
+
+        {
+            let item = iter.next();
+            assert!(item.is_some());
+            let result = item.unwrap();
+            assert!(result.is_ok());
+            let value = result.unwrap();
+            assert_eq!(value, 1);
+        }
+        {
+            let item = iter.next();
+            assert!(item.is_some());
+            let result = item.unwrap();
+            assert!(result.is_ok());
+            let value = result.unwrap();
+            assert_eq!(value, 2);
+        }
+        {
+            let item = iter.next();
+            assert!(item.is_none());
+        }
     }
 
     #[test]

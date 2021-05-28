@@ -1,5 +1,5 @@
 use human_panic::setup_panic;
-use pareidolia::synalize::grammar::Ufwb;
+use preidolia::synalize::grammar::Ufwb;
 use quick_xml::de::{from_reader, DeError};
 use std::fs::File;
 use std::io::BufReader;
