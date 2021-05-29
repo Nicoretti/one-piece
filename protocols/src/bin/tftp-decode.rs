@@ -1,6 +1,5 @@
 use anyhow::Result;
 use human_panic::setup_panic;
-use preidolia;
 use std::io::{BufWriter, Write};
 use structopt::StructOpt;
 

@@ -34,14 +34,14 @@ fn main() -> Result<()> {
     let input: BufReader<Box<dyn std::io::Read>> = BufReader::new(args.input.into());
     let mut output: BufWriter<Box<dyn std::io::Write>> = BufWriter::new(args.output.into());
     let lines: Box<dyn Iterator<Item = std::io::Result<String>>> = if let Some(count) = args.count {
-        Box::new(input.lines().take(count).into_iter())
+        Box::new(input.lines().take(count))
     } else {
         Box::new(input.lines())
     };
 
     for line in lines {
         let tftp_packet: protocols::tftp::TftpPacket = serde_json::from_str(&line?)?;
-        output.write(tftp_packet.to_bytes().collect::<Vec<u8>>().as_slice())?;
+        output.write_all(tftp_packet.to_bytes().collect::<Vec<u8>>().as_slice())?;
         output.flush()?;
     }
     Ok(())
