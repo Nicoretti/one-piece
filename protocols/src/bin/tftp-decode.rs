@@ -1,9 +1,8 @@
 use anyhow::Result;
 use human_panic::setup_panic;
 use preidolia;
-use std::io::{BufRead, BufReader, BufWriter, Write};
+use std::io::{BufWriter, Write};
 use structopt::StructOpt;
-use tobytes::ToBytes;
 
 mod cli {
     use structopt::StructOpt;
@@ -36,7 +35,7 @@ fn main() -> Result<()> {
     let args = cli::Decode::from_args();
     let input: Box<dyn std::io::Read> = args.input.into();
     let mut output: BufWriter<Box<dyn std::io::Write>> = BufWriter::new(args.output.into());
-    let mut parser = preidolia::parsers::ParsingIterator::new(
+    let parser = preidolia::parsers::ParsingIterator::new(
         preidolia::parsers::Parser::new(&protocols::tftp::parsers::tftp),
         input,
     );

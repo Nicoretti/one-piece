@@ -41,8 +41,8 @@ fn main() -> Result<()> {
 
     for line in lines {
         let tftp_packet: protocols::tftp::TftpPacket = serde_json::from_str(&line?)?;
-        output.write(tftp_packet.to_bytes().collect::<Vec<u8>>().as_slice());
-        output.flush();
+        output.write(tftp_packet.to_bytes().collect::<Vec<u8>>().as_slice())?;
+        output.flush()?;
     }
     Ok(())
 }
