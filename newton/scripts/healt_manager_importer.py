@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import csv
+import json
 import datetime
 import argparse
 
@@ -37,7 +38,9 @@ def breuer_hm_csv_entries(csv_file, date_fmt):
 def main(argv=None):
     parser = create_parser()
     args = parser.parse_args(argv)
-    sys.exit(-1)
+    for entry in  breuer_hm_csv_entries(args.csv, args.date_format):
+        print(entry)
+    sys.exit(0)
 
 
 if __name__ == '__main__':
