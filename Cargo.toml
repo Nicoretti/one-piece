@@ -8,5 +8,6 @@ members = [
     "formats",
     "protocols",
     "newton",
-    "nostd"
+    "nostd",
+    "nordic"
 ]
