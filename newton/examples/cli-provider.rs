@@ -6,7 +6,7 @@
 /// user@host ~: cargo run --example cli-provider -- "query { entry(id: 2){weight bodyFat amr bmr } }"
 /// ```
 use anyhow::Result;
-use juniper::{graphql_object, graphql_value, FieldError, FieldResult, GraphQLObject};
+use juniper::{graphql_object, graphql_value, FieldError, FieldResult};
 use juniper::{EmptyMutation, EmptySubscription, Variables};
 use newton::graphql::{Entry, VecDataProvider};
 
@@ -14,7 +14,8 @@ pub struct Query {}
 
 #[graphql_object(context=VecDataProvider)]
 impl Query {
-    fn apiVersion() -> &str {
+    #[graphql(name = "apiVersion")]
+    fn api_version() -> &str {
         "1.0"
     }
 
@@ -36,7 +37,6 @@ type Schema<'a> = juniper::RootNode<
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
 
-    println!("{:?}", args);
     if args.len() < 2 {
         return Err(anyhow::anyhow!("no query provided"));
     }
