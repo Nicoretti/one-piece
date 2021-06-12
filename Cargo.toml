@@ -7,5 +7,6 @@ members = [
     "bricks",
     "formats",
     "protocols",
-    "newton"
+    "newton",
+    "nostd"
 ]
