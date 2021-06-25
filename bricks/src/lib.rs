@@ -16,6 +16,7 @@ use std::io::Write;
 pub mod cli {
 
     use anyhow::{anyhow, Error};
+    use std::io::{Read, Write};
     use std::{
         convert::Into,
         path::{Path, PathBuf},
@@ -24,30 +25,15 @@ pub mod cli {
 
     #[derive(Debug)]
     pub enum Input {
-        Stdin,
-        File { path: PathBuf },
+        Stdin(std::io::Stdin),
+        File(std::fs::File),
     }
 
-    #[derive(Debug)]
-    pub enum Output {
-        Stdout,
-        File { path: PathBuf },
-    }
-
-    impl Into<Box<dyn std::io::Read>> for Input {
-        fn into(self) -> Box<dyn std::io::Read> {
+    impl Read for Input {
+        fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
             match self {
-                Input::Stdin => Box::new(std::io::stdin()),
-                Input::File { path } => Box::new(std::fs::File::open(path).unwrap()),
-            }
-        }
-    }
-
-    impl Into<Box<dyn std::io::Write>> for Output {
-        fn into(self) -> Box<dyn std::io::Write> {
-            match self {
-                Output::Stdout => Box::new(std::io::stdout()),
-                Output::File { path } => Box::new(std::fs::File::open(path).unwrap()),
+                Input::Stdin(s) => s.read(buf),
+                Input::File(f) => f.read(buf),
             }
         }
     }
@@ -55,16 +41,31 @@ pub mod cli {
     impl FromStr for Input {
         type Err = Error;
         fn from_str(s: &str) -> Result<Self, Self::Err> {
-            match s.to_lowercase().as_ref() {
-                "-" => Ok(Input::Stdin),
-                _ => {
-                    let path = Path::new(s).to_path_buf();
-                    if path.exists() {
-                        Ok(Input::File { path })
-                    } else {
-                        Err(anyhow!("Could not find file {:?}", path))
-                    }
-                }
+            match s {
+                "-" => Ok(Input::Stdin(std::io::stdin())),
+                path => Ok(Input::File(std::fs::File::open(path)?)),
+            }
+        }
+    }
+
+    #[derive(Debug)]
+    pub enum Output {
+        Stdout(std::io::Stdout),
+        File(std::fs::File),
+    }
+
+    impl Write for Output {
+        fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+            match self {
+                Output::Stdout(s) => s.write(buf),
+                Output::File(f) => f.write(buf),
+            }
+        }
+
+        fn flush(&mut self) -> std::io::Result<()> {
+            match self {
+                Output::Stdout(s) => s.flush(),
+                Output::File(f) => f.flush(),
             }
         }
     }
@@ -72,16 +73,9 @@ pub mod cli {
     impl FromStr for Output {
         type Err = Error;
         fn from_str(s: &str) -> Result<Self, Self::Err> {
-            match s.to_lowercase().as_ref() {
-                "-" => Ok(Output::Stdout),
-                _ => {
-                    let path = Path::new(s).to_path_buf();
-                    if !path.exists() {
-                        Ok(Output::File { path })
-                    } else {
-                        Err(anyhow!("File already exists {:?}", path))
-                    }
-                }
+            match s {
+                "-" => Ok(Output::Stdout(std::io::stdout())),
+                path => Ok(Output::File(std::fs::File::open(path)?)),
             }
         }
     }

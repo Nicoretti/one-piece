@@ -31,8 +31,8 @@ mod cli {
 fn main() -> Result<()> {
     setup_panic!();
     let args = cli::Encode::from_args();
-    let input: BufReader<Box<dyn std::io::Read>> = BufReader::new(args.input.into());
-    let mut output: BufWriter<Box<dyn std::io::Write>> = BufWriter::new(args.output.into());
+    let input = BufReader::new(args.input);
+    let mut output = BufWriter::new(args.output);
     let lines: Box<dyn Iterator<Item = std::io::Result<String>>> = if let Some(count) = args.count {
         Box::new(input.lines().take(count))
     } else {

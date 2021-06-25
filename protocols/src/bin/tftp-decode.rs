@@ -32,11 +32,10 @@ mod cli {
 fn main() -> Result<()> {
     setup_panic!();
     let args = cli::Decode::from_args();
-    let input: Box<dyn std::io::Read> = args.input.into();
-    let mut output: BufWriter<Box<dyn std::io::Write>> = BufWriter::new(args.output.into());
+    let mut output = BufWriter::new(args.output);
     let parser = preidolia::parsers::ParsingIterator::new(
         preidolia::parsers::Parser::new(&protocols::tftp::parsers::tftp),
-        input,
+        args.input,
     );
     let tftp_packets: Box<dyn Iterator<Item = Result<protocols::tftp::TftpPacket>>> =
         if let Some(count) = args.count {
