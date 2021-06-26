@@ -1,3 +1,5 @@
+![build](https://github.com/nicoretti/spica/actions/workflows/rust.yml/badge.svg)
+
 # Spica 
 My effort to create a mono repo for all of my rust code and projects.
 So far it contains the following crates/projects:
