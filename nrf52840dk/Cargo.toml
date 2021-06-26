@@ -1,0 +1,24 @@
+[package]
+name = "nrf52840dk"
+authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
+edition = "2018"
+version = "0.1.0"
+test = false
+bench = false
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+cortex-m = "0.5.8"
+cortex-m-rt = "0.6.5"
+panic-halt = "0.2.0"
+nostd = { version = "0.1", path = "../nostd" }
+nordic = { version = "0.1", path = "../nordic" }
+
+
+[profile.release]
+# better optimizations
+codegen-units = 1
+# symbols are nice and they don't increase the size on Flash
+debug = true
+# better optimizations
+lto = true

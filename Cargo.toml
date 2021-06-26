@@ -9,5 +9,6 @@ members = [
     "protocols",
     "newton",
     "nostd",
-    "nordic"
+    "nordic",
+    "nrf52840dk"
 ]

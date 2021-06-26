@@ -1,5 +1,6 @@
-/target
+**/target
 /venv
 **/*.rs.bk
 .idea
 Cargo.lock
+*openocd.log
