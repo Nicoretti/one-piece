@@ -10,6 +10,7 @@ So far it contains the following crates/projects:
 | newton | TBD | TBD |
 | nordic | TBD | TBD |
 | nostd | TBD | TBD |
+| nrf52840dk | TBD | TBD |
 | pareidolia | TBD | TBD |
 | protocols | TBD | TBD |
 | tobytes | TBD | TBD |
