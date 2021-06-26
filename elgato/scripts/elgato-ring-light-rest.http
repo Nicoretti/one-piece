@@ -1,0 +1,49 @@
+# Retrive light state information
+GET http://ringlight.local.:9123/elgato/lights
+
+###
+
+# Change state
+PUT http://ringlight.local.:9123/elgato/lights
+#Host: ringlight.local.:9123
+#Connection: keep-alive
+#Accept: */*
+#User-Agent: Elgato%20Control%20Center/10368 CFNetwork/1128.1 Darwin/19.6.0 (x86_64)
+#Accept-Language: en-us
+#Accept-Encoding: gzip, deflate
+
+# Brightness 0-100 (Percentage), Temperature: 143 - 344, ON: [0,1], NumberOfLights: ?
+{
+  "numberOfLights": 1,
+  "lights": [
+    {
+      "on": 1,
+      "brightness": 100,
+      "temperature": 344
+    }
+  ]
+}
+
+###
+
+# Retrive general light information power on etc
+GET http://ringlight.local.:9123/elgato/lights/settings
+
+###
+
+# Change general light settings
+PUT http://ringlight.local.:9123/elgato/lights/settings
+
+{
+  "powerOnBehavior": 1,
+  "powerOnBrightness": 40,
+  "powerOnTemperature": 230,
+  "switchOnDurationMs": 100,
+  "switchOffDurationMs": 300,
+  "colorChangeDurationMs": 100
+}
+
+###
+
+# Get product information (name, hw, firmware, etc.)
+GET http://ringlight.local.:9123/elgato/accessory-info
