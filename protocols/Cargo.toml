@@ -3,6 +3,7 @@ name = "protocols"
 version = "0.1.0"
 authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
 edition = "2018"
+license = "MIT OR Apache-2.0"
 
 [[bin]]
 name = "tftp-encode"
