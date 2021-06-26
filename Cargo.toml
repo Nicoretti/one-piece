@@ -10,5 +10,4 @@ members = [
     "newton",
     "nostd",
     "nordic",
-    "nrf52840dk"
 ]
