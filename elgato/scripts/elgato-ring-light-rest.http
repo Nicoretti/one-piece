@@ -1,3 +1,5 @@
+# Tested against firmware version(s) [1.0.4 (137), 1.0.4 (143)]
+
 # Retrive light state information
 GET http://ringlight.local.:9123/elgato/lights
 
@@ -19,7 +21,7 @@ PUT http://ringlight.local.:9123/elgato/lights
     {
       "on": 1,
       "brightness": 100,
-      "temperature": 344
+      "temperature": 244
     }
   ]
 }
@@ -37,7 +39,7 @@ PUT http://ringlight.local.:9123/elgato/lights/settings
 {
   "powerOnBehavior": 1,
   "powerOnBrightness": 40,
-  "powerOnTemperature": 230,
+  "powerOnTemperature": 130,
   "switchOnDurationMs": 100,
   "switchOffDurationMs": 300,
   "colorChangeDurationMs": 100
@@ -47,3 +49,8 @@ PUT http://ringlight.local.:9123/elgato/lights/settings
 
 # Get product information (name, hw, firmware, etc.)
 GET http://ringlight.local.:9123/elgato/accessory-info
+
+###
+GET http://ringlight.local.:9123/elgato/wifi-info
+###
+PUT http://ringlight.local.:9123/elgato/identify
