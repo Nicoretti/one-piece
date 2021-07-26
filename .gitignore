@@ -4,3 +4,5 @@
 .idea
 Cargo.lock
 *openocd.log
+newton/scripts/HealthManagerApp_DataExport-1.csv
+
