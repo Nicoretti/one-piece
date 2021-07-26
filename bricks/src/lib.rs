@@ -15,13 +15,9 @@ use std::io::Write;
 
 pub mod cli {
 
-    use anyhow::{anyhow, Error};
+    use anyhow::Error;
     use std::io::{Read, Write};
-    use std::{
-        convert::Into,
-        path::{Path, PathBuf},
-        str::FromStr,
-    };
+    use std::str::FromStr;
 
     #[derive(Debug)]
     pub enum Input {
