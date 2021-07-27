@@ -5,6 +5,12 @@ authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "ringlight-updater"
+path = "src/bin/ringlight-updater.rs"
 
 [dependencies]
+tokio = { version = "1.9.0", features = ["full"] }
+structopt = "0.3.22"
+anyhow = "1.0.42"
+human-panic = "1.0.3"
