@@ -14,3 +14,5 @@ tokio = { version = "1.9.0", features = ["full"] }
 structopt = "0.3.22"
 anyhow = "1.0.42"
 human-panic = "1.0.3"
+reqwest = { version = "0.11.4", features = ["gzip", "deflate", "json", "serde_json"] }
+itertools = "0.10.1"
