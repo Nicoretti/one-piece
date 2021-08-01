@@ -52,5 +52,6 @@ GET http://ringlight.local.:9123/elgato/accessory-info
 
 ###
 GET http://ringlight.local.:9123/elgato/wifi-info
+
 ###
 PUT http://ringlight.local.:9123/elgato/identify
