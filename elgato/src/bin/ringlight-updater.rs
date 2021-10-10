@@ -1,3 +1,75 @@
+//! # ringlight-updater
+//!
+//! ## General Information
+//! Even though the the "Elgato Control Center" received patches regarding
+//! it's  firmware update mechanism in version 1.1.4.
+//! ```
+//! ...
+//!  * Improved the reliability of firmware updating when Wi-Fi conditions are not optimal.
+//! ...
+//! ```
+//! seems still to have issues with fast Wi-Fi connections. This firmware updater was written
+//! to provide a more stable updater.
+//!
+//! **ATTENTION:**
+//! The update mechanism of the Ring Light in combination with the Elgato Control Center does
+//! not seem to be very solid (e.g. "missing" flow control). This updater was written mainly
+//! based on "black-box" observations (network traces, http endpoint behaviours etc.).
+//! Using this updater you may harm/brick your device.
+//! So if you choose to use this firmware updater you do so on your own risk.
+//!
+//! ## The Firmware Update Mechanism
+//! The following paragraphs describe the elgato firmware update mechanism from a mostly
+//! black box point of view.
+//!
+//! ### Components involved in the firmware update process
+//! * Elgato Ring Light [version -]
+//! * Elgato Control Center [version 1.1.4] (this component is/can be replaced by this updater)
+//!
+//! ### Update Relevant Constrains/Properties of the RingLight
+//! * Timeout on Target if client waits to long in betwen chunks/next update step
+//! * http
+//! * 202 -> Acceted chunk "is processed"
+//! * 408 -> still busy e.g. with saving/handling previous chunk (reconnection needed afterwards)
+//! * Web endpoint http 1.1
+//!
+//! #### Update Relevant Constrains/Properties of the Elgato Control Center
+//! * will find the ring light
+//! * Timeout/Retry limit in the elgato control center application max 10/15 timeouts from the ring light
+//!    -> not so nice because thats the "only flow" control in place, this can cause aborts from
+//!    updater client side if the network overwelms the target (ring light)
+//! * Elgato Control Center uses chunk size of 4096
+//!
+//! ### The Update Process
+//! 1. prepare              [prepare]
+//! 2. upload chucks        [data]
+//! 3. run update           [execute]t
+//!
+//!
+//! ## The ringligh-updater cli
+//!
+//! `
+//! More stable elgato ring light firmware updater
+//!
+//! USAGE:
+//!     ringlight-updater [OPTIONS] <firmware> <ip>
+//!
+//! FLAGS:
+//!     -h, --help       Prints help information
+//!     -V, --version    Prints version information
+//!
+//! OPTIONS:
+//!     -c, --chunk-size <bytes>       size of individually transferred chunks in bytes [default: 4096]
+//!         --chunk-retries <count>    Amount of retires for a single chunk upload, if not specified it will retry until
+//!                                    chunk upload succeeds
+//!     -d, --delay <ms>               inter packet delay in milli seconds [default: 25]
+//!
+//! ARGS:
+//!     <firmware>    Path to the firmware file which shall be used for the update
+//!     <ip>          Ip address of the ring light
+//!`
+//!
+
 use anyhow::{format_err, Result};
 use human_panic::setup_panic;
 use itertools::Itertools;
