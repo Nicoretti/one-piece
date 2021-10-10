@@ -117,8 +117,8 @@ pub mod grammar {
     #[cfg(test)]
     mod tests {
         use super::*;
+        use crate::synalize::grammar::{Endianess, Grammar, Signedness};
         use quick_xml::de::{from_str, DeError};
-        use crate::synalize::grammar::{Grammar, Endianess, Signedness};
 
         #[test]
         fn test_structure() -> Result<(), DeError> {
@@ -141,7 +141,13 @@ pub mod grammar {
 
         #[test]
         fn test_fixed_length_string() -> Result<(), DeError> {
-            let expected = String { name: std::string::String::from("FixedLengthString"), id: 8, r#type: StringType::FixedLength, length: Some(10), delimiter: None };
+            let expected = String {
+                name: std::string::String::from("FixedLengthString"),
+                id: 8,
+                r#type: StringType::FixedLength,
+                length: Some(10),
+                delimiter: None,
+            };
             let xml = r#"
             <?xml version="1.0" encoding="UTF-8"?>
             <string name="FixedLengthString" id="8" type="fixed-length" length="10"/>
@@ -153,7 +159,13 @@ pub mod grammar {
 
         #[test]
         fn test_zero_terminated_string() -> Result<(), DeError> {
-            let expected = String { name: std::string::String::from("ZeroTerminated"), id: 10, r#type: StringType::ZeroTerminated, length: None, delimiter: None };
+            let expected = String {
+                name: std::string::String::from("ZeroTerminated"),
+                id: 10,
+                r#type: StringType::ZeroTerminated,
+                length: None,
+                delimiter: None,
+            };
             let xml = r#"
             <?xml version="1.0" encoding="UTF-8"?>
             <string name="ZeroTerminated" id="10" type="zero-terminated"/>
@@ -165,7 +177,13 @@ pub mod grammar {
 
         #[test]
         fn test_delimiter_terminated_string() -> Result<(), DeError> {
-            let expected = String { name: std::string::String::from("DelimiterTerminated"), id: 11, r#type: StringType::DelimiterTerminated, length: None, delimiter: Some(std::string::String::from("0A0A")) };
+            let expected = String {
+                name: std::string::String::from("DelimiterTerminated"),
+                id: 11,
+                r#type: StringType::DelimiterTerminated,
+                length: None,
+                delimiter: Some(std::string::String::from("0A0A")),
+            };
             let xml = r#"
             <?xml version="1.0" encoding="UTF-8"?>
             <string name="DelimiterTerminated" id="11" type="delimiter-terminated" delimiter="0A0A"/>
@@ -177,7 +195,13 @@ pub mod grammar {
 
         #[test]
         fn test_length_prefixed_string() -> Result<(), DeError> {
-            let expected = String { name: std::string::String::from("LengthPrefixed"), id: 13, r#type: StringType::PrefixedLength, length: None, delimiter: None };
+            let expected = String {
+                name: std::string::String::from("LengthPrefixed"),
+                id: 13,
+                r#type: StringType::PrefixedLength,
+                length: None,
+                delimiter: None,
+            };
             let xml = r#"
             <?xml version="1.0" encoding="UTF-8"?>
             <string name="LengthPrefixed" id="13" type="pascal"/>
@@ -189,7 +213,13 @@ pub mod grammar {
 
         #[test]
         fn test_integer_number_with_byte_length() -> Result<(), DeError> {
-            let expected = Number { name: std::string::String::from("IntegerWithByteLenght1"), id: 3, r#type: NumberType::Integer, length: 1, unit: None };
+            let expected = Number {
+                name: std::string::String::from("IntegerWithByteLenght1"),
+                id: 3,
+                r#type: NumberType::Integer,
+                length: 1,
+                unit: None,
+            };
             let xml = r#"
             <?xml version="1.0" encoding="UTF-8"?>
             <number name="IntegerWithByteLenght1" id="3" type="integer" length="1"/>
@@ -201,7 +231,13 @@ pub mod grammar {
 
         #[test]
         fn test_float_number_with_byte_length() -> Result<(), DeError> {
-            let expected = Number { name: std::string::String::from("FloatingPointByteLength2"), id: 15, r#type: NumberType::Float, length: 2, unit: None };
+            let expected = Number {
+                name: std::string::String::from("FloatingPointByteLength2"),
+                id: 15,
+                r#type: NumberType::Float,
+                length: 2,
+                unit: None,
+            };
             let xml = r#"
             <?xml version="1.0" encoding="UTF-8"?>
             <number name="FloatingPointByteLength2" id="15" type="float" length="2"/>
@@ -213,7 +249,13 @@ pub mod grammar {
 
         #[test]
         fn test_integer_number_with_bit_length() -> Result<(), DeError> {
-            let expected = Number { name: std::string::String::from("IntegerWithBitLength8"), id: 10, r#type: NumberType::Integer, length: 8, unit: Some(Unit::Bit) };
+            let expected = Number {
+                name: std::string::String::from("IntegerWithBitLength8"),
+                id: 10,
+                r#type: NumberType::Integer,
+                length: 8,
+                unit: Some(Unit::Bit),
+            };
             let xml = r#"
             <?xml version="1.0" encoding="UTF-8"?>
             <number name="IntegerWithBitLength8" id="10" type="integer" length="8" lengthunit="bit"/>
@@ -225,7 +267,13 @@ pub mod grammar {
 
         #[test]
         fn test_float_number_with_bit_length() -> Result<(), DeError> {
-            let expected = Number { name: std::string::String::from("FloatingPointBitLength16"), id: 18, r#type: NumberType::Float, length: 16, unit: Some(Unit::Bit) };
+            let expected = Number {
+                name: std::string::String::from("FloatingPointBitLength16"),
+                id: 18,
+                r#type: NumberType::Float,
+                length: 16,
+                unit: Some(Unit::Bit),
+            };
             let xml = r#"
             <?xml version="1.0" encoding="UTF-8"?>
             <number name="FloatingPointBitLength16" id="18" type="float" length="16" lengthunit="bit"/>
@@ -271,5 +319,3 @@ pub mod grammar {
         }
     }
 }
-
-
