@@ -191,12 +191,12 @@ pub trait ToBytes<T: ByteView + Sized = Self> {
 
 impl<'a, T: Sized + ByteView> ToBytes for T {
     fn to_bytes(&self) -> Bytes<T> {
-        Bytes::new(&self)
+        Bytes::new(self)
     }
 }
 
 /// Implements the [ByteView](trait.ByteView.html) trait for types which provide a `to_ne_bytes` method.
-/// (for more details on `to_ne_bytes` check e.g. `U8, U16, U32, ...`.
+/// (for more details on `to_ne_bytes` check e.g. `u8, u16, u32, ...`.
 macro_rules! implement_byte_view_for {
     ($t:ty) => {
         impl ByteView for $t {
