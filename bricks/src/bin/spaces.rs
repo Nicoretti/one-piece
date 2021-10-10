@@ -29,7 +29,6 @@ mod cli {
         )]
         pub number_of_spaces: usize,
     }
-
 }
 
 fn main() -> io::Result<()> {

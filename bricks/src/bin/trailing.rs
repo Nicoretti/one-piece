@@ -31,7 +31,6 @@ mod cli {
         )]
         pub check: bool,
     }
-
 }
 
 fn main() -> io::Result<()> {

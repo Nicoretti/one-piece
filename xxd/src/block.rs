@@ -108,6 +108,4 @@ impl<'a> fmt::Octal for Block<'a> {
 }
 
 #[cfg(test)]
-mod tests {
-
-}
+mod tests {}

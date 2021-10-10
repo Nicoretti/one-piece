@@ -1,2 +1,2 @@
-pub mod synalize;
 pub mod parsers;
+pub mod synalize;
