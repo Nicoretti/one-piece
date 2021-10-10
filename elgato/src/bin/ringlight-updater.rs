@@ -81,7 +81,6 @@ use tokio::time::{sleep, Duration};
 mod cli {
     use std::net::IpAddr;
     use std::path::PathBuf;
-    use structopt;
 
     #[derive(structopt::StructOpt, Debug)]
     #[structopt(about = "More stable elgato ring light firmware updater")]

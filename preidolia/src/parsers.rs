@@ -8,7 +8,7 @@ fn parse_from_read<I: Read, O: Sized>(
     input: &mut I,
 ) -> Result<O> {
     loop {
-        match (parser)(&buffer) {
+        match (parser)(buffer) {
             Ok((_, value)) => return Ok(value),
             Err(e) => match e {
                 Err::Incomplete(Needed::Size(size)) => {

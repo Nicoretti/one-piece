@@ -39,10 +39,10 @@ async fn main() {
     let mut command = match matches.subcommand() {
         (name, Some(matches)) => {
             let mut c = tokio::process::Command::new(name);
-            let args = matches
+            let args: Vec<&str> = matches
                 .values_of("")
                 .map(|v| v.collect())
-                .unwrap_or(Vec::new());
+                .unwrap_or_default();
             for argument in args {
                 c.arg(argument);
             }
