@@ -228,18 +228,6 @@ implement_byte_view_for!(i128);
 implement_byte_view_for!(f32);
 implement_byte_view_for!(f64);
 
-// TODO: add implement macro or impl. for types which can be converted into a slice of bytes
-
-// TODO's: Implement ByteView for
-// * [u8; T]
-// * Vec<u8>
-// * &[u8]
-// ...
-
-// TODO: Implement Derive Macro if all members implement ByteView
-
-// Add test for all supported built in types
-
 #[cfg(test)]
 mod tests {
     use super::*;
