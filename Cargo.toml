@@ -5,6 +5,7 @@ members = [
     "tobytes",
     "preidolia",
     "bricks",
+    "brickster",
     "formats",
     "protocols",
     "newton",
