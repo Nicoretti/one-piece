@@ -1,9 +1,11 @@
 use std::collections::hash_map::HashMap;
+use std::ops::{Index, IndexMut};
 
 /// Builder used to build environment variable(s) environment.
 #[derive(Debug)]
 pub struct EnvBuilder {
     env: HashMap<String, String>,
+    empty: String,
 }
 
 impl EnvBuilder {
@@ -11,40 +13,61 @@ impl EnvBuilder {
     pub fn new() -> Self {
         Self {
             env: HashMap::new(),
+            empty: String::from(""),
         }
     }
 
-    pub fn configure<F>(self, closure: F) -> Self
+    pub fn configure<F>(mut self, mut closure: F) -> Self
     where
-        F: FnOnce(Self) -> Self,
+        F: FnMut(&mut Self),
     {
-        closure(self)
+        closure(&mut self);
+        self
     }
 
     /// Clone the current system environment variables into the `EnvBuilder`.
-    pub fn clone(mut self) -> Self {
+    pub fn clone(&mut self) {
         std::env::vars().for_each(|(key, value)| {
             self.env.insert(key, value);
         });
-        self
     }
 
     /// Add an environment variable to the `EnvBuilder`.
-    pub fn add(mut self, key: &str, value: &str) -> Self {
+    pub fn add(&mut self, key: &str, value: &str) {
         self.env.insert(key.into(), value.into());
-        self
     }
 
     /// Remove an environment variable from the `EnvBuilder`.
-    pub fn remove(mut self, key: &str) -> Self {
+    pub fn remove(&mut self, key: &str) {
         self.env.remove(key);
-        self
     }
 
     /// Clear all environment variable from the `EnvBuilder`.
-    pub fn clear(mut self) -> Self {
+    pub fn clear(&mut self) {
         self.env.clear();
-        self
+    }
+}
+
+impl Index<&str> for EnvBuilder {
+    type Output = String;
+
+    fn index(&self, index: &str) -> &Self::Output {
+        match self.env.get(index) {
+            Some(v) => v,
+            None => &self.empty,
+        }
+    }
+}
+
+impl IndexMut<&str> for EnvBuilder {
+    fn index_mut(&mut self, index: &str) -> &mut Self::Output {
+        match self.env.get(index) {
+            Some(v) => self.env.get_mut(index).unwrap(),
+            None => {
+                self.env.insert(index.into(), "".into());
+                self.env.get_mut(index).unwrap()
+            }
+        }
     }
 }
 
@@ -62,7 +85,7 @@ mod tests {
     #[test]
     fn test_env_builder_clone() {
         let expected = std::env::vars();
-        let mut builder = EnvBuilder::new().clone();
+        let mut builder = EnvBuilder::new().configure(|env| env.clone());
         assert_eq!(
             std::env::vars().collect::<HashMap<String, String>>(),
             builder.into()
@@ -73,7 +96,10 @@ mod tests {
     fn test_env_builder_add() {
         let mut expected = std::env::vars().collect::<HashMap<String, String>>();
         expected.insert(String::from("MY_TEST_VAR_XYZ"), String::from("MY_VALUE"));
-        let mut builder = EnvBuilder::new().clone().add("MY_TEST_VAR_XYZ", "MY_VALUE");
+        let mut builder = EnvBuilder::new().configure(|env| {
+            env.clone();
+            env.add("MY_TEST_VAR_XYZ", "MY_VALUE");
+        });
         assert_eq!(expected, builder.into());
     }
 
@@ -81,14 +107,33 @@ mod tests {
     fn test_env_builder_remove() {
         let mut expected = std::env::vars().collect::<HashMap<String, String>>();
         expected.remove("HOME");
-        let mut builder = EnvBuilder::new().clone().remove("HOME");
+        let mut builder = EnvBuilder::new().configure(|env| {
+            env.clone();
+            env.remove("HOME")
+        });
         assert_eq!(expected, builder.into());
     }
 
     #[test]
     fn test_env_builder_clear() {
         let expected: HashMap<String, String> = HashMap::new();
-        let mut builder = EnvBuilder::new().clone().clear();
+        let mut builder = EnvBuilder::new().configure(|env| {
+            env.clone();
+            env.clear();
+        });
+        assert_eq!(expected, builder.into());
+    }
+    #[test]
+    fn test_env_builder_index_mut() {
+        let mut expected: HashMap<String, String> = HashMap::new();
+        expected.insert("FOO".into(), "BAR".into());
+        expected.insert("BAR".into(), "FOO".into());
+        expected.insert("FooBar".into(), "FOO:BAR:".into());
+        let mut builder = EnvBuilder::new().configure(|env| {
+            env["FOO"] = "BAR".into();
+            env["BAR"] = "FOO".into();
+            env["FooBar"] = [&env["BAR"], &env["FOO"], ""].join(":");
+        });
         assert_eq!(expected, builder.into());
     }
 
@@ -99,11 +144,11 @@ mod tests {
         expected.insert("BAR".into(), "FOO".into());
         expected.insert("MAM".into(), "??".into());
         let e = super::EnvBuilder::new().configure(|env| {
-            env.clone()
-                .clear()
-                .add("FOO", "BAR")
-                .add("BAR", "FOO")
-                .add("MAM", "??")
+            env.clone();
+            env.clear();
+            env.add("FOO", "BAR");
+            env.add("BAR", "FOO");
+            env.add("MAM", "??");
         });
         assert_eq!(expected, e.into());
     }
