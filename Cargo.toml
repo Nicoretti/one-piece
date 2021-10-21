@@ -12,4 +12,5 @@ members = [
     "nostd",
     "nordic",
     "elgato",
+    "game-of-life",
 ]
