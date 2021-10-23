@@ -62,7 +62,7 @@ impl Index<&str> for EnvBuilder {
 impl IndexMut<&str> for EnvBuilder {
     fn index_mut(&mut self, index: &str) -> &mut Self::Output {
         match self.env.get(index) {
-            Some(v) => self.env.get_mut(index).unwrap(),
+            Some(_) => self.env.get_mut(index).unwrap(),
             None => {
                 self.env.insert(index.into(), "".into());
                 self.env.get_mut(index).unwrap()
@@ -84,8 +84,8 @@ mod tests {
 
     #[test]
     fn test_env_builder_clone() {
-        let expected = std::env::vars();
-        let mut builder = EnvBuilder::new().configure(|env| env.clone());
+        let _expected = std::env::vars();
+        let builder = EnvBuilder::new().configure(|env| env.clone());
         assert_eq!(
             std::env::vars().collect::<HashMap<String, String>>(),
             builder.into()
@@ -96,7 +96,7 @@ mod tests {
     fn test_env_builder_add() {
         let mut expected = std::env::vars().collect::<HashMap<String, String>>();
         expected.insert(String::from("MY_TEST_VAR_XYZ"), String::from("MY_VALUE"));
-        let mut builder = EnvBuilder::new().configure(|env| {
+        let builder = EnvBuilder::new().configure(|env| {
             env.clone();
             env.add("MY_TEST_VAR_XYZ", "MY_VALUE");
         });
@@ -107,7 +107,7 @@ mod tests {
     fn test_env_builder_remove() {
         let mut expected = std::env::vars().collect::<HashMap<String, String>>();
         expected.remove("HOME");
-        let mut builder = EnvBuilder::new().configure(|env| {
+        let builder = EnvBuilder::new().configure(|env| {
             env.clone();
             env.remove("HOME")
         });
@@ -117,7 +117,7 @@ mod tests {
     #[test]
     fn test_env_builder_clear() {
         let expected: HashMap<String, String> = HashMap::new();
-        let mut builder = EnvBuilder::new().configure(|env| {
+        let builder = EnvBuilder::new().configure(|env| {
             env.clone();
             env.clear();
         });
@@ -129,7 +129,7 @@ mod tests {
         expected.insert("FOO".into(), "BAR".into());
         expected.insert("BAR".into(), "FOO".into());
         expected.insert("FooBar".into(), "FOO:BAR:".into());
-        let mut builder = EnvBuilder::new().configure(|env| {
+        let builder = EnvBuilder::new().configure(|env| {
             env["FOO"] = "BAR".into();
             env["BAR"] = "FOO".into();
             env["FooBar"] = [&env["BAR"], &env["FOO"], ""].join(":");

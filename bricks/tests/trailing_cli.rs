@@ -1,8 +1,8 @@
-use anyhow::Result;
+
 use assert_cmd::Command;
 use assert_fs::prelude::*;
-use std::env::temp_dir;
-use std::io::Write;
+
+
 
 const CONTENT_WITH_TRAILING_WS: &str = r#"
 Lorem ipsum

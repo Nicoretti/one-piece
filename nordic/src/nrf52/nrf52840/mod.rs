@@ -108,7 +108,7 @@ impl io::Write for Uart {
         let mut written_bytes: usize = 0;
         for byte in buf.iter() {
             match self.write_byte(*byte) {
-                Ok(v) => {
+                Ok(_) => {
                     written_bytes += 1;
                 }
                 Err(e) => return Err(e),

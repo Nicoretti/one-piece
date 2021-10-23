@@ -7,7 +7,7 @@ pub mod graphql {
         type IterType: Iterator;
         fn iter(&self) -> Self::IterType;
     }
-    impl<'a, I: std::iter::Iterator<Item = &'a Entry>> Context for DataProvider<'a, IterType = I> where
+    impl<'a, I: std::iter::Iterator<Item = &'a Entry>> Context for dyn DataProvider<'a, IterType = I> where
         I: 'a
     {
     }
