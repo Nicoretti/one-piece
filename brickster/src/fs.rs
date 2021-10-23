@@ -4,28 +4,66 @@ use std::path::{Path, PathBuf};
 use tempfile::TempDir;
 
 #[derive(Debug)]
-pub struct DirBuilder {
+pub struct DirectoryBuilder {
     root: TempDir,
     backup: Option<PathBuf>,
 }
 
-struct Data<R: Read + Sized> {
-    src: R,
+// TODO: Description if add_file shall be supported add conversion to FileContent
+pub struct FileContent {
+    src: Box<dyn Read>,
 }
 
-impl<R: Read + Sized> Read for Data<R> {
+impl FileContent {
+    /// Creates a new `FileContent` using the provided `std::io::Read`er
+    /// as data source.
+    pub fn new<R: 'static + Read>(src: R) -> Self {
+        Self { src: Box::new(src) }
+    }
+}
+
+impl Read for FileContent {
     fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
         self.src.read(buf)
     }
 }
 
-impl From<Cursor<Vec<u8>>> for Data<std::io::Cursor<Vec<u8>>> {
-    fn from(c: Cursor<Vec<u8>>) -> Self {
-        Data { src: c }
+impl From<Vec<u8>> for FileContent {
+    fn from(data: Vec<u8>) -> Self {
+        FileContent {
+            src: Box::new(Cursor::new(data)),
+        }
     }
 }
 
-impl DirBuilder {
+impl From<&str> for FileContent {
+    fn from(data: &str) -> Self {
+        FileContent {
+            src: Box::new(Cursor::new(
+                data.as_bytes().iter().cloned().collect::<Vec<u8>>(),
+            )),
+        }
+    }
+}
+
+impl From<String> for FileContent {
+    fn from(data: String) -> Self {
+        FileContent {
+            src: Box::new(Cursor::new(data.into_bytes())),
+        }
+    }
+}
+
+fn add_content<W, D>(src: D, mut dst: W)
+where
+    W: Write,
+    D: Into<FileContent>,
+{
+    let mut content: FileContent = src.into();
+    std::io::copy(&mut content, &mut dst).expect("Could not write data");
+}
+
+impl DirectoryBuilder {
     pub fn new() -> Self {
         Self {
             root: tempfile::Builder::new()
@@ -36,15 +74,12 @@ impl DirBuilder {
         }
     }
 
-    pub fn add_file<R: Read + Sized>(&mut self, path: &Path, data: R)
-    where
-        Data<R>: From<R>,
-    {
-        let data: Data<R> = data.into();
+    pub fn add_file<R: Into<FileContent>>(&mut self, path: &Path, data: R) {
+        let data: FileContent = data.into();
         let path = self.root.path().join(path);
         let mut file =
             File::create(&path).expect(&format!("Could not create test file {:?}", &path));
-        std::io::copy::<Data<R>, Write>(&mut data.into(), &mut file)
+        std::io::copy::<FileContent, dyn Write>(&mut data.into(), &mut file)
             .expect(&format!("Failed to write data to test file {:?}", &path));
     }
 
@@ -61,7 +96,7 @@ impl DirBuilder {
     }
 }
 
-impl Drop for DirBuilder {
+impl Drop for DirectoryBuilder {
     fn drop(&mut self) {
         if let Some(path) = &self.backup {
             // TODO: Check result, on error print warning/info to stderr
@@ -72,17 +107,52 @@ impl Drop for DirBuilder {
 
 #[cfg(test)]
 mod tests {
-    use std::io::Cursor;
-    use std::path::Path;
+    use crate::fs::{add_content, DirectoryBuilder, FileContent};
+    use std::io::{Cursor, Seek};
+    use std::io::{Read, Write};
 
     #[test]
-    fn smoke_test() {
-        let tmpdir = super::DirBuilder::new().configure(|dir| {
-            let p = Path::new("test.txt");
-            let data: Vec<u8> = vec![0x65, 0x65, 0x65, 0x65];
-            let c = Cursor::new(data);
-            dir.add_file(p, c);
-            dir.backup("/Users/nicoretti/");
-        });
+    fn add_byte_vector_as_content() {
+        let mut file = Cursor::new(Vec::<u8>::new());
+        let content: Vec<u8> = (0..10).collect();
+
+        add_content(content, &mut file);
+        file.rewind().unwrap();
+
+        let expected = (0..10).collect::<Vec<u8>>();
+        assert_eq!(
+            expected,
+            file.bytes().filter_map(|r| r.ok()).collect::<Vec<u8>>()
+        )
+    }
+
+    #[test]
+    fn add_str_as_content() {
+        let mut file = Cursor::new(Vec::<u8>::new());
+        let content = "abcde";
+
+        add_content(content, &mut file);
+        file.rewind().unwrap();
+
+        let expected = vec![97u8, 98u8, 99u8, 100u8, 101u8];
+        assert_eq!(
+            expected,
+            file.bytes().filter_map(|r| r.ok()).collect::<Vec<u8>>()
+        )
+    }
+
+    #[test]
+    fn add_string_as_content() {
+        let mut file = Cursor::new(Vec::<u8>::new());
+        let content = String::from("abcde");
+
+        add_content(content, &mut file);
+        file.rewind().unwrap();
+
+        let expected = vec![97u8, 98u8, 99u8, 100u8, 101u8];
+        assert_eq!(
+            expected,
+            file.bytes().filter_map(|r| r.ok()).collect::<Vec<u8>>()
+        )
     }
 }
