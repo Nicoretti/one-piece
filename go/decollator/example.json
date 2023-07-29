@@ -1,0 +1,32 @@
+[
+  {
+    "type": "added",
+    "summary": "Added feature xyz",
+    "details": {}
+  },
+  {
+    "type": "changed",
+    "summary": "Changed Important thingy",
+    "details": {}
+  },
+  {
+    "type": "deprecated",
+    "summary": "Outdated api",
+    "details": {}
+  },
+  {
+    "type": "removed",
+    "summary": "Removed old feature",
+    "details": {}
+  },
+  {
+    "type": "fixed",
+    "summary": "Fixed anoying UI bug",
+    "details": {}
+  },
+  {
+    "type": "security",
+    "summary": "Addressed CVE 0815 by doing nothing",
+    "details": {}
+  }
+]
