@@ -1,0 +1,91 @@
+[tool.poetry]
+name = "invokees"
+packages = [{include = "invokees", from = "src"}]
+
+version = "0.4.0"
+description = "Common python project tasks"
+authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+invoke = "^2.0.0"
+rich = "^13.3.1"
+pytest = "^7.2.1"
+prysk = {extras = ["pytest-plugin"], version = ">=0.13.1"}
+coverage = "^7.1.0"
+pytest-cov = "^4.0.0"
+pytest-xdist = "^3.2.0"
+ruff = ">=0.0.247"
+mypy = "^1.0.1"
+black = "^23.1.0"
+tomlkit = "^0.11.6"
+isort = "^5.12.0"
+types-setuptools = "^67.4.0.3"
+types-invoke = "^2.0.0.5"
+types-docutils = ">=0.19.1.6"
+types-pygments = "^2.14.0.5"
+pre-commit = "^3.1.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+verbose = true
+include = "\\.pyi?$"
+
+[tool.isort]
+profile = "black"
+force_grid_wrap = 2
+skip = [".gitignore", "venv", ".nox"]
+
+[tool.ruff]
+# Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
+select = ["A", "B", "C", "E", "F", "G", "UP", "YTT", "S", "BLE"]
+ignore = []
+
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+fixable = ["A", "B", "C", "E", "F", "G", "UP", "YTT", "S", "BLE"]
+unfixable = []
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+per-file-ignores = {}
+
+# Same as Black.
+line-length = 88
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# Assume Python 3.10.
+target-version = "py310"
+
+[tool.ruff.mccabe]
+# Unlike Flake8, default to a complexity level of 10.
+max-complexity = 10

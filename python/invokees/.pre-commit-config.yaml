@@ -1,0 +1,32 @@
+default_stages: [ commit, push, manual ]
+repos:
+  - repo: local
+    hooks:
+      - id: format
+        name: format
+        types: [ python ]
+        pass_filenames: false
+        language: system
+        entry: inv code.format
+
+      - id: lint
+        name: lint
+        types: [ python ]
+        pass_filenames: false
+        language: system
+        entry: inv code.lint
+
+      - id: type-check
+        name: type-check
+        types: [ python ]
+        pass_filenames: false
+        language: system
+        entry: inv code.typing
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.2.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        exclude: ^test/integration
