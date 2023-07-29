@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/css/nicoretti.css">
+    <title>Food Reserves</title>
+</head>
+<body>
+
+<table>
+    <tr>
+        <th>Box</th>
+        <th>Count</th>
+        <th>Product</th>
+        <th>Amount</th>
+        <th>Expiry Date</th>
+    </tr>
+
+    {% for food in foods %}
+        <tr>
+            <td>{{ food.box }}</td>
+            <td>{{ food.count }}</td>
+            <td>{{ food.description }}</td>
+            <td>{{ food.amount }} {{ food.unit }}</td>
+            <td>{{ food.expiry_date }}</td>
+        </tr>
+    {% endfor %}
+
+</table>
+
+
+</body>
+</html>

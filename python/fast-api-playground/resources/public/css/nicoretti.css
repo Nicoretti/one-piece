@@ -1,0 +1,18 @@
+/* Stash  styling */
+th, td {
+  border: 1px solid;
+  text-align: center;
+}
+
+th {
+  background-color: #7d85a8;
+}
+
+tr:nth-child(even){background-color: #ffffff}
+tr:nth-child(odd){background-color: coral}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+/* End Stash  styling */

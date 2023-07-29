@@ -1,0 +1,5 @@
+.idea/
+resources/private/**/*
+resources/protected/**/*
+__pycache__/
+/resources/private/
