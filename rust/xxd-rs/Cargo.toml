@@ -1,0 +1,35 @@
+[package]
+name = "xxd-rs"
+description = "A rust clone of xxd"
+repository = "https://github.com/Nicoretti/xxd-rs"
+readme = "README.md"
+authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
+edition = "2018"
+keywords = ["xxd", "hex-dump"]
+license-file = "LICENSE"
+version = "0.3.0"
+build = "build.rs"
+autobins = false
+
+[badges]
+appveyor = { repository = "Nicoretti/xxd-rs", branch = "master", service = "github" }
+travis-ci = { repository = "Nicoretti/xxd-rs", branch = "master" }
+
+[build-dependencies]
+clap = "2.16.2"
+
+[lib]
+name = "xxd"
+path = "src/xxd/lib.rs"
+
+[[bin]]
+name = "xxd-rs"
+test = false
+doc = false
+path = "src/bin/main.rs"
+
+[dependencies]
+nom = "3.0.0"
+clap = "2.16.2"
+anyhow = "1.0.32"
+human-panic = "1.0.3"
