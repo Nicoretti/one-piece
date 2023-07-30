@@ -1,5 +1,5 @@
 # Bootstrap the terminal-conifg environment
-```curl https://raw.githubusercontent.com/Nicoretti/one-piece/master/shell/sh/bootstrap-cfg/bootstrap.sh | sh```
+```curl https://raw.githubusercontent.com/Nicoretti/one-piece/grand-line/sh/bootstrap-cfg/bootstrap.sh | sh```
 
 **Attention:**
 *VIM/NVIM* need an additional call to PlugUpdate on the first run.
