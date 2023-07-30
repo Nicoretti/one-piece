@@ -1,0 +1,13 @@
+Project {
+	ExecutableConfig Debug {
+
+		Files "**/*.cpp"
+		IncludeDir "snf/include"
+		ArtifactName "sniffer"
+		DefaultToolchain GCC {
+			Compiler CPP {
+				Flags "-O0 -g3 -Wall -fmessage-length=0"
+			}
+		}
+	}
+}
