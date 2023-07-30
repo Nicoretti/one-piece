@@ -1,0 +1,80 @@
+[build-system]
+requires = [
+    "poetry>=1.0.0",
+]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "python-cookie"
+version = "0.1.0"
+description = "Cookiecutter template for basic python projects"
+readme = "README.rst"
+license = "MIT"
+authors = [
+    "Nicola Coretti <nico.coretti@gmail.com>",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+]
+keywords = [
+    "python",
+    "cookiecutter",
+    "template",
+]
+repository = "https://github.com/Nicoretti/python-cookie"
+homepage = "https://github.com/Nicoretti/python-cookie"
+include = [
+    ".coveragerc",
+    "noxfile.py",
+    "poetry.lock",
+    "*.rst",
+    "*.txt",
+    "*.toml",
+    "docs/*",
+    "scripts/*",
+    "examples/*",
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+[tool.poetry.dev-dependencies]
+black = "^22.1.0"
+coverage = "^6.3.1"
+furo = "^2022.1.2"
+isort = "^5.10.1"
+mypy = "^0.931"
+nox = "^2022.1.7"
+nox-poetry = "^0.9.0"
+prysk = "^0.11.0"
+pylint = "^2.12.2"
+pytest = "^7.0.1"
+pyupgrade = "^2.32.0"
+Sphinx = "^4.4.0"
+
+[tool.coverage.run]
+source = [
+    "src/{{ cookiecutter.project_slug }}",
+]
+
+[tool.pylint.master]
+fail-under = 7
+
+[tool.pylint.format]
+max-line-length = 88
+max-module-lines = 800
+
+[tool.pylint.message_control]
+disable = "C0330, C0326"
+
+[tool.black]
+line-length = 88
+verbose = true
+include = "\\.pyi?$"
+
+[too.isort]
+profile = "black"

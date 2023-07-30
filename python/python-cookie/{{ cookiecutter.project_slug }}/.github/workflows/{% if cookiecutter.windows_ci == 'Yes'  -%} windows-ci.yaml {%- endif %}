@@ -1,0 +1,38 @@
+name: Windows CI
+
+on: [ pull_request ]
+
+jobs:
+  build:
+    {% raw -%}
+    name: "Python ${{ matrix.python-version }} on ${{ matrix.os }}"
+    runs-on: "${{ matrix.os }}"
+    {%- endraw %}
+    strategy:
+      matrix:
+        os:
+          - windows-latest
+        python-version:
+        {%- set major, minor = cookiecutter.python_base_version.split('.') | map('int') -%}
+        {%- for version in range(minor, 11) %}
+          - 3.{{ version }}
+        {%- endfor %}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      {% raw %}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Dependencies
+        run: poetry install
+
+      - name: Run workspace/project verification
+        run: poetry run python -m nox -s verify
+      {% endraw %}

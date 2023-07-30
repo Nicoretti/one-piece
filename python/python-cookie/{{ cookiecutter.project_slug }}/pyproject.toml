@@ -1,0 +1,99 @@
+[build-system]
+requires = [
+    "poetry>=1.0.0",
+]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "{{ cookiecutter.project_name }}"
+version = "{{ cookiecutter.version }}"
+description = "{{ cookiecutter.project_short_description }}"
+readme = "README.rst"
+license = "{{ cookiecutter.open_source_license }}"
+authors = [
+    "{{ cookiecutter.full_name }} <{{ cookiecutter.email }}>",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+]
+keywords = [
+    {% for keyword in cookiecutter.keywords.split(',') %}"{{ keyword.strip() }}",
+    {% endfor %}
+]
+repository = "{{ cookiecutter.github_repository }}"
+homepage = "{{ cookiecutter.github_repository }}"
+include = [
+    ".coveragerc",
+    "noxfile.py",
+    "poetry.lock",
+    "*.rst",
+    "*.txt",
+    "*.toml",
+    "docs/*",
+    "scripts/*",
+    "examples/*",
+]
+
+[tool.poetry.scripts]
+{{ cookiecutter.project_slug }} = "{{ cookiecutter.project_slug }}:cli.main"
+
+[tool.poetry.dependencies]
+python = "^{{ cookiecutter.python_base_version }}"
+tomli = "^2.0.1"
+tomli-w = "^1.0.0"
+
+[tool.poetry.dev-dependencies]
+black = "^22.1.0"
+coverage = "^6.3.1"
+furo = "^2022.1.2"
+isort = "^5.10.1"
+mypy = "^0.931"
+nox = "^2022.1.7"
+nox-poetry = "^0.9.0"
+prysk = "^0.11.0"
+pylint = "^2.12.2"
+pytest = "^7.0.1"
+pyupgrade = "^2.32.0"
+Sphinx = "^4.4.0"
+
+[tool.coverage.run]
+source = [
+    "src/{{ cookiecutter.project_slug }}",
+]
+
+[tool.pylint.master]
+fail-under = 7
+
+[tool.pylint.format]
+max-line-length = 88
+max-module-lines = 800
+
+[tool.pylint.message_control]
+disable = "C0330, C0326"
+
+[tool.black]
+line-length = 88
+verbose = true
+include = "\\.pyi?$"
+
+[tool.isort]
+profile = "black"
+force_grid_wrap = 2
+
+[tool.pytest.ini_options]
+pythonpath = [
+    "src"
+]
+
+[mypy]
+mypy_path = "$MYPY_CONFIG_FILE_DIR/src"
+
+[tool.mypy]
+files = [
+    'noxfile.py',
+    'src/**/*.py',
+]
