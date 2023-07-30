@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "nc-dev-jornal"
+packages = [
+    {include = "tasks"}
+]
+version = "0.1.0"
+description = ""
+authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+invoke = "^2.0.0"
+rich = "^13.3.1"
+exasol-bucketfs = "^0.7.0"
+black = "^23.1.0"
+invokees = "^0.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
