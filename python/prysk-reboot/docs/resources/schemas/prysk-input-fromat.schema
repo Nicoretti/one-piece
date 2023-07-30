@@ -1,0 +1,148 @@
+{
+  "$id": "",
+  "$schema": "",
+  "description": "Specifies a single test execution and its expectations",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "A unique name identifying the test"
+    },
+    "settings": {
+      "type": "object",
+      "properties": {
+        "interactive": {
+          "type": "boolean",
+          "description": "User will be asked to if changes should be accepted"
+        },
+        "log-file": {
+          "type": "string",
+          "description": "indicates where the logs should be written to"
+        },
+        "log-level": {
+          "type": "string",
+          "description": "level which should be set for logging mechansim"
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "description": "describes the environment to setup",
+      "properties": {
+        "working-dir": {
+          "type": "string",
+          "description": "working directory which shall be cwd during execution"
+        },
+        "isolated": {
+          "type": "boolean",
+          "description": ""
+        },
+        "save-to": {
+          "type": "string",
+          "description": "path where the env should be persisted to"
+        },
+        "env": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/environment-variable"
+          },
+          "description": "add entry type and make it array of entries"
+        }
+      }
+    },
+    "runtime": {
+      "type": "objects",
+      "description": "",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "description, make it enum with supported types"
+        },
+        "arguments": {
+          "type": "array",
+          "description": "arguments passed to the runtime"
+        }
+      }
+    },
+    "executable": {
+      "name": {
+        "type": "string",
+        "description": ""
+      },
+      "arguments": {
+        "type": "array",
+        "items": "string",
+        "description": ""
+      }
+    },
+    "inputs": {
+    },
+    "outputs": {
+    },
+    "expectations": {
+    }
+  },
+  "$defs": {
+    "environment-variable": {
+      "type": "object",
+      "required": [
+        "name",
+        "value"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "environment variable name"
+        },
+        "value": {
+          "type": "string",
+          "description": "value of the environment variable"
+        }
+      }
+    },
+    "input": {
+    },
+    "output": {
+      "type": "object"
+    },
+    "expectation": {
+      "type": "object",
+      "description": "",
+      "properties": {
+        "comparator": {
+          "type": "object",
+          "description": "",
+          "properties": {
+            "target": {
+              "type": "object",
+              "description": ""
+            },
+            "com"
+          }
+        }
+      }
+    },
+    "output-expectation": {
+      "type": "object",
+      "description": "",
+      "properties": {
+        "exit-code": {
+          "type": "integer",
+          "description": ""
+        }
+      }
+    },
+    "file": {
+      "type": "object",
+      "description": "",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": ""
+        },
+        "encoding": {
+        }
+      }
+    }
+  }
+}

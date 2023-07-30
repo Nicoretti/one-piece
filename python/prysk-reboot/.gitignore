@@ -1,0 +1,6 @@
+.idea
+target/*
+__pycache__/*
+docs/drawio-exporter/*
+docs/drawings/.$*
+

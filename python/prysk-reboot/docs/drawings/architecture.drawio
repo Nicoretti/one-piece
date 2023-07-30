@@ -1,0 +1,40 @@
+<mxfile host="Electron" modified="2023-05-01T08:14:54.566Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.2.1 Chrome/112.0.5615.87 Electron/24.1.2 Safari/537.36" etag="rziq7eY_E_zhN4aM-W6C" version="21.2.1" type="device">
+  <diagram id="23iRSUPoRavnBvh4doch" name="Page-1">
+    <mxGraphModel dx="1546" dy="999" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="3" value="" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="90" y="110" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="zngU5D1K1zTTuBJBaog--3" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="120" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="zngU5D1K1zTTuBJBaog--8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="zngU5D1K1zTTuBJBaog--4" target="zngU5D1K1zTTuBJBaog--7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="zngU5D1K1zTTuBJBaog--4" value="DSL Test Description&lt;br&gt;e.g. Cram/Prysk File" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="110" y="130" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="zngU5D1K1zTTuBJBaog--10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="zngU5D1K1zTTuBJBaog--7" target="zngU5D1K1zTTuBJBaog--9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="zngU5D1K1zTTuBJBaog--7" value="Test Spec&lt;br&gt;&lt;br&gt;JSON" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="110" y="357.5" width="120" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="zngU5D1K1zTTuBJBaog--15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.479;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="zngU5D1K1zTTuBJBaog--9" target="zngU5D1K1zTTuBJBaog--14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="zngU5D1K1zTTuBJBaog--9" value="Prysk Runtime (Execution Engine)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="390" y="205" width="380" height="485" as="geometry" />
+        </mxCell>
+        <mxCell id="zngU5D1K1zTTuBJBaog--11" value="Diff Tools&lt;br&gt;Text, Json, Img, ..." style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="485" y="520" width="190" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="zngU5D1K1zTTuBJBaog--14" value="Test Report&lt;br&gt;Status" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="930" y="260" width="150" height="390" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

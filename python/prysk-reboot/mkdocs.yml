@@ -1,0 +1,52 @@
+site_name: prysk-reboot
+site_url: https://nicoretti.github.io/prysk-reboot/
+repo_name: nicoretti/prysk-reboot
+repo_url: https://github.com/Nicoretti/prysk-reboot
+
+nav:
+  - "index.md"
+  - "design/index.md"
+  - "hall-of-fame.md"
+theme:
+  name: material
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+  features:
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+  font: false
+copyright: >
+  Copyright &copy; 2023 Nicola Coretti
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      use_pygments: true
+  - pymdownx.superfences
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+  - search
+  - autorefs
+  - drawio-exporter

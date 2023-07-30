@@ -1,0 +1,41 @@
+[build-system]
+requires = ["maturin>=0.14,<0.15"]
+build-backend = "maturin"
+
+[project]
+name = "prysk"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+
+[tool.maturin]
+python-source = "python"
+
+
+# Only used for venv etc. for development
+[tool.poetry]
+name = "prysk-workspace"
+version = "0.1.0"
+description = "Prysk build/environment/workspace setup"
+authors = [
+    "Nicola Coretti <nico.coretti@gmail.com>"
+]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<4.0"
+maturin = "^0.14.10"
+
+[tool.poetry.group.doc.dependencies]
+mkdocs = "^1.4.2"
+mkdocs-material = "^9.0.6"
+mkdocs-autorefs = "^0.4.1"
+mkdocs-drawio-exporter = "^0.8.0"
+
+
+[tool.poetry.group.dev.dependencies]
+invokees = "^0.1.0"
+pydantic = "^1.10.7"
+
