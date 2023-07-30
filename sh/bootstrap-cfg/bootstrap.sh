@@ -1,14 +1,14 @@
 #!/bin/sh
 
 # configuration
-CONFIG_SOURCE="git@github.com:Nicoretti/terminal-config.git"
+CONFIG_SOURCE="git@github.com:Nicoretti/config-files.git"
 CONFIG_DESTIONATION="${HOME}/.cfg"
 OH_MY_ZSH_SOURCE="https://github.com/robbyrussell/oh-my-zsh.git"
 OH_MY_ZSH_DESTINATION="${HOME}/.oh-my-zsh"
 
 # adjust configuration for read only setup
 if [ $1 ] && [ $1 -eq "readonly" ]; then
-    CONFIG_SOURCE="https://github.com/Nicoretti/terminal-config.git"
+    CONFIG_SOURCE="https://github.com/Nicoretti/config-files.git"
 fi
 
 say() {
