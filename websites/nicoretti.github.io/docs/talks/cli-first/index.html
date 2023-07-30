@@ -1,0 +1,465 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/blood.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css">
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-background-image="images/terminal.png" data-background-size="contain">
+					<h1>
+						<span>CLI - First</span>
+					</h1>
+					<h2>
+						<span style="color:Tomato;">Why & How</span>
+					</h2>
+					<aside class="notes">
+						<h2>About me</h2>
+						<ul>
+							<li>Name</li>
+							<li>What I do/did</li>
+							<li>CLI Fanboy </li>
+						</ul>
+					</aside>
+				</section>
+				<section data-background-image="images/terminal.png" data-background-size="contain">
+					<h2>TRIGGER</h2>
+					<h1 style="color:black;background-color:white;">WARNING</h1>
+					<h2>MEME CONTENT AHEAD</h2>
+
+					<aside class="notes">
+						<h2>Disclaimer</h2>
+						<ul>
+							<li>Memes</li>
+							<li>Stereotypes</li>
+							<li>Over-exaggerated</li>
+							<li>Consider leaving if easily triggered</li>
+						</ul>
+					</aside>
+				</section>
+
+				<section data-background-image="images/terminal.png" data-background-size="contain">
+                    <h2>What's in it for me?</h2>
+					<h4 style="color:Tomato;">To leave or not to leave</h4>
+					<ul>
+						<li>Lessons learned</li>
+						<li>An occasional rant</li>
+						<li>Stereotypes & Memes</li>
+					</ul>
+
+					<aside class="notes">
+						<h2>Reworked version</h2>
+						<ul>
+							<li>No syntax de-section etc.</li>
+							<li>As told as seen more accommodated with cli</li>
+						</ul>
+						<h2>TL;DR</h2>
+						<ul>
+							<li>Rookie: Teasing & Nudgeing</li>
+							<li>Advanced: fill in some gaps</li>
+							<li>Pro's & Nerds: Funny Memes</li>
+						</ul>
+					</aside>
+				</section>
+
+				<section data-background-image="images/cli-first_logo.png">
+
+					<section>
+						<h2>WHY?</h2>
+						<h4 style="color:Tomato;">¯\_(ツ)_/¯</h4>
+					</section>
+
+					<section>
+						<h2>The Obvious Ones</h2>
+						<img class="r-stretch" src="images/memo.jpeg"/>
+						<aside class="notes">
+							<ul>
+								<li>Automation</li>
+								<li>Documentation</li>
+								<li>(Secure) Remote "Support"</li>
+								<li>
+									Smaller tech stack
+									<ul>
+										<li>easier to learn</li>
+										<li>less dependencies</li>
+										<li>size, ...</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 style="color:Tomato;">Rant: Late CLI Automation</h4>
+							<ul>
+								<li>GUI needs automation</li>
+								<li>A "command" server is added</li>
+								<li>Cli in GUI or command server only would be ok</li>
+							</ul>
+						</aside>
+					</section>
+
+					<section>
+						<h2>Shift Left</h2>
+						<img class="r-stretch" src="images/dogfood-yow.png"/>
+						<aside class="notes">
+							<ul>
+								<li>
+									Unit Test(s) like approach
+									<ul>
+										<li>Helps & No golden bullet</li>
+										<li>Cleaner Architecture, Separation of concerns</li>
+										<li>Improves testability</li>
+										<li>Faster feedback on functionality</li>
+										<li>...</li>
+									</ul>
+								</li>
+								<h4 style="color:Tomato;">Anecdote: Protocol design (+socat)</h4>
+								<li>
+									You are the first user/customer
+									<ul>
+										<li>Pain / Paper cuts</li>
+										<li>Feeling for improvements</li>
+										<li>Always one more user point of view on the SW/tool</li>
+									</ul>
+								</li>
+							</ul>
+						</aside>
+					</section>
+
+					<section>
+						<h2>Learn & Grow</h2>
+						<img class="r-stretch" src="images/devs-domain.png"/>
+						<aside class="notes">
+							<ul>
+								<li>
+									Easy to learn and get the basics right
+									<ul>
+										<li>Focus on the new thing</li>
+									</ul>
+								</li>
+								<li>
+									Learn new things
+									<ul>
+										<li>Programming Language</li>
+										<li>Technology (Protocol, Stack, ...)</li>
+										<li>Pet test project(s)</li>
+									</ul>
+								</li>
+								<li>
+									"Onboarding" / Jr. Devs
+									<ul>
+										<li>Provides good learning experience</li>
+										<li>Provides "instant" value</li>
+										<li>Good to oversee, as long as IF is ok all good</li>
+									</ul>
+								<li>Will improve your pipes & long commands will improve understanding of separation</li>
+							</ul>
+						</aside>
+					</section>
+
+					<section>
+						<h2>They are cool</h2>
+						<img src="images/hackerman.png"/>
+						<aside class="notes">
+							<ul>
+								<li>Fun: like every skill fun once you "master" it</li>
+								<li>Efficiency: once you have the hang and have a tool box</li>
+								<li>Long-term: long Lasting "Interdependencies" toolbox</li>
+								<li>Iterative: pieces of the toolbox can be removed/improved</li>
+							</ul>
+						</aside>
+					</section>
+
+				</section>
+
+				<section data-background-image="images/cli-first_logo_block.png">
+					<section>
+						<h2>How?</h2>
+						<h4 style="color:Tomato;">42</h4>
+						<aside class="notes">
+							<ul>
+								<li>Key points</li>
+								<li>80/20</li>
+								<li>Lessons learned</li>
+								<li>Fill some gaps</li>
+							</ul>
+						</aside>
+					</section>
+
+					<section>
+						<h2>We got you covered</h2>
+						<img src="images/internetz.jpg"/>
+						<aside class="notes">
+							<ul>
+								<li>
+									Use a library
+									<ul>
+										<li>When you should write yourself you know</li>
+										<li>Consistency: One of the most common ones for the lang</li>
+										<li>Learn along the way</li>
+										<li>
+											Free Bees:
+											<ul>
+												<li>Help</li>
+												<li>Type/Parameter conversion & checks</li>
+												<li>Config/ENV & Co.</li>
+											</ul>
+
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</aside>
+					</section>
+
+					<section>
+						<h2>Long Vs Short</h2>
+						<img class="r-stretch" src="images/options.jpg"/>
+						<aside class="notes">
+							<h4 style="color:Tomato;">Rant/Anecdote: Bake --crc</h4>
+							<ul>
+								<li>
+									Always long short where it makes sense
+									<ul>
+										<li>Long in script(s) etc. documentation (is more clear)</li>
+										<li>Short handy for manual quick typing and executing</li>
+									</ul>
+								</li>
+								<li>
+									Types
+									<ul>
+										<li>argument</li>
+										<li>option</li>
+										<li>switch</li>
+										<li>flag</li>
+									</ul>
+								</li>
+							</ul>
+						</aside>
+					</section>
+
+					<section>
+						<h2>Help</h2>
+						<img class="r-stretch" src="images/helpdesk.png"/>
+						<aside class="notes">
+							Must have:
+							<ul>
+								<li>Usage</li>
+								<li>-h/--help</li>
+								<li>If the help flag is anywhere in the cli, print help</li>
+							</ul>
+							Ideally:
+							<ul>
+								<li>For complexer tools or addition: help command</li>
+								<li>man page</li>
+								<li>some local help document</li>
+								<li>online help (can be same as local one)</li>
+							</ul>
+							<h4 style="color:Tomato;">Rant: "Exception generator tool" -help disaster & co.</h4>
+
+						</aside>
+					</section>
+
+					<section>
+						<h2>Usability</h2>
+						<img class="r-stretch" src="images/spong-bob-color.jpg"/>
+						<aside class="notes">
+							is tty
+							<ul>
+								<li>
+									Color
+									<ul>
+										<li>auto</li>
+										<li>never</li>
+										<li>always</li>
+									</ul>
+								</li>
+								<li>
+									General
+									<li>Pipeline | Processing vs User interaction</li>
+									<li>Anecdote: ls -1</li>
+								</li>
+							</ul>
+						</aside>
+					</section>
+
+					<section>
+						<h2>Configuration</h2>
+						<img class="r-stretch" src="images/config-buttons.jpg"/>
+						<aside class="notes">
+							Layering
+							<ul>
+								<li>Global</li>
+								<li>User</li>
+								<li>Env</li>
+								<li>CLI</li>
+							</ul>
+							ENV-VARS
+							<ul>
+								<li>Prefix yours</li>
+								<li>Warn on overwrite or problematic "GLOBAL"s</li>
+								<li>Problem: Multiple instances share the same "env"</li>
+							</ul>
+							<h4 style="color:Tomato;">Rant: LUAC configuration</h4>
+						</aside>
+					</section>
+					<section>
+						<h2>Robustness</h2>
+						<img class="r-stretch" src="images/rambo.png"/>
+						<aside class="notes">
+							<ul>
+								<li>Check your input, clean failure/abort</li>
+								<li>sigquit ctrl + \</li>
+								<li>sigint ctrl + c</li>
+								<li>EOF</li>
+								<li>cleanup start/stop</li>
+							</ul>
+							<h4 style="color:Tomato;">Anecdote: wrong format/error in cli pipeline "sca"</h4>
+						</aside>
+					</section>
+
+
+					<section>
+						<h2>Error messages</h2>
+						<img class="r-stretch" src="images/what-are-you-in-for.png" />
+						<aside class="notes">
+							<ul>
+								<li>No Stack Traces (by default)</li>
+								<li>Feels wonky, not well engineered</li>
+								<li>Even if its a dev, e.g. java stacktrace on python dev?</li>
+								<li>Alternative: --debug</li>
+								<li>Common error codes and solutions</li>
+							</ul>
+						</aside>
+					</section>
+
+					<section>
+						<h2>Status vs Output</h2>
+						<img class="r-stretch" src="images/status-vs-output.png"/>
+						<aside class="notes">
+							<ul>
+								<li>
+									Stdout vs Stderr
+									<ul>
+										<li>You don't want your interface dependent on status</li>
+										<li>filters</li>
+									</ul>
+								</li>
+								<li>
+									User interface vs data output
+									<ul>
+										<li>text</li>
+										<li>json, jsonl</li>
+										<li>json vs jsonl (pipelineing)</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 style="color:Tomato;">Anecdote: git --porcelain</h4>
+							<ul>
+								<li>git evolution from plumbing to porcelain</li>
+								<li>Plumbing and Porcelain (scripts vs user-friendly)</li>
+								<li>--porcelain (parseable output)</li>
+							</ul>
+						</aside>
+					</section>
+
+					<section>
+						<h2>Exit Codes</h2>
+						<div style="width: 50%; height: 100%; float: left">
+							<img src="images/success-kid-exit-code-0.jpeg" style="height: 40%"/>
+						</div>
+						<div style="width: 50%; float: left">
+							<img src="images/picard-exit-code-0.jpg" style="height: 40%"/>
+							<aside class="notes">
+								<ul>
+									<li>Posix only 1 Byte least significant bits are available</li>
+									<li>Modern Windows 4 Byte cmd.exe</li>
+									<li>CI/CD & Automation</li>
+									<li>Chaining/Conditional execution && etc.</li>
+									<li>0 Success</li>
+									<li>1 General Error</li>
+									<li>2 CLI Error</li>
+								</ul>
+								<h4 style="color:Tomato;">Anecdote: Passing CI ("crash expected")</h4>
+							</aside>
+						</div>
+					</section>
+					<section>
+						<h2>Living piece of SW</h2>
+						<img class="r-stretch" src="images/backtrack.png" />
+						<aside class="notes">
+							<ul>
+								<li>YAGNI</li>
+								<li>It does not need to be "perfect"</li>
+								<li>Evolution Steps</li>
+								<li>Everything needs to maintain in nature and life (e.g. house)</li>
+								<li>Think about where you at</li>
+							</ul>
+						</aside>
+					</section>
+				</section>
+				<section data-background-image="images/terminal.png" data-background-size="contain">
+				<section>
+					<h2>Drive Through</h2>
+					<h4 style="color:Tomato;">80/20</h4>
+					<ul>
+						<li>Communicate clearly</li>
+						<li>Use libraries for argument parsing</li>
+						<li>Separate Status & Errors from Output</li>
+						<li>Provide at least two exit code(s) 0 and one != 0</li>
+					</ul>
+					<p style="color:Tomato;">Pro-tip: In case of doubt check how git does it</p>
+					<aside class="notes">
+						<ul>
+							<li>It is a user interaction, e.g. good exmaple git status</li>
+							<li>Libs take care of std format and help</li>
+							<li>Sum up previous slides</li>
+							<li>Mention <a href="www.clig.dev">www.clig.dev </a></li>
+						</ul>
+					</aside>
+				</section>
+				<section data-visibility="hidden">
+					<h1>Examples</h1>
+					<h4 style="color:Tomato;">Teasers</h4>
+					<ul>
+						<li>Extract TCP/UDP data stream with Tshark</li>
+						<li>Reporting and statistics</li>
+						<li>Socat based test server</li>
+						<li>rot13 ... aws pws & co</li>
+						<li>pygments based bat</li>
+						<li>...</li>
+					</ul>
+				</section>
+				</section>
+
+				<section data-background-image="images/terminal.png" data-background-size="contain">
+					<h1>EOF</h1>
+					<h4 style="color:Tomato;">-1</h4>
+				</section>
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+				slideNumber: 'c/t',
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+			});
+		</script>
+	</body>
+</html>

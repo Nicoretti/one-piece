@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "website"
+version = "0.1.0"
+description = ""
+authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+mkdocs = "^1.4.2"
+mkdocs-rss-plugin = "^1.5.0"
+mkdocs-autorefs = "^0.4.1"
+mkdocs-material = "9.2.0b1"
+
+
+[tool.poetry.group.dev.dependencies]
+invoke = "^2.0.0"
+rich = "^13.3.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,78 @@
+site_name: nicoretti.github.io
+site_url: https://nicoretti.github.io/
+
+nav:
+  - "index.md"
+  - "projects.md"
+  - "user-manual.md"
+  - "skills/index.md"
+  - "talks.md"
+  - Blog:
+      - "blog/index.md"
+theme:
+  name: material
+  logo: images/nicoretti.svg
+  favicon: images/nicoretti.svg
+  palette:
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      primary: orange
+      accent: yellow
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      primary: orange
+      accent: yellow
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+  features:
+    - navigation.tabs
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+  font: false
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/nicoretti
+      name: Nicoretti on Github
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/in/nicola-coretti-07778470/
+      name: Nicoretti on LinkedIn
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/nicoretti
+      name: Nicoretti on Twitter
+
+
+copyright: >
+  Copyright &copy; 2023 Nicola Coretti
+  
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      use_pygments: true
+  - pymdownx.superfences
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+- search
+- blog
+- rss:
+    match_path: blog/posts/.*
+    date_from_meta:
+      as_creation: date
+    categories:
+      - categories
+      - tags
+- offline
+- autorefs

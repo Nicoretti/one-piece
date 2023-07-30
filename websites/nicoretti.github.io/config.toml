@@ -1,0 +1,60 @@
+baseurl = "/"
+languageCode = "en-us"
+paginate = 5
+theme = "friend-ng"
+
+[author]
+  name = "Nicola Coretti"
+
+[permalinks]
+  posts = "/posts/:year/:month/:title/"
+
+
+[params]
+  defaultTheme = "light"
+
+  # dir name of your blog content (default is `content/posts`)
+  contentTypeName = "posts"
+
+  # if you set this to 0, only submenu trigger will be visible
+  showMenuItems = 2
+
+  # show selector to switch language
+  showLanguageSelector = false
+
+  # set theme to full screen width
+  fullWidthTheme = false
+
+  # center theme with default width
+  centerTheme = false
+
+   # Social icons
+  [[params.social]]
+    name = "twitter"
+    url  = "https://twitter.com/nicoretti/"
+
+  [[params.social]]
+    name = "email"
+    url  = "mailto:nico.coretti@gmail.com"
+
+  [[params.social]]
+    name = "github"
+    url  = "https://github.com/nicoretti/"
+
+  [[params.social]]
+    name = "stackoverflow"
+    url  = "https://stackoverflow.com/users/546873/nicoretti"
+
+  [[params.social]]
+    name = "linkedin"
+    url  = "https://www.linkedin.com/in/nicola-coretti-07778470"
+
+
+[languages]
+  [languages.en]
+    languageName = "English"
+    title = "Nicola Coretti"
+
+    [languages.en.params.logo]
+      logoText = "NiCoretti"
+      logoHomeLink = "/"
