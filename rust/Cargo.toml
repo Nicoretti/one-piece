@@ -13,4 +13,5 @@ members = [
     "nordic",
     "elgato",
     "game-of-life",
+    "exercism"
 ]
