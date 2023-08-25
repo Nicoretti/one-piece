@@ -33,7 +33,11 @@ def product_versions(product: str):
     response = requests.get(f"https://endoflife.date/api/{product}.json")
     if not response.ok:
         raise Exception("Could not fetch product details")
-    versions = set(entry['cycle'] for entry in response.json())
+    versions = sorted(
+            set(entry['cycle'] for entry in response.json()),
+            key=lambda v: [int(part) for part in v.split('.')]
+
+    )
     return versions
 
 
