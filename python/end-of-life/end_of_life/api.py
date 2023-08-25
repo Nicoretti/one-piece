@@ -1,5 +1,5 @@
 import requests
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import date
 
 
@@ -10,9 +10,9 @@ class Cycle(BaseModel):
     latestReleaseDate: date
     releaseDate: date
     lts: bool
-    link: str | None
-    support: str | bool | None
-    discontinued: bool | None
+    link: str | None = Field(default=None)
+    support: str | bool | None = Field(default=None)
+    discontinued: bool | None = Field(default=None)
 
 
 def product_cycle_details(product: str, cycle: str):
