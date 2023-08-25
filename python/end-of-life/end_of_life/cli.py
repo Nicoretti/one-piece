@@ -28,6 +28,7 @@ def _status(date) -> Status:
 @CLI.command(name="check")
 def eol(product: str, version: str, warnings_as_error: bool = False, silent: bool = False):
     """Check if a product already reached its end of life."""
+    product = product.lower()
     info = api.product_cycle_details(product, version)
     status = _status(info.eol)
     is_eol = status == Status.Failure or (warnings_as_error and status == Status.Warning)
