@@ -52,9 +52,3 @@ Todo's
 * Textuil tui (tui command)
 
 
-
-Dev Todo's
-++++++++++
-* Linter, formatter, etc.
-* Add/Write changelog plugin
-
