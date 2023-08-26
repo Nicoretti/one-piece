@@ -77,10 +77,10 @@ pub mod cli {
     }
 }
 
-pub fn create_reader(path: &str) -> std::io::Result<Box<dyn std::io::Read>> {
+pub fn create_reader(path: &str) -> std::io::Result<cli::Input> {
     match path {
-        "stdin" => Ok(Box::new(std::io::stdin())),
-        _ => Ok(Box::new(std::fs::File::open(path)?)),
+        "stdin" => Ok(cli::Input::Stdin(std::io::stdin())),
+        _ => Ok(cli::Input::File(std::fs::File::open(path)?)),
     }
 }
 
