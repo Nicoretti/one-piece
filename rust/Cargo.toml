@@ -3,7 +3,7 @@
 members = [
     "bricks",
     "brickster",
-    "clikit"
+    "clikit",
     "elgato",
     "exercism",
     "formats",
