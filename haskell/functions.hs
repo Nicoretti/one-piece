@@ -3,7 +3,7 @@ factorial :: Integer -> Integer
 factorial 0 = 1
 factorial n = n * factorial(n - 1)
 
-
+-- Fibonacci
 fibonacci :: Integer -> Integer
 fibonacci 0 = 0
 fibonacci 1 = 1
