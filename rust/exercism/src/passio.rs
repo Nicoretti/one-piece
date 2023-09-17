@@ -1,4 +1,3 @@
-
 use std::io::{Read, Result, Write};
 
 pub struct ReadStats<R: Read> {
