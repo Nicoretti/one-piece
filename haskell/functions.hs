@@ -15,6 +15,16 @@ absValue x
     | x >= 0 = x
     | otherwise = -x
 
+-- Power b ^ e
+-- b = base
+-- e = exponent
+power :: Int -> Int -> Int
+power b 0 = 1
+power b e
+    | even e = n * n
+    | otherwise = n * n * b
+    where
+        n = power b (e `div` 2)
 
 
 
