@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "stellenwerttafel"
+version = "0.1.0"
+description = ""
+authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+textual = "^0.38.1"
+
+
+[tool.poetry.group.dev.dependencies]
+textual-dev = "^1.2.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

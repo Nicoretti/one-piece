@@ -1,0 +1,78 @@
+$einer: red;
+$zehner: blue;
+$hunderter: green;
+$tausender: orange;
+
+Screen {
+    overflow: auto auto;
+}
+
+Mode {
+    height: 100%;
+    width: 100%;
+}
+
+StellenWertTafel {
+    border: grey;
+    height: 40%;
+    width: 100%;
+}
+
+Status {
+    height: 10%;
+}
+
+Position {
+    width: 25%;
+    height: 100%;
+}
+
+Position Digits {
+    align: center middle;
+    width: 100%;
+    height: auto;
+}
+
+Position Digits.e {
+    background: $einer;
+}
+
+Position Digits.z {
+    background: $zehner;
+}
+
+Position Digits.h {
+    background: $hunderter;
+}
+
+Position Digits.t {
+    background: $tausender;
+}
+
+Position Vertical.e {
+    border: $einer;
+}
+
+Position Vertical.z {
+    border: $zehner;
+}
+
+Position Vertical.h {
+    border: $hunderter;
+}
+
+Position Vertical.t {
+    border: $tausender;
+}
+
+Position #increment {
+    width: 100%;
+    height: auto;
+}
+
+Position #decrement {
+    width: 100%;
+    height: auto;
+}
+
+
