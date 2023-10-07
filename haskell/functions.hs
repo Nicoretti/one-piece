@@ -37,3 +37,16 @@ isPrime x  = not (hasDivisor (x-1))
         hasDivisor 1 = False
         hasDivisor n = mod x n == 0 || hasDivisor(n-1)
 
+
+-- Pop the last element from the list
+pop_back :: [a] -> a
+pop_back [] = error "Empty List"
+pop_back [x] = x
+pop_back (_:xs) = pop xs
+
+-- Pop the front element from the list
+pop_front :: [a] -> a
+pop_front [] = error "Emtpy List"
+pop_front [x] = x
+pop_front [head:tail] = head
+
