@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "universal-open"
+version = "0.1.0"
+description = ""
+authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
+readme = "README.md"
+packages = [{include = "universal_open", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.scripts]
+crc = "universal_open._cli:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
