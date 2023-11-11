@@ -1,16 +1,28 @@
 [tool.poetry]
 name = "universal-open"
 version = "0.1.0"
-description = ""
+description = "Platform agnostic file opener"
 authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
+maintainers = ["Nicola Coretti <nico.coretti@gmail.com>"]
 readme = "README.md"
-packages = [{include = "universal_open", from = "src"}]
+packages = [{ include = "uopen.py" }]
+license = "BSD-2-Clause"
+classifiers = [
+    "License :: OSI Approved :: BSD License",
+]
+keywords = ['open', 'xdg-open', 'start', 'application-launcher', 'launcher', 'cli']
+repository = "https://github.com/Nicoretti/one-piece/tree/grand-line/python/universal-open"
+
+[tool.poetry.urls]
+"Homepage" = "https://github.com/Nicoretti/one-piece/blob/grand-line/python/universal-open/README.md"
+"Documentation" = "https://github.com/Nicoretti/one-piece/blob/grand-line/python/universal-open/README.md"
+"Source" = "https://github.com/Nicoretti/one-piece/blob/grand-line/python/universal-open/"
 
 [tool.poetry.dependencies]
 python = "^3.8"
 
 [tool.poetry.scripts]
-crc = "universal_open._cli:main"
+uopen = "uopen:main"
 
 [build-system]
 requires = ["poetry-core"]
