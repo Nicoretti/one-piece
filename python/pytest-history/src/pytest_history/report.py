@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 import sqlite3
 from inspect import cleandoc
 from pathlib import Path
 
 
 class SqlLite:
-
     def __init__(self, db, test_run):
         def ensure_test_runs_table_exists(name):
             with sqlite3.connect(name) as con:
@@ -50,7 +51,7 @@ class SqlLite:
         self._test_run = add_test_run_entry(db, test_run)
 
     def pytest_runtest_logreport(self, report):
-        if report.when != 'teardown':
+        if report.when != "teardown":
             return
         self.report(report)
 
@@ -71,15 +72,18 @@ class SqlLite:
                 """
             )
             file, lineno, testcase = test.location
-            con.execute(query, (
-                self._test_run,
-                test.nodeid,
-                file,
-                lineno,
-                testcase,
-                test.outcome,
-                test.duration
-            ))
+            con.execute(
+                query,
+                (
+                    self._test_run,
+                    test.nodeid,
+                    file,
+                    lineno,
+                    testcase,
+                    test.outcome,
+                    test.duration,
+                ),
+            )
 
     @staticmethod
     def create_db(name: str | Path) -> str | Path:
