@@ -1,28 +1,12 @@
 from __future__ import annotations
-import pytest
 
 import sqlite3
 from inspect import cleandoc
 
 from pytest import Pytester
-
 from pytest_history import DEFAULT_DB
 
 pytest_plugins = "pytester"
-
-
-@pytest.mark.xfail
-def test_xfail(pytester: Pytester):
-    assert False
-
-
-@pytest.mark.skip
-def test_skip(pytester: Pytester):
-    assert False
-
-
-def test_fail(pytester: Pytester):
-    assert False
 
 
 def test_plugin_creates_default_database(pytester: Pytester):
@@ -45,30 +29,42 @@ def test_plugin_creates_default_database(pytester: Pytester):
 
 
 def test_plugin_creates_history_table_for_test_results(pytester: Pytester):
-    pass
+    test = cleandoc(
+        f"""
+        from pathlib import Path
 
+        def test_pass():
+            db = Path("{DEFAULT_DB}")
+            assert db.exists()
+        """
+    )
+    pytester.makepyfile(passing_test=test)
+    pytester.runpytest()
 
-def test_plugin_creates_history_table_for_test_results(pytester: Pytester):
-    pass
+    with sqlite3.connect(DEFAULT_DB) as con:
+        query = "SELECT name FROM sqlite_master WHERE type=? AND name=?;"
+        result = con.execute(query, ("table", "test.results")).fetchall()
+        expected = 1
+        actual = len(result)
+        assert actual == expected
 
 
 def test_plugin_creates_history_table_for_test_runs(pytester: Pytester):
     test = cleandoc(
-        """
+        f"""
+        from pathlib import Path
+
         def test_pass():
-            assert True
+            db = Path("{DEFAULT_DB}")
+            assert db.exists()
         """
     )
     pytester.makepyfile(passing_test=test)
-    results = pytester.runpytest()
+    pytester.runpytest()
 
-    with sqlite3.connect("metrics.db") as con:
-        table_name = "test_results"
-        query = "SELECT name FROM [sqlite_master] WHERE type='table' and name=?;"
-        result = con.execute(query, (table_name,))
-        result = result.fetchall()
-
-    expected = 1
-    actual = len(result)
-
-    assert actual == expected
+    with sqlite3.connect(DEFAULT_DB) as con:
+        query = "SELECT name FROM sqlite_master WHERE type=? AND name=?;"
+        result = con.execute(query, ("table", "test.runs")).fetchall()
+        expected = 1
+        actual = len(result)
+        assert actual == expected
