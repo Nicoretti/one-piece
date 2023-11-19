@@ -13,11 +13,11 @@ repository = "https://github.com/Nicoretti/one-piece/tree/grand-line/python/pyte
 packages = [{include = "pytest_history", from = "src"}]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.8"
 pytest = "^7.4.3"
 
 [tool.poetry.plugins.pytest11]
-pytest_history = "pytest_history"
+pytest-history = "pytest_history"
 
 
 [tool.poetry.group.dev.dependencies]
