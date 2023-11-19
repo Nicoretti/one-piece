@@ -1,10 +1,15 @@
 [tool.poetry]
 name = "pytest-history"
 version = "0.1.0"
-description = ""
+description = "Pytest plugin to keep a history of your pytest runs"
 authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
 readme = "README.md"
 license = "MIT"
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+]
+keywords = ['pytest', 'sqlite', 'sql', 'history']
+repository = "https://github.com/Nicoretti/one-piece/tree/grand-line/python/pytest-history"
 packages = [{include = "pytest_history", from = "src"}]
 
 [tool.poetry.dependencies]
