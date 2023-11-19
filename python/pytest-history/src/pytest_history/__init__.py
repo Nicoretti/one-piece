@@ -18,3 +18,5 @@ def pytest_configure(config):
     test_reporter = report.SqlLite(db, f"{datetime.now()}")
     config.stash["sql-reporter"] = test_reporter
     config.pluginmanager.register(test_reporter)
+
+    # TODO: Add support for pytest cli flag in order to support custom db file(s)
