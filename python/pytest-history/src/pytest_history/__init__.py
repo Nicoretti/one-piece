@@ -4,8 +4,6 @@ from pathlib import Path
 from pytest_history import report
 from datetime import datetime
 
-# TODO: rename to pytest-history
-
 DEFAULT_DB = ".test-results.db"
 
 
