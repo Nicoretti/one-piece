@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pytest-history"
-version = "0.1.0"
+version = "0.2.0"
 description = "Pytest plugin to keep a history of your pytest runs"
 authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
 readme = "README.md"
@@ -18,6 +18,10 @@ pytest = "^7.4.3"
 
 [tool.poetry.plugins.pytest11]
 pytest-history = "pytest_history"
+
+[tool.poetry.scripts]
+pytest-history = "pytest_history.cli:main"
+
 
 
 [tool.poetry.group.dev.dependencies]

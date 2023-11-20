@@ -21,20 +21,69 @@ Pytest plugin to keep history of your pytest runs
 
 ## Overview
 
-`pytest-history` enables the tracking of test statuses and other metadata across multiple test runs, providing additional insights into test behavior.
+`pytest-history` enables the tracking of test statuses and other metadata across multiple test runs, providing
+additional insights into test behavior.
 
-Initially, this plugin was developed specifically to identify potentially flaky tests (approximately 200) within a test suite containing over 1000 tests, where various tests exhibited inconsistent behavior by failing on alternate runs.
+Initially, this plugin was developed specifically to identify potentially flaky tests (approximately 200) within a test
+suite containing over 1000 tests, where various tests exhibited inconsistent behavior by failing on alternate runs.
 
 ## Purpose
 
-- **Tracking Test History:** Capturing and storing historical test results, encompassing pass, fail, and other pertinent metadata.
-- **Identifying Flaky Tests:** Enabling the identification of flaky tests by scrutinizing historical data, detecting irregularities or recurring patterns in test outcomes.
-- **Facilitating Debugging:** Offering developers and testers insights into test stability, thereby assisting in debugging efforts and enhancing overall test reliability.
+- **Tracking Test History:** Capturing and storing historical test results, encompassing pass, fail, and other pertinent
+  metadata.
+- **Identifying Flaky Tests:** Enabling the identification of flaky tests by scrutinizing historical data, detecting
+  irregularities or recurring patterns in test outcomes.
+- **Facilitating Debugging:** Offering developers and testers insights into test stability, thereby assisting in
+  debugging efforts and enhancing overall test reliability.
 
 ## Usage
 
 1. Install the plugin using `pip install pytest-history`.
-2. Utilize the historical data stored in `.test-results.db` (SQLite database).
+2. Utilize the historical data stored in the `.test-results.db` SQLite database using either the `pytest-history` CLI or an SQLite client.
+
+## CLI
+The `pytest-history` command utilizes a SQLite database (default: `.test-results.db`) to provide analysis and information about past test runs and their results. It offers two main subcommands: `list` and `flakes`.
+
+### Subcommands
+
+#### `list`
+- `pytest-history list` offers insights into historical data and provides two additional subcommands: `results` and `runs`.
+  
+##### subcommand `results`
+- `pytest-history list results <id>`: Lists historic test results for a specific test run identified by its ID.
+  
+##### subcommand  `runs`
+- `pytest-history list runs`: Lists historic test runs.
+
+#### `flakes`
+- `pytest-history flakes`: Lists all flaky tests identified in the test suite.
+
+### Usage
+
+```bash
+pytest-history [options] <subcommand> [suboptions]
+
+options
+    -h, --help: Show the help message and exit.
+    --db DB: Specify the database to be used for analyzing data (default: .test-results.db).
+```
+
+### Examples
+
+List historic test runs
+```bash
+pytest-history list runs
+```
+
+List historic test results for a specific run
+```bash
+pytest-history list results <id>
+```
+
+List all flaky tests
+```bash
+pytest-history flakes
+```
 
 ## Example Queries
 
@@ -43,7 +92,7 @@ Example: To find flaky tests between two distinct test runs, execute the followi
 ```sql
 SELECT t1.testcase, t1.test_run, t2.test_run, t1.outcome, t2.outcome
 FROM "test.results" t1
-JOIN "test.results" t2 on t1.testcase = t2.testcase AND (t1.test_run = 1 AND t2.test_run = 2)
+         JOIN "test.results" t2 on t1.testcase = t2.testcase AND (t1.test_run = 1 AND t2.test_run = 2)
 WHERE (t1.outcome = 'passed' AND t2.outcome = 'failed')
    OR (t1.outcome = 'failed' AND t2.outcome = 'passed')
 GROUP BY t1.testcase
