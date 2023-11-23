@@ -41,6 +41,48 @@ suite containing over 1000 tests, where various tests exhibited inconsistent beh
 1. Install the plugin using `pip install pytest-history`.
 2. Utilize the historical data stored in the `.test-results.db` SQLite database using either the `pytest-history` CLI or an SQLite client.
 
+## Configuration Options
+### 1. INI File Setting
+Users can configure the database file location by adding the following setting in their INI file:
+
+```ini
+# pytest.ini
+[pytest]
+pytest-history = /path/to/history.db
+```
+
+```toml
+# pyproject.toml
+[tool.pytest.ini_options]
+pytest-history = "history.db"
+```
+
+
+### 2. Environment Variable
+Another option to configure the database file location is through an environment variable:
+
+Setting the environment variable in a Unix-based system:
+```bash
+export PYTEST_HISTORY_DB=/path/to/history.db
+```
+
+Setting the environment variable in a Windows system:
+```cmd
+set PYTEST_HISTORY_DB=C:\path\to\history.db
+```
+
+### 3. Command-line Parameter
+Users can also specify the database file location via a command-line parameter:
+
+```shell
+pytest --history-db /path/to/history.db tests/
+```
+
+
+The database file path specified should be writable by the user running pytest commands.
+When multiple configuration methods are used simultaneously, the command-line parameter takes precedence over the environment variable, and both take precedence over the INI file setting.
+
+
 ## CLI
 The `pytest-history` command utilizes a SQLite database (default: `.test-results.db`) to provide analysis and information about past test runs and their results. It offers two main subcommands: `list` and `flakes`.
 
