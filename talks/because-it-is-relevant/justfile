@@ -1,0 +1,32 @@
+default_theme := 'black'
+
+@default:
+    just --list
+
+@list-themes:
+    echo "* black"
+    echo "* white"
+    echo "* league"
+    echo "* beige"
+    echo "* night"
+    echo "* serif"
+    echo "* simple"
+    echo "* solarized"
+    echo "* moon"
+    echo "* dracula"
+    echo "* sky"
+    echo "* blood"
+
+
+@build theme=default_theme:
+    echo "Building Presentation..."
+    pandoc --to=revealjs --embed-resources --standalone \
+    --resource-path=./images \
+    00-metadata.yml  *.md \
+    --slide-level=3 --variable "progress=true" --variable "theme={{theme}}" \
+    --highlight-style haddock \
+    -o because-it-is-relevant.html
+
+
+@open:
+    xdg-open because-it-is-relevant.html
