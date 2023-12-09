@@ -1,5 +1,19 @@
 # Talks
 
+## Because it is relevant
+
+!!! Abstract
+
+    "Because it is Relevant," delves into the interconnectedness of tools across various domains and their significance in software development.
+    Using the "Magic Arm" from photography as an analogy, it underscores how abstract concepts and tools can seamlessly transfer between different domains.
+
+    Transitioning to Wireshark, the talk highlights its extensive applications. Based on actual problems, the speaker illustrates Wireshark's practical uses,
+    demonstrating its effectiveness in debugging protocols, handling TLS encryption, extracting crucial data, and enhancing software performance.
+
+    In conclusion, the talk emphasizes Wireshark's capabilities in tandem with other network tools, encouraging audiences to venture beyond their immediate domain to explore diverse tools. 
+
+    [:material-file-document: Slides](talks/because-it-is-relevant/because-it-is-relevant.html){:target="_blank"}
+
 ## Rust vs C++
 
 !!! Abstract
