@@ -1,5 +1,4 @@
 ---
-draft: true
 date: 2023-12-10
 categories:
   - Python
@@ -79,14 +78,43 @@ python idioms [here](https://exasol.github.io/python-styleguide/guides/idioms/id
 
 
 ## Podcasts
-- [Talk Python To Me](https://talkpython.fm){:target="blank_"}
-- [Python Bytes](https://pythonbytes.fm){:target="blank_"}
+
+### [Python Bytes](https://pythonbytes.fm){:target="_blank"}
+
+**`Python headlines dilivered directly to your earbuds`**
+
+Python Bytes is an entertaining weekly podcast of roughly 30 minutes.
+It's fantastic for getting quick updates and discovering new ideas (such as blog posts, new libraries, and frameworks) within the Python space.
+
+Although it's a podcast, the episodes are also live-streamed, allowing listeners to engage in a live chat during the show.
+
+### [Talk Python To Me](https://talkpython.fm){:target="_blank"}
+
+**`A podcast on Python and related technologies`**
+
+While the above description is accurate, it understates the true value of this podcast. 
+
+**My personal TL;DR would be:** 
+
+    An excellent ~60-minute podcast covering various detailed Python-related topics.
+
+While not every episode might align with one's specific interests, they are consistently enjoyable to listen to.
+Alongside `Python Bytes`, this podcast offers an ideal way for staying updated on on Python and its community.
 
 
 ## Talks
-- [Stop Writing Classes](https://youtu.be/o9pEzgHorH0?si=efYB_vU5bW-yvKsV) by [Jack Diederich](https://github.com/jackdied)
-- [Transforming Code into Beautiful, Idiomatic Python](https://www.youtube.com/watch?v=OSGv2VnC0go) by [Raymond Hettinger](https://github.com/rhettinger)
-- [Refactoring Python: Why and how to restructure your code](https://youtu.be/D_6ybDcU5gc?si=5f7nbKJVM19pnn-3) by [Brett Slatkin](https://github.com/bslatkin)
-- [Modern Dictionaries](https://youtu.be/p33CVV29OG8?si=iPNPWVqFx3mo5RtX) by [Raymond Hettinger](https://github.com/rhettinger)
-- [Awesome Command Line Tools PyCon 2017](https://youtu.be/hJhZhLg3obk?si=mxOPP_-DSlmU7K1f) by [Amjith Ramanujam](https://github.com/amjith)
+
+### [Stop Writing Classes](https://youtu.be/o9pEzgHorH0?si=efYB_vU5bW-yvKsV) by [Jack Diederich](https://github.com/jackdied)
+
+
+TL;DR: `Old but Gold!!`
+
+### [Transforming Code into Beautiful, Idiomatic Python](https://www.youtube.com/watch?v=OSGv2VnC0go) by [Raymond Hettinger](https://github.com/rhettinger)
+TL;DR: `Must watch talk on how to improve your python code.`
+
+### [Refactoring Python: Why and how to restructure your code](https://youtu.be/D_6ybDcU5gc?si=5f7nbKJVM19pnn-3) by [Brett Slatkin](https://github.com/bslatkin)
+TL;DR: `Must watch talk on how to go about refacotring in python.`
+
+### [Modern Dictionaries](https://youtu.be/p33CVV29OG8?si=iPNPWVqFx3mo5RtX) by [Raymond Hettinger](https://github.com/rhettinger)
+TL;DR: `An interesting and insightful deep dive into dictionaries.`
 
