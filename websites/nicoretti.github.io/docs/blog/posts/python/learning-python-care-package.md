@@ -1,5 +1,5 @@
 ---
-date: 2023-12-10
+date: 2023-12-11
 categories:
   - Python
   - Idioms
