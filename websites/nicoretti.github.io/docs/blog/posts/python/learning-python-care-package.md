@@ -11,9 +11,12 @@ categories:
   - Courses
 ---
 
-# The Learning Python Care Package
 
-![p](../../../images/the-learning-python-care-package.png)
+# The Learning Python Care Package
+![Learning Python Care Package](../../../images/DALL-E/the-learning-python-care-package.png)
+
+:material-information-outline:{ title="Prompt: Create a futuristic version of the illustration for the blog entry titled 'The Python Learning Care Package'. The scene is set in an advanced, tech-inspired learning environment, showcasing a diverse group of students and developers in a futuristic classroom or co-working space..." } *Image created by DALL-E, OpenAI's image generation model.*
+
 
 Over the past year, I've been approached by numerous individuals seeking recommendations for good Python learning resources.
 So I've decided to compile a somewhat comprehensive list in form of this article. Making it easier for me to share, by simply directing people here.
