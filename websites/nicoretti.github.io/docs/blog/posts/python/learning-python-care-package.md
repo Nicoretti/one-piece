@@ -13,6 +13,8 @@ categories:
 
 # The Learning Python Care Package
 
+![p](../../../images/the-learning-python-care-package.png)
+
 Over the past year, I've been approached by numerous individuals seeking recommendations for good Python learning resources.
 So I've decided to compile a somewhat comprehensive list in form of this article. Making it easier for me to share, by simply directing people here.
 If you've send here by me, I hope these resources meet your needs. If not, please let me know!
