@@ -1,5 +1,21 @@
 # Skills
 
+## Overview
+
+<div class="grid cards" markdown>
+
+- :simple-python: __Python__
+- :fontawesome-solid-terminal: __CLI's__
+- :simple-rust: __Rust__
+- :fontawesome-solid-toolbox: __Tooling & Integration__
+- :simple-cplusplus: __C++__
+- :fontawesome-solid-microchip: __Embedded__
+- :material-database: __SQL__
+- :material-server-network: __Networking__
+
+
+</div>
+
 
 ## Technical
 
