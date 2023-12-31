@@ -12,6 +12,9 @@ sqlglot = "^19.7.0"
 [tool.poetry.scripts]
 nu_plugin_to_sql = "to_sql:plugin"
 
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.1.6"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

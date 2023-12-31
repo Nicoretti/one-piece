@@ -24,8 +24,44 @@
 #
 # This plugin uses python3
 # Note: To debug plugins write to stderr using sys.stderr.write
+
+
+# To sql
+# save db
+
 import sys
 import json
+
+from inspect import cleandoc
+import sqlglot as sg
+
+
+def record2table(record):
+    name = ""
+    columns = []
+    type = mappings = {
+        "": "",
+    }
+    return cleandoc(
+        """
+    CREATE TABLE IF NOT EXISTS {name} (
+    {columns} 
+    );
+    """
+    ).format(
+        name=name,
+        columns=",\n".join(["{name} {type}".format() for name, type in columns]),
+    )
+
+
+def record2insert(record):
+    pass
+
+
+
+def _create_table():
+    sg.table()
+    sg.trans
 
 
 def signatures():
@@ -44,7 +80,7 @@ def signatures():
                     "usage": "Converts tables or records to sql statements",
                     "extra_usage": "",
                     "input_type": "Any",
-                    "output_type": "Text",
+                    "output_type": "Table",
                     "required_positional": [],
                     "optional_positional": [],
                     "named": [
@@ -92,277 +128,9 @@ def process_call(plugin_call):
     # Pretty printing the call to stderr
     sys.stderr.write(json.dumps(plugin_call, indent=4))
     sys.stderr.write("\n")
-
-    # Creates a Value of type List that will be encoded and sent to Nushell
-    return {
-        "Value": {
-            "List": {
-                "vals": [
-                    {
-                        "Record": {
-                            "cols": ["one", "two", "three"],
-                            "vals": [
-                                {
-                                    "Int": {
-                                        "val": 0,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                                {
-                                    "Int": {
-                                        "val": 0,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                                {
-                                    "Int": {
-                                        "val": 0,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                            ],
-                            "span": {"start": 0, "end": 1},
-                        }
-                    },
-                    {
-                        "Record": {
-                            "cols": ["one", "two", "three"],
-                            "vals": [
-                                {
-                                    "Int": {
-                                        "val": 0,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                                {
-                                    "Int": {
-                                        "val": 1,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                                {
-                                    "Int": {
-                                        "val": 2,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                            ],
-                            "span": {"start": 0, "end": 1},
-                        }
-                    },
-                    {
-                        "Record": {
-                            "cols": ["one", "two", "three"],
-                            "vals": [
-                                {
-                                    "Int": {
-                                        "val": 0,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                                {
-                                    "Int": {
-                                        "val": 2,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                                {
-                                    "Int": {
-                                        "val": 4,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                            ],
-                            "span": {"start": 0, "end": 1},
-                        }
-                    },
-                    {
-                        "Record": {
-                            "cols": ["one", "two", "three"],
-                            "vals": [
-                                {
-                                    "Int": {
-                                        "val": 0,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                                {
-                                    "Int": {
-                                        "val": 3,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                                {
-                                    "Int": {
-                                        "val": 6,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                            ],
-                            "span": {"start": 0, "end": 1},
-                        }
-                    },
-                    {
-                        "Record": {
-                            "cols": ["one", "two", "three"],
-                            "vals": [
-                                {
-                                    "Int": {
-                                        "val": 0,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                                {
-                                    "Int": {
-                                        "val": 4,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                                {
-                                    "Int": {
-                                        "val": 8,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                            ],
-                            "span": {"start": 0, "end": 1},
-                        }
-                    },
-                    {
-                        "Record": {
-                            "cols": ["one", "two", "three"],
-                            "vals": [
-                                {
-                                    "Int": {
-                                        "val": 0,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                                {
-                                    "Int": {
-                                        "val": 5,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                                {
-                                    "Int": {
-                                        "val": 10,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                            ],
-                            "span": {"start": 0, "end": 1},
-                        }
-                    },
-                    {
-                        "Record": {
-                            "cols": ["one", "two", "three"],
-                            "vals": [
-                                {
-                                    "Int": {
-                                        "val": 0,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                                {
-                                    "Int": {
-                                        "val": 6,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                                {
-                                    "Int": {
-                                        "val": 12,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                            ],
-                            "span": {"start": 0, "end": 1},
-                        }
-                    },
-                    {
-                        "Record": {
-                            "cols": ["one", "two", "three"],
-                            "vals": [
-                                {
-                                    "Int": {
-                                        "val": 0,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                                {
-                                    "Int": {
-                                        "val": 7,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                                {
-                                    "Int": {
-                                        "val": 14,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                            ],
-                            "span": {"start": 0, "end": 1},
-                        }
-                    },
-                    {
-                        "Record": {
-                            "cols": ["one", "two", "three"],
-                            "vals": [
-                                {
-                                    "Int": {
-                                        "val": 0,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                                {
-                                    "Int": {
-                                        "val": 8,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                                {
-                                    "Int": {
-                                        "val": 16,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                            ],
-                            "span": {"start": 0, "end": 1},
-                        }
-                    },
-                    {
-                        "Record": {
-                            "cols": ["one", "two", "three"],
-                            "vals": [
-                                {
-                                    "Int": {
-                                        "val": 0,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                                {
-                                    "Int": {
-                                        "val": 9,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                                {
-                                    "Int": {
-                                        "val": 18,
-                                        "span": {"start": 0, "end": 1},
-                                    }
-                                },
-                            ],
-                            "span": {"start": 0, "end": 1},
-                        }
-                    },
-                ],
-                "span": {"start": 0, "end": 1},
-            }
-        }
-    }
+    with open("/Users/nicoretti/Projects/one-piece/python/to-sql/nu.json", "w") as f:
+        print(f"{plugin_call}", file=f)
+    return {}
 
 
 def tell_nushell_encoding():

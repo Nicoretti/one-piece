@@ -1,0 +1,1169 @@
+{
+  'CallInfo': {
+    'name': 'to sql',
+    'call': {
+      'head': {
+        'start': 131762,
+        'end': 131768
+      },
+      'positional': [],
+      'named': []
+    },
+    'input': {
+      'Value': {
+        'List': {
+          'vals': [
+            {
+              'Record': {
+                'val': {
+                  'cols': [
+                    'name',
+                    'type',
+                    'target',
+                    'readonly',
+                    'mode',
+                    'num_links',
+                    'inode',
+                    'user',
+                    'group',
+                    'size',
+                    'created',
+                    'accessed',
+                    'modified'
+                  ],
+                  'vals': [
+                    {
+                      'String': {
+                        'val': 'README.md',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'file',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Nothing': {
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Bool': {
+                        'val': False,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'rw-r--r--',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Int': {
+                        'val': 1,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Int': {
+                        'val': 61891323,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'nicoretti',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'staff',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Filesize': {
+                        'val': 0,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:37:04.562219981+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:37:04.562219981+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:37:04.562219981+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    }
+                  ]
+                },
+                'internal_span': {
+                  'start': 131753,
+                  'end': 131755
+                }
+              }
+            },
+            {
+              'Record': {
+                'val': {
+                  'cols': [
+                    'name',
+                    'type',
+                    'target',
+                    'readonly',
+                    'mode',
+                    'num_links',
+                    'inode',
+                    'user',
+                    'group',
+                    'size',
+                    'created',
+                    'accessed',
+                    'modified'
+                  ],
+                  'vals': [
+                    {
+                      'String': {
+                        'val': '__pycache__',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'dir',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Nothing': {
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Bool': {
+                        'val': False,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'rwxr-xr-x',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Int': {
+                        'val': 3,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Int': {
+                        'val': 61895277,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'nicoretti',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'staff',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Filesize': {
+                        'val': 96,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:47:56.272960399+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:48:01.668004123+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:57:25.067868876+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    }
+                  ]
+                },
+                'internal_span': {
+                  'start': 131753,
+                  'end': 131755
+                }
+              }
+            },
+            {
+              'Record': {
+                'val': {
+                  'cols': [
+                    'name',
+                    'type',
+                    'target',
+                    'readonly',
+                    'mode',
+                    'num_links',
+                    'inode',
+                    'user',
+                    'group',
+                    'size',
+                    'created',
+                    'accessed',
+                    'modified'
+                  ],
+                  'vals': [
+                    {
+                      'String': {
+                        'val': 'nu.json',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'file',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Nothing': {
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Bool': {
+                        'val': False,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'rw-r--r--',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Int': {
+                        'val': 1,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Int': {
+                        'val': 61895602,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'nicoretti',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'staff',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Filesize': {
+                        'val': 32525,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:57:25.079636469+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:59:28.519725113+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:59:27.159553684+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    }
+                  ]
+                },
+                'internal_span': {
+                  'start': 131753,
+                  'end': 131755
+                }
+              }
+            },
+            {
+              'Record': {
+                'val': {
+                  'cols': [
+                    'name',
+                    'type',
+                    'target',
+                    'readonly',
+                    'mode',
+                    'num_links',
+                    'inode',
+                    'user',
+                    'group',
+                    'size',
+                    'created',
+                    'accessed',
+                    'modified'
+                  ],
+                  'vals': [
+                    {
+                      'String': {
+                        'val': 'nu.txt',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'file',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Nothing': {
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Bool': {
+                        'val': False,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'rw-r--r--',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Int': {
+                        'val': 1,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Int': {
+                        'val': 61895547,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'nicoretti',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'staff',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Filesize': {
+                        'val': 9570,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:55:55.299180553+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:57:08.814728461+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:57:07.571028456+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    }
+                  ]
+                },
+                'internal_span': {
+                  'start': 131753,
+                  'end': 131755
+                }
+              }
+            },
+            {
+              'Record': {
+                'val': {
+                  'cols': [
+                    'name',
+                    'type',
+                    'target',
+                    'readonly',
+                    'mode',
+                    'num_links',
+                    'inode',
+                    'user',
+                    'group',
+                    'size',
+                    'created',
+                    'accessed',
+                    'modified'
+                  ],
+                  'vals': [
+                    {
+                      'String': {
+                        'val': 'poetry.lock',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'file',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Nothing': {
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Bool': {
+                        'val': False,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'rw-r--r--',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Int': {
+                        'val': 1,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Int': {
+                        'val': 61891324,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'nicoretti',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'staff',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Filesize': {
+                        'val': 3571,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:37:04.562431506+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:46:30.776096216+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:46:29.705035503+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    }
+                  ]
+                },
+                'internal_span': {
+                  'start': 131753,
+                  'end': 131755
+                }
+              }
+            },
+            {
+              'Record': {
+                'val': {
+                  'cols': [
+                    'name',
+                    'type',
+                    'target',
+                    'readonly',
+                    'mode',
+                    'num_links',
+                    'inode',
+                    'user',
+                    'group',
+                    'size',
+                    'created',
+                    'accessed',
+                    'modified'
+                  ],
+                  'vals': [
+                    {
+                      'String': {
+                        'val': 'pyproject.toml',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'file',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Nothing': {
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Bool': {
+                        'val': False,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'rw-r--r--',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Int': {
+                        'val': 1,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Int': {
+                        'val': 61891325,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'nicoretti',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'staff',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Filesize': {
+                        'val': 402,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:37:04.562893055+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:46:30.774883528+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:46:29.705545565+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    }
+                  ]
+                },
+                'internal_span': {
+                  'start': 131753,
+                  'end': 131755
+                }
+              }
+            },
+            {
+              'Record': {
+                'val': {
+                  'cols': [
+                    'name',
+                    'type',
+                    'target',
+                    'readonly',
+                    'mode',
+                    'num_links',
+                    'inode',
+                    'user',
+                    'group',
+                    'size',
+                    'created',
+                    'accessed',
+                    'modified'
+                  ],
+                  'vals': [
+                    {
+                      'String': {
+                        'val': 'test',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'dir',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Nothing': {
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Bool': {
+                        'val': False,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'rwxr-xr-x',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Int': {
+                        'val': 3,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Int': {
+                        'val': 61891326,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'nicoretti',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'staff',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Filesize': {
+                        'val': 96,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:37:04.563276980+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:37:04.948608967+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:37:04.563431423+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    }
+                  ]
+                },
+                'internal_span': {
+                  'start': 131753,
+                  'end': 131755
+                }
+              }
+            },
+            {
+              'Record': {
+                'val': {
+                  'cols': [
+                    'name',
+                    'type',
+                    'target',
+                    'readonly',
+                    'mode',
+                    'num_links',
+                    'inode',
+                    'user',
+                    'group',
+                    'size',
+                    'created',
+                    'accessed',
+                    'modified'
+                  ],
+                  'vals': [
+                    {
+                      'String': {
+                        'val': 'to_sql.py',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'file',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Nothing': {
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Bool': {
+                        'val': False,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'rw-r--r--',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Int': {
+                        'val': 1,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Int': {
+                        'val': 61891328,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'nicoretti',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'String': {
+                        'val': 'staff',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Filesize': {
+                        'val': 4725,
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T13:37:04.563542073+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T14:00:05.484421381+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    },
+                    {
+                      'Date': {
+                        'val': '2023-12-01T14:00:04.674926511+01:00',
+                        'internal_span': {
+                          'start': 131753,
+                          'end': 131755
+                        }
+                      }
+                    }
+                  ]
+                },
+                'internal_span': {
+                  'start': 131753,
+                  'end': 131755
+                }
+              }
+            }
+          ],
+          'internal_span': {
+            'start': 131762,
+            'end': 131768
+          }
+        }
+      }
+    }
+  }
+}
