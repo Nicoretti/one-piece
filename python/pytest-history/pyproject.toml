@@ -6,11 +6,14 @@ authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
 readme = "README.md"
 license = "MIT"
 classifiers = [
-    "License :: OSI Approved :: MIT License",
+    'Framework :: Pytest',
+    'Programming Language :: Python',
+    'Topic :: Software Development :: Testing',
+    'License :: OSI Approved :: MIT License',
 ]
 keywords = ['pytest', 'sqlite', 'sql', 'history']
 repository = "https://github.com/Nicoretti/one-piece/tree/grand-line/python/pytest-history"
-packages = [{include = "pytest_history", from = "src"}]
+packages = [{ include = "pytest_history", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -97,4 +100,3 @@ force-wrap-aliases = true
 combine-as-imports = true
 order-by-type = true
 required-imports = ["from __future__ import annotations"]
-
