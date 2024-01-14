@@ -60,3 +60,53 @@ def results(db, id):
     with sqlite3.connect(db) as con:
         results = con.execute(query, (id,))
         yield from (TestResult(*result) for result in results)
+
+
+def newly_added(db):
+    query = cleandoc(
+        """
+        SELECT id,
+        test_run,
+        node_id,
+        file,
+        lineno,
+        testcase,
+        outcome,
+        skipped,
+        duration
+        FROM "test.results"
+        WHERE node_id NOT IN (
+            SELECT node_id
+            FROM "test.results"
+            WHERE test_run != (SELECT MAX(id) FROM "test.runs"))
+        ORDER BY testcase;
+        """
+    )
+    with sqlite3.connect(db) as con:
+        results = con.execute(query)
+        yield from (TestResult(*result) for result in results)
+
+
+def added_since(db, since):
+    query = cleandoc(
+        """
+        SELECT id,
+        test_run,
+        node_id,
+        file,
+        lineno,
+        testcase,
+        outcome,
+        skipped,
+        duration
+        FROM "test.results"
+        WHERE node_id NOT IN (
+            SELECT node_id
+            FROM "test.results"
+            WHERE test_run < ? )
+        ORDER BY testcase;
+        """
+    )
+    with sqlite3.connect(db) as con:
+        results = con.execute(query, since)
+        yield from (TestResult(*result) for result in results)

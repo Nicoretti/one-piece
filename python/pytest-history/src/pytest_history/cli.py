@@ -5,7 +5,7 @@ import sys
 from enum import IntEnum
 from pathlib import Path
 
-from pytest_history.queries import flakes, results, runs
+from pytest_history.queries import flakes, newly_added, results, runs
 
 
 class ExitCode(IntEnum):
@@ -37,7 +37,7 @@ class History:
             self._subcommands = self._parser.add_subparsers(description="")
 
             list_results = self._subcommands.add_parser(
-                "results", description="List historic tests results"
+                "results", description="List historic test results"
             )
             list_results.add_argument(
                 "id",
@@ -50,6 +50,11 @@ class History:
                 "runs", description="List historic test runs"
             )
             list_runs.set_defaults(func=self.print_runs)
+
+            list_added = self._subcommands.add_parser(
+                "added", description="List test added during the most recent run"
+            )
+            list_added.set_defaults(func=self.print_newly_added)
 
         @staticmethod
         def print_results(db, args):
@@ -71,6 +76,20 @@ class History:
             template = "{id} {datetime}"
             for r in runs(db):
                 print(template.format(id=r.id, datetime=r.start))
+            return ExitCode.Success
+
+        @staticmethod
+        def print_newly_added(db, _args):
+            template = "{id} {node_id} {duration} {outcome}"
+            for n in newly_added(db):
+                print(
+                    template.format(
+                        id=n.id,
+                        node_id=n.node_id,
+                        duration=n.duration,
+                        outcome=n.outcome,
+                    )
+                )
             return ExitCode.Success
 
     @staticmethod
