@@ -28,6 +28,20 @@ Unlocking encrypted root partion of a Debian based system (Ubuntu 22.04) via ssh
 * Reboot `sudo systemctl reboot`
 * Connect to the booting machine (`ssh root@<host>`) and unlock the encrypted partion using `cryptroot-unlock`
 
+## Background
+
+I recently ventured back into the realm of server management, setting up a basic home server and opting for a hosting provider to manage some services myself. While encrypting the drives of laptops or desktops is generally accepted and straightforward, applying similar security measures to a server—especially one you don't physically access—might not seem as obvious or easy to everyone. Before diving deeper, let me clarify two key points.
+
+### Why Encrypt Your Server Disk?
+
+The rationale behind encrypting a server disk might vary, but there are two primary benefits I believe make it indispensable:
+
+- **Data Erasure Security:** Ensuring that data is irrecoverable when I choose to delete it helps maintain online privacy and security. It's about making sure that the internet has the ability to "forget."
+- **Protection Against Unauthorized Access:** Encrypting the disk offers a fundamental layer of security against potential theft or unauthorized access to the disk storage by the hosting provider or others.
+
+**Disclaimer:** It's crucial to recognize that lacking physical control over the machine introduces additional attack vectors,
+potentially reducing some of the security guarantees. However, in my opinion, the benefits of disk encryption still outweigh the effort.
+
 
 ### Links & Resources
 Below are links and resources I've consulted while setting up and figuring out my personal setup.
