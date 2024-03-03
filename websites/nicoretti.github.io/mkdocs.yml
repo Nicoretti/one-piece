@@ -33,6 +33,7 @@ theme:
     - search.suggest
     - search.highlight
     - content.tabs.link
+    - content.code.copy
   font: false
 
 extra:
@@ -53,6 +54,7 @@ copyright: >
   
 markdown_extensions:
   - admonition
+  - pymdownx.details
   - pymdownx.highlight:
       use_pygments: true
   - pymdownx.superfences
