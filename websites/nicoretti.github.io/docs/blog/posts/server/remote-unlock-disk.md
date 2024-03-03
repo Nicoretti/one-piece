@@ -17,16 +17,16 @@ categories:
 
 :material-information-outline:{ title="Craft an image of a server and its data disk under the vigilant protection of a formidable bear, symbolizing an unbreakable lock, all set within a vivid digital realm. The path to this secure server is a digital highway, encrypted with cryptic data, emphasizing the fortified access against unauthorized intrusion, with the entire scenery unfolding in a visually rich, digital landscape." } *Image created by DALL-E, OpenAI's image generation model.*
 
-### TL;DR
+## TL;DR
 
 Unlocking encrypted root partion of a Debian based system (Ubuntu 22.04) via ssh.
 
-* Install `dropbear-initramfs` package
-* Adjust configuration `/etc/dropbear/initramfs/dropbear.conf`
-* Create or add key to `/etc/dropbear/initramfs/authorized_keys`
-* Update the `initramfs`: `sudo update-initramfs -u`
-* Reboot `sudo systemctl reboot`
-* Connect to the booting machine (`ssh root@<host>`) and unlock the encrypted partion using `cryptroot-unlock`
+1. Install `dropbear-initramfs` package
+2. Adjust configuration `/etc/dropbear/initramfs/dropbear.conf`
+3. Create or add key to `/etc/dropbear/initramfs/authorized_keys`
+4. Update the `initramfs`: `sudo update-initramfs -u`
+5. Reboot `sudo systemctl reboot`
+6. Connect to the booting machine (`ssh root@<host>`) and unlock the encrypted partion using `cryptroot-unlock`
 
 ## Background
 
@@ -39,8 +39,10 @@ The rationale behind encrypting a server disk might vary, but there are two prim
 - **Data Erasure Security:** Ensuring that data is irrecoverable when I choose to delete it helps maintain online privacy and security. It's about making sure that the internet has the ability to "forget."
 - **Protection Against Unauthorized Access:** Encrypting the disk offers a fundamental layer of security against potential theft or unauthorized access to the disk storage by the hosting provider or others.
 
-**Disclaimer:** It's crucial to recognize that lacking physical control over the machine introduces additional attack vectors,
-potentially reducing some of the security guarantees. However, in my opinion, the benefits of disk encryption still outweigh the effort.
+!!! warning "Disclaimer" 
+
+    It's crucial to recognize that lacking physical control over the machine introduces additional attack vectors,
+    potentially reducing some of the security guarantees. However, in my opinion, the benefits of disk encryption still outweigh the effort.
 
 
 ## Compatibility and System Requirements
@@ -81,10 +83,13 @@ This section addresses some of the typical challenges you might encounter when s
 - **Unlocking Mechanism:** Methods to allow only `cryptunlock` commands and scripts to enhance security.
 
 
-### Links & Resources
-Below are links and resources I've consulted while setting up and figuring out my personal setup.
-Since preferences vary, you might find some of these resources more suited for your needs or maybe they
-provide you some additional insights.
+## Links & Resources
+
+!!! note "Note"
+
+    Below are links and resources I've consulted while setting up and figuring out my personal setup.
+    Since preferences vary, you might find some of these resources more suited for your needs or maybe they
+    provide you some additional insights.
 
 * [Dropbear SSH](https://matt.ucc.asn.au/dropbear/dropbear.html)
 * [Package: dropbear-initramfs](https://packages.ubuntu.com/jammy/dropbear-initramfs)
