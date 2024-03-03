@@ -52,6 +52,34 @@ Although the general workflow should be consistent, package names and paths may 
 
     For those using Fedora or systems that employ Dracut, a similar setup can be achived using Dracut and [dracut-crypt-ssh](https://github.com/dracut-crypt-ssh/dracut-crypt-ssh).
 
+## Setting Up the Basic System
+
+This section will guide you through the initial steps of setting up your system to unlock the LUKS disk encryption via SSH.
+
+### Install Packages
+### Generate SSH Key
+### Configure Dropbear
+### Generate Initramfs
+### Unlock
+
+## Enhancing Convenience and Security
+
+This section discusses enhancements convenience and security.
+
+- **Dropbear Configuration/Security Tweaks:** Exploring flags and options for Dropbear.
+
+
+## Gotchas and How to Tackle Them
+
+This section addresses some of the typical challenges you might encounter when setting up or using the setup described obove.
+
+- **Port Management:** Strategies for choosing different ports for Dropbear and OpenSSH to improve security, including considerations for duplication and subdomains.
+- **Command Execution in Dropbear:** Ensuring Dropbear executes commands as expected.
+- **Multi-Partition/Disk Encryption:** Strategies for managing multiple partitions or disks with different passwords.
+- **User Access:** Connecting to Dropbear as a user other than `root` and its implications.
+- **Key Management:** Handling different server keys for Dropbear and OpenSSH when using the same URL/endpoint, with a focus on strict checking.
+- **Unlocking Mechanism:** Methods to allow only `cryptunlock` commands and scripts to enhance security.
+
 
 ### Links & Resources
 Below are links and resources I've consulted while setting up and figuring out my personal setup.
