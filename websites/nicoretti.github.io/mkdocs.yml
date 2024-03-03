@@ -54,6 +54,7 @@ copyright: >
   
 markdown_extensions:
   - admonition
+  - pymdownx.details
   - pymdownx.highlight:
       use_pygments: true
   - pymdownx.superfences
