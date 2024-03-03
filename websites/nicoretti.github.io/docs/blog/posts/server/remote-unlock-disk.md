@@ -43,6 +43,16 @@ The rationale behind encrypting a server disk might vary, but there are two prim
 potentially reducing some of the security guarantees. However, in my opinion, the benefits of disk encryption still outweigh the effort.
 
 
+## Compatibility and System Requirements
+
+This walkthrough is tailored for Debian-based systems, specifically highlighting **Ubuntu 22.04**.
+Although the general workflow should be consistent, package names and paths may differ across distributions and versions.
+
+!!! note "Note: Fedora and Dracut Users"
+
+    For those using Fedora or systems that employ Dracut, a similar setup can be achived using Dracut and [dracut-crypt-ssh](https://github.com/dracut-crypt-ssh/dracut-crypt-ssh).
+
+
 ### Links & Resources
 Below are links and resources I've consulted while setting up and figuring out my personal setup.
 Since preferences vary, you might find some of these resources more suited for your needs or maybe they
