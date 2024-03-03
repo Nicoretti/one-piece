@@ -28,3 +28,20 @@ Unlocking encrypted root partion of a Debian based system (Ubuntu 22.04) via ssh
 * Reboot `sudo systemctl reboot`
 * Connect to the booting machine (`ssh root@<host>`) and unlock the encrypted partion using `cryptroot-unlock`
 
+
+### Links & Resources
+Below are links and resources I've consulted while setting up and figuring out my personal setup.
+Since preferences vary, you might find some of these resources more suited for your needs or maybe they
+provide you some additional insights.
+
+* [Dropbear SSH](https://matt.ucc.asn.au/dropbear/dropbear.html)
+* [Package: dropbear-initramfs](https://packages.ubuntu.com/jammy/dropbear-initramfs)
+* [dropbear(8)](https://manpages.ubuntu.com/manpages/jammy/en/man8/dropbear.8.html)
+* [cryptsetup(8)](https://manpages.ubuntu.com/manpages/jammy/en/man8/cryptsetup.8.html)
+* [dcracut-crypt-ssh](https://github.com/dracut-crypt-ssh/dracut-crypt-ssh)
+* [ceremcem/unlock-luks-partition](https://github.com/ceremcem/unlock-luks-partition)
+* [Remotely unlock a LUKS-encrypted Linux server using Dropbear (Debain 12)](https://www.dwarmstrong.org/remote-unlock-dropbear/)
+* [UNLOCKING A LUKS FULLY ENCRYPTED DRIVE AND BOOTING INTO THE OS VIA DROPBEAR](https://swissmade.host/en/blog/unlocking-a-luks-fully-encrypted-drive-and-booting-into-the-os-via-dropbear-ssh)
+* [How to unlock LUKS using Dropbear SSH keys remotely in Linux](https://www.cyberciti.biz/security/how-to-unlock-luks-using-dropbear-ssh-keys-remotely-in-linux/)
+
+
