@@ -30,7 +30,7 @@ Unlocking encrypted root partion of a Debian based system (Ubuntu 22.04) via ssh
 
 ## Background
 
-I recently ventured back into the realm of server management, setting up a basic home server and opting for a hosting provider to manage some services myself. While encrypting the drives of laptops or desktops is generally accepted and straightforward, applying similar security measures to a server—especially one you don't physically access—might not seem as obvious or easy to everyone. Before diving deeper, let me clarify two key points.
+I recently came back to doing some server management, setting up a basic home server and opting for hosting some services myself. While encrypting the drives of laptops or desktops is a no brainer, applying similar security measures to a server might not seem as obvious or easy to everyone, even though it can be.
 
 ### Why Encrypt Your Server Disk?
 
