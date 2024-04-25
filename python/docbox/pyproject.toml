@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "docbox"
+version = "0.1.0"
+description = ""
+authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.4.4"
+
+[tool.poetry.scripts]
+docbox = 'docbox:main'
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
