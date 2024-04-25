@@ -33,6 +33,8 @@ theme:
     - search.suggest
     - search.highlight
     - content.tabs.link
+    - content.code.copy
+
   font: false
 
 extra:
