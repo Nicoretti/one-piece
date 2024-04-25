@@ -1,0 +1,22 @@
+// General Rules
+START_OF_RULE = _{ "    " }
+ANY_EXCEPT_NEWLINE = _{ !"\n" ~ ANY }
+ANY_EXCEPT_NEWLINE_AND_MODIFIERS = _{ !"\n" ~ !Modifier ~ ANY }
+
+File = { SOI ~ Line+ ~ EOI }
+
+// Line(s)
+Line = _{ (MultilineCommand | ShellCommand | ReturnCode | CommandOutput | CommentLine)} 
+MultilineCommand = { ShellCommand ~ (START_OF_RULE ~ ">" ~ ANY_EXCEPT_NEWLINE* ~ NEWLINE)+ }
+ShellCommand = { START_OF_RULE ~ "$" ~ ANY_EXCEPT_NEWLINE* ~ NEWLINE}
+CommentLine = { ANY_EXCEPT_NEWLINE* ~ NEWLINE} 
+CommandOutput = { START_OF_RULE ~ ANY_EXCEPT_NEWLINE_AND_MODIFIERS* ~ (Modifier | NEWLINE) }
+ReturnCode = { START_OF_RULE ~ "[" ~ ASCII_DIGIT+ ~ "]" ~ ANY_EXCEPT_NEWLINE* ~ NEWLINE }
+
+// Modifiers
+Modifier = { (Regexp | Glob | NoEol | Esc) ~ NEWLINE }
+Regexp = { "(re)" }
+Glob = { "(glob)" }
+NoEol = { "(no-eol)" }
+Esc = { "(esc)" }
+
