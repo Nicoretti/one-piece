@@ -13,6 +13,7 @@ members = [
     "newton",
     "nordic",
     "nostd",
+    "nyx",
     "preidolia",
     "protocols",
     "tobytes",
