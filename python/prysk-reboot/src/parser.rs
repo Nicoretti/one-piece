@@ -13,3 +13,6 @@ pub mod prysk4spaces {
     #[grammar = "prysk4spaces.pest"]
     pub struct PryskParser;
 }
+
+pub fn to_ast() {
+}
