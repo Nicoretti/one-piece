@@ -4,6 +4,17 @@ version = "0.1.0"
 description = ""
 authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
 readme = "README.md"
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Environment :: Console",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+keywords = ['ai', 'openai', 'llm', 'tui', 'cli', 'repl']
+repository = "https://github.com/Nicoretti/one-piece/python/aergia"
+
 
 [tool.poetry.dependencies]
 python = ">=3.10"
@@ -22,5 +33,5 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-aergia = "aergia.main:main"
-ae = "aergia.main:main"
+aergia = "aergia.application:main"
+ae = "aergia.application:main"

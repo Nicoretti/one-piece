@@ -1,4 +1,4 @@
 import logging
 
-logger = logging.getLogger("ai")
+logger = logging.getLogger("aergia")
 

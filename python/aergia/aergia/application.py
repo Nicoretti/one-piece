@@ -3,9 +3,9 @@ import sys
 import logging
 
 from functools import wraps
-from aergia.cli.parser import create_parser
-from aergia.cli.output import stderr, stdout
-from aergia.cli.commands import ExitCode
+from aergia._cli._parser import make_parser
+from aergia._cli._output import stderr, stdout
+from aergia._cli._command import ExitCode
 from aergia._logging import logger
 from rich.logging import RichHandler
 
@@ -30,9 +30,9 @@ def _protect(func, *args, **kwargs):
     return wrapper
 
 
-def main():
-    parser = create_parser()
-    args = parser.parse_args()
+def main(argv=None):
+    parser = make_parser()
+    args = parser.parse_args(argv)
 
     if args.log_level:
         level = {
