@@ -54,7 +54,10 @@ class Message:
 class Image(BaseModel):
     _TABLE_NAME = 'images'
     name: str
-    data: bytes
+    model: str
+    prompt: str
+    blob: bytes
+    openai_data: str
 
     @classmethod
     @property
@@ -63,7 +66,10 @@ class Image(BaseModel):
         CREATE TABLE  IF NOT EXISTS {cls._TABLE_NAME.default} (
             id INTEGER PRIMARY KEY,
             name TEXT NOT NULL,
-            blob BLOB NOT NULL
+            model TEXT NOT NULL,
+            prompt TEXT NOT NULL,
+            blob BLOB NOT NULL,
+            openai_data TEXT
         );
         """)
 
