@@ -1,3 +1,4 @@
+import asyncio
 import sys
 import logging
 
@@ -5,6 +6,7 @@ from functools import wraps
 from aergia.cli.parser import create_parser
 from aergia.cli.output import stderr, stdout
 from aergia.cli.commands import ExitCode
+from aergia._logging import logger
 from rich.logging import RichHandler
 
 
@@ -14,7 +16,14 @@ def _protect(func, *args, **kwargs):
         try:
             exit_code = func(*args, **kwargs)
         except Exception as ex:
-            stdout.print(f"Error occurred, details: {ex}", style='red')
+            err_msg = f"Error occurred, details: {ex}"
+            logger.error(err_msg)
+            stdout.print(err_msg, style='red')
+            exit_code = ExitCode.Failure
+        except asyncio.CancelledError as ex:
+            err_msg = f"Canceled by user, details: {ex}"
+            logger.error(err_msg)
+            stdout.print(err_msg, style='red')
             exit_code = ExitCode.Failure
         return exit_code
 
