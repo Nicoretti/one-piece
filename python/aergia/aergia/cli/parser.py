@@ -1,5 +1,5 @@
 import argparse
-from atalk.cli.commands import default, chat, image, models
+from aergia.cli.commands import default, chat, image, models
 from rich_argparse import ArgumentDefaultsRichHelpFormatter
 from contextlib import contextmanager
 

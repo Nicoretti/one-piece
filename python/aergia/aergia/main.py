@@ -2,9 +2,9 @@ import sys
 import logging
 
 from functools import wraps
-from atalk.cli.parser import create_parser
-from atalk.cli.output import stderr, stdout
-from atalk.cli.commands import ExitCode
+from aergia.cli.parser import create_parser
+from aergia.cli.output import stderr, stdout
+from aergia.cli.commands import ExitCode
 from rich.logging import RichHandler
 
 

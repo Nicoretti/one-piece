@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "atalk"
+name = "aergia"
 version = "0.1.0"
 description = ""
 authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
@@ -22,4 +22,5 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-ai = "atalk.main:main"
+aergia = "aergia.main:main"
+ae = "aergia.main:main"

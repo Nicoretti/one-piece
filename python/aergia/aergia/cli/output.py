@@ -1,4 +1,4 @@
-from atalk._logging import logger
+from aergia._logging import logger
 from rich.console import Console
 
 
