@@ -7,6 +7,7 @@ from inspect import cleandoc
 import httpx
 from openai import AsyncOpenAI, OpenAI
 from rich.markdown import Markdown
+from aergia._storage import save, load, Image, application_db
 
 from enum import IntEnum
 
@@ -131,6 +132,8 @@ def image(args, stdout, stderr):
     response = client.images.generate(prompt=prompt, model=args.model)
     image_url = response.data[0].url
     download(image_url, args.filename)
+    created = response.created
+    img = Imagej
 
     return ExitCode.Success
 
