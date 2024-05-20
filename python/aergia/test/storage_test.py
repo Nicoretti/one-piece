@@ -19,9 +19,9 @@ def test_store_image(test_db):
         name='Test.png',
         model='gpt-4o',
         prompt='Some test prompt',
+        revised_prompt='revised: Some test prompt',
         created=datetime.datetime.now(),
         blob=b'fake blob this is obviously no image data',
-        openai_data=None
     )
     save(image, test_db)
     expected = 1
@@ -35,9 +35,9 @@ def test_store_image_round_trip(test_db):
         name='Test.png',
         model='gpt-4o',
         prompt='Some test prompt',
+        revised_prompt='revised: Some test prompt',
         created=datetime.datetime.now(),
         blob=b'fake blob this is obviously no image data',
-        openai_data=None
     )
     save(image, test_db)
 

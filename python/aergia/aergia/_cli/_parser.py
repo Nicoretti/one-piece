@@ -1,4 +1,5 @@
 import argparse
+import datetime as dt
 from aergia._cli._command import default, chat, image, models
 from rich_argparse import ArgumentDefaultsRichHelpFormatter
 from contextlib import contextmanager
@@ -84,20 +85,23 @@ def add_code_subcommand(subparsers):
 def add_image_subcommand(subparsers):
     subcommand = subparsers.add_parser(
         'image',
-        help='generate images',
+        help='manage and generate images',
         formatter_class=ArgumentDefaultsRichHelpFormatter
     )
     subcommand.add_argument(
-        'filename', type=str, help='Name of the imag for storage input'
+        '-n', '--name', type=str, default=f'unnamed',
+        help='name or title which will be used for the image'
     )
     subcommand.add_argument(
         '-m', '--model',
         default='dall-e-2',
         choices=['dall-e-2', 'dall-e-3'],
-        help='Select a model'
+        help='model to use for generating the image'
     )
     subcommand.add_argument(
-        'text', type=str, nargs=argparse.REMAINDER, help='Text input'
+        'prompt', type=str, nargs="*",
+        metavar='PROMPT',
+        help='prompt which shall be used for generating the image, if None stdin will be read.'
     )
     subcommand.set_defaults(func=image)
     return subcommand

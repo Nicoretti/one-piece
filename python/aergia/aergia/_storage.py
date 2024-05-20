@@ -59,9 +59,9 @@ class Image(BaseModel):
     name: str
     model: str
     prompt: str
+    revised_prompt: str | None
     created: dt.datetime
     blob: bytes
-    openai_data: str | None
 
     @classmethod
     @property
@@ -72,9 +72,9 @@ class Image(BaseModel):
             name TEXT NOT NULL,
             model TEXT NOT NULL,
             prompt TEXT NOT NULL,
+            revised_prompt TEXT NOT NULL,
             created INTEGER NOT NULL, 
-            blob BLOB NOT NULL,
-            openai_data TEXT
+            blob BLOB NOT NULL
         );
         """)
 
@@ -83,7 +83,7 @@ def save(image: Image, db=None):
     with sqlite3.connect(db) as con:
         with con as transaction:
             stmt = cleandoc("""
-            INSERT INTO images (name, model, prompt, created, blob, openai_data)
+            INSERT INTO images (name, model, prompt, revised_prompt, created, blob)
             VALUES (?, ?, ?, ?, ?, ?);
             """)
             result = transaction.execute(
@@ -92,9 +92,9 @@ def save(image: Image, db=None):
                     image.name,
                     image.model,
                     image.prompt,
+                    image.revised_prompt or "[No Revised Prompt]",
                     image.created.timestamp(),
                     image.blob,
-                    image.openai_data
                 )
             )
         image.id = result.lastrowid
@@ -105,7 +105,7 @@ def load(type, name, db=None) -> Image:
     with sqlite3.connect(db) as con:
         with con as transaction:
             stmt = cleandoc("""
-            SELECT id, name, model, prompt, created, blob, openai_data FROM images
+            SELECT id, name, model, prompt, revised_prompt, created, blob FROM images
             WHERE name = ?;
             """)
             result = transaction.execute(stmt, (name,))

@@ -1,10 +1,13 @@
 import asyncio
 import io
 import os
+import sys
+
 from rich.table import Table
 from inspect import cleandoc
 
 import httpx
+import datetime as dt
 from openai import AsyncOpenAI, OpenAI
 from rich.markdown import Markdown
 from aergia._storage import save, load, Image, application_db
@@ -120,20 +123,39 @@ def chat(args, stdout, stderr):
 
 
 def image(args, stdout, stderr):
-    def download(url, file_name):
+    def download(url, file):
         resp = httpx.get(url)
-        with open(file_name, 'wb') as f:
-            f.write(resp.content)
+        file.write(resp.content)
 
     client = OpenAI(
         api_key=os.environ.get("OPENAI_API_KEY")
     )
-    prompt = " ".join(args.text)
+    if not args.prompt:
+        prompt = sys.stdin.read()
+    else:
+        prompt = args.prompt if isinstance(args.prompt, str) else " ".join(args.prompt)
     response = client.images.generate(prompt=prompt, model=args.model)
-    image_url = response.data[0].url
-    download(image_url, args.filename)
-    created = response.created
-    img = Imagej
+    data = response.data[0]
+    image_url = data.url
+    revised_prompt = data.revised_prompt
+    buffer = io.BytesIO()
+    download(image_url, buffer)
+    created = dt.datetime.fromtimestamp(response.created)
+    img = Image(
+        id=None,
+        name=args.name,
+        model=args.model,
+        prompt=prompt,
+        created=created,
+        revised_prompt=revised_prompt,
+        blob=buffer.getvalue()
+    )
+    db = application_db()
+    save(img, db)
+
+    from PIL import Image as PillowImage
+    pimg = PillowImage.open(buffer)
+    pimg.show(args.name)
 
     return ExitCode.Success
 
