@@ -2,7 +2,8 @@ import datetime
 
 import pytest
 from inspect import cleandoc
-from aergia._storage import Image, store, initialize, TABLES, save, load
+from aergia._model._storage import store, initialize, TABLES, save, load
+from aergia._model._data import Image
 
 
 @pytest.fixture

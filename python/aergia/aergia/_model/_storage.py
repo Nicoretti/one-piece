@@ -3,80 +3,40 @@ from __future__ import annotations
 import datetime
 import io
 import sqlite3
-import datetime as dt
 from pathlib import Path
 from inspect import cleandoc
 
-from pydantic import BaseModel
+from aergia._model._data import Session, Message, Image
+
+TABLES = [Image, Session, Message]
 
 
-class Session:
-    _TABLE_NAME = 'session'
-
-    id: int
-    name: str
-    model: str
-    temperature: float
-
-    @classmethod
-    @property
-    def ddl(cls):
-        return cleandoc(f"""
-        CREATE TABLE IF NOT EXISTS {cls._TABLE_NAME} (
-            id INTEGER PRIMARY KEY,
-            name TEXT NOT NULL UNIQUE,
-            model TEXT NOT NULL,
-            temperature REAL NOT NULL
-        );
-        """)
+def data_directory(name: str) -> Path:
+    return Path.home() / '.local' / 'share' / name
 
 
-class Message:
-    _TABLE_NAME = 'messages'
-
-    id: int
-    role: str
-    content: str
-    session_id: int
-
-    @classmethod
-    @property
-    def ddl(cls):
-        return cleandoc(f"""
-        CREATE TABLE IF NOT EXISTS {cls._TABLE_NAME} (
-            id INTEGER PRIMARY KEY,
-            role TEXT NOT NULL,
-            content TEXT NOT NULL,
-            session_id INTEGER,
-            FOREIGN KEY (session_id) REFERENCES sessions(id)
-        );
-        """)
+def store(name, directory):
+    directory.mkdir(exist_ok=True, parents=True)
+    db = directory / f"{name}.sqlite"
+    with sqlite3.connect(db):
+        pass
+    return db
 
 
-class Image(BaseModel):
-    _TABLE_NAME = 'images'
-    id: int | None
-    name: str
-    model: str
-    prompt: str
-    revised_prompt: str | None
-    created: dt.datetime
-    blob: bytes
+def initialize(db, tables=None):
+    tables = tables or []
+    with sqlite3.connect(db) as con:
+        with con as transaction:
+            for table in tables:
+                transaction.execute(table.ddl)
 
-    @classmethod
-    @property
-    def ddl(cls):
-        return cleandoc(f"""
-        CREATE TABLE  IF NOT EXISTS {cls._TABLE_NAME.default} (
-            id INTEGER PRIMARY KEY,
-            name TEXT NOT NULL,
-            model TEXT NOT NULL,
-            prompt TEXT NOT NULL,
-            revised_prompt TEXT NOT NULL,
-            created INTEGER NOT NULL, 
-            blob BLOB NOT NULL
-        );
-        """)
+
+def application_db():
+    name = 'aergia'
+    directory = data_directory(name)
+    db = store(name, directory)
+    initialize(db, TABLES)
+    return db
 
 
 def save(image: Image, db=None):
@@ -144,34 +104,3 @@ def load_blob(type, id, db=None):
         result = con.execute(stmt, (id,))
         row = result.fetchone()
         return io.BytesIO(row[0])
-
-
-TABLES = [Image, Session, Message]
-
-
-def data_directory(name: str) -> Path:
-    return Path.home() / '.local' / 'share' / name
-
-
-def store(name, directory):
-    directory.mkdir(exist_ok=True, parents=True)
-    db = directory / f"{name}.sqlite"
-    with sqlite3.connect(db) as con:
-        pass
-    return db
-
-
-def initialize(db, tables=None):
-    tables = tables or []
-    with sqlite3.connect(db) as con:
-        with con as transaction:
-            for table in tables:
-                transaction.execute(table.ddl)
-
-
-def application_db():
-    name = 'aergia'
-    directory = data_directory(name)
-    db = store(name, directory)
-    initialize(db, TABLES)
-    return db

@@ -3,9 +3,9 @@ import sys
 import logging
 
 from functools import wraps
-from aergia._cli._parser import make_parser
-from aergia._cli._output import stderr, stdout
-from aergia._cli._command import ExitCode
+from aergia._cli._command._parser import make_parser
+from aergia._cli._io import stderr, stdout
+from aergia._cli._command._utilities import ExitCode
 from aergia._logging import logger
 from rich.logging import RichHandler
 
