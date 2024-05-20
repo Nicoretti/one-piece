@@ -10,7 +10,8 @@ import httpx
 import datetime as dt
 from openai import AsyncOpenAI, OpenAI
 from rich.markdown import Markdown
-from aergia._storage import save, load, Image, application_db
+from PIL import Image as PillowImage
+from aergia._storage import save, load_list, Image, application_db, load_blob
 
 from enum import IntEnum
 
@@ -153,10 +154,44 @@ def image(args, stdout, stderr):
     db = application_db()
     save(img, db)
 
-    from PIL import Image as PillowImage
     pimg = PillowImage.open(buffer)
     pimg.show(args.name)
 
+    return ExitCode.Success
+
+
+def list_images(args, stdout, stderr):
+    table = Table(title='Generated Images')
+    table.add_column("Id", justify='right')
+    table.add_column("Name", justify='left', style='green')
+    table.add_column("Model", justify='left', style='cyan')
+    table.add_column("Created", justify='left', style='yellow')
+    table.add_column("Prompt", justify='left', style='white')
+    table.add_column("Revised-Prompt", justify='left', style='magenta')
+
+    db = application_db()
+    limit = None if args.all else args.limit
+    images = load_list(Image, db, limit=limit, offset=args.offset)
+    for img in images:
+        table.add_row(
+            f"{img.id}",
+            img.name,
+            img.model,
+            f"{img.created}",
+            img.prompt,
+            img.revised_prompt
+        )
+
+    stdout.print(table)
+
+    return ExitCode.Success
+
+
+def show_image(args, stdout, stderr):
+    db = application_db()
+    blob = load_blob(Image, args.id, db)
+    pimg = PillowImage.open(blob)
+    pimg.show()
     return ExitCode.Success
 
 

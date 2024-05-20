@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import datetime
+import io
 import sqlite3
 import datetime as dt
 from pathlib import Path
 from inspect import cleandoc
-from contextlib import contextmanager
 
 from pydantic import BaseModel
 
@@ -114,6 +114,36 @@ def load(type, name, db=None) -> Image:
             kwargs = dict(zip(names, row))
             kwargs['created'] = datetime.datetime.fromtimestamp(kwargs['created'])
             return Image(**kwargs)
+
+
+def load_list(type, db=None, limit=10, offset=0):
+    with sqlite3.connect(db) as con:
+        if limit is None:
+            stmt = "SELECT id, name, model, prompt, revised_prompt, created, blob FROM images;"
+            result = con.execute(stmt)
+        else:
+            stmt = cleandoc("""
+                SELECT id, name, model, prompt, revised_prompt, created, blob FROM images
+                ORDER BY id
+                LIMIT ? OFFSET ?;
+            """)
+            result = con.execute(stmt, (limit, offset))
+        names = Image.model_json_schema()['properties'].keys()
+        rows = result.fetchall()
+        images = []
+        for row in rows:
+            kwargs = dict(zip(names, row))
+            kwargs['created'] = datetime.datetime.fromtimestamp(kwargs['created'])
+            images.append(Image(**kwargs))
+        return images
+
+
+def load_blob(type, id, db=None):
+    with sqlite3.connect(db) as con:
+        stmt = "SELECT blob FROM images WHERE id = ?;"
+        result = con.execute(stmt, (id,))
+        row = result.fetchone()
+        return io.BytesIO(row[0])
 
 
 TABLES = [Image, Session, Message]

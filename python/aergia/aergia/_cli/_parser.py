@@ -1,6 +1,5 @@
 import argparse
-import datetime as dt
-from aergia._cli._command import default, chat, image, models
+from aergia._cli._command import default, chat, image, models, list_images, show_image
 from rich_argparse import ArgumentDefaultsRichHelpFormatter
 from contextlib import contextmanager
 
@@ -88,22 +87,58 @@ def add_image_subcommand(subparsers):
         help='manage and generate images',
         formatter_class=ArgumentDefaultsRichHelpFormatter
     )
-    subcommand.add_argument(
+    sub_subparsers = subcommand.add_subparsers(
+        dest='session_subcommand', help='Sessions commands'
+    )
+
+    generate_subcommand = sub_subparsers.add_parser(
+        'generate',
+        help='generate images',
+        formatter_class=ArgumentDefaultsRichHelpFormatter
+    )
+
+    generate_subcommand.add_argument(
         '-n', '--name', type=str, default=f'unnamed',
         help='name or title which will be used for the image'
     )
-    subcommand.add_argument(
+    generate_subcommand.add_argument(
         '-m', '--model',
         default='dall-e-2',
         choices=['dall-e-2', 'dall-e-3'],
         help='model to use for generating the image'
     )
-    subcommand.add_argument(
+    generate_subcommand.add_argument(
         'prompt', type=str, nargs="*",
         metavar='PROMPT',
         help='prompt which shall be used for generating the image, if None stdin will be read.'
     )
-    subcommand.set_defaults(func=image)
+    generate_subcommand.set_defaults(func=image)
+
+    list_subcommand = sub_subparsers.add_parser(
+        'list',
+        help='list previously generated images',
+        formatter_class=ArgumentDefaultsRichHelpFormatter
+    )
+    list_subcommand.add_argument(
+        '-a', '--all', action='store_true', default=False, help='list all images'
+    )
+    list_subcommand.add_argument(
+        '-l', '--limit', type=int, default=10, help='amount of images to list'
+    )
+    list_subcommand.add_argument(
+        '-o', '--offset', type=int, default=0, help='offset for listing images'
+    )
+    list_subcommand.set_defaults(func=list_images)
+
+    show_subcommand = sub_subparsers.add_parser(
+        'show',
+        help='show an image',
+        formatter_class=ArgumentDefaultsRichHelpFormatter
+    )
+    show_subcommand.add_argument(
+        'id', type=int, help='image to show'
+    )
+    show_subcommand.set_defaults(func=show_image)
     return subcommand
 
 
