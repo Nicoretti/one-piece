@@ -10,6 +10,9 @@ def make_parser():
         prog='ae[rgia]', formatter_class=ArgumentDefaultsRichHelpFormatter
     )
     parser.add_argument(
+        '-b', '--backend', type=str, default='openai', help='select backend type'
+    )
+    parser.add_argument(
         '--version', action='store_true', help='print the version'
     )
     parser.add_argument(
