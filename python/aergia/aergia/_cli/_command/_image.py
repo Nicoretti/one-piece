@@ -24,24 +24,28 @@ def image(args, stdout, stderr):
         prompt = sys.stdin.read()
     else:
         prompt = args.prompt if isinstance(args.prompt, str) else " ".join(args.prompt)
-    response = client.images.generate(prompt=prompt, model=args.model)
-    data = response.data[0]
-    image_url = data.url
-    revised_prompt = data.revised_prompt
-    buffer = io.BytesIO()
-    download(image_url, buffer)
-    created = dt.datetime.fromtimestamp(response.created)
-    img = Image(
-        id=None,
-        name=args.name,
-        model=args.model,
-        prompt=prompt,
-        created=created,
-        revised_prompt=revised_prompt,
-        blob=buffer.getvalue()
-    )
-    db = application_db()
-    save(img, db)
+
+    with stdout.status(
+        "Generating image ...", spinner="aesthetic", spinner_style="magenta"
+    ):
+        response = client.images.generate(prompt=prompt, model=args.model)
+        data = response.data[0]
+        image_url = data.url
+        revised_prompt = data.revised_prompt
+        buffer = io.BytesIO()
+        download(image_url, buffer)
+        created = dt.datetime.fromtimestamp(response.created)
+        img = Image(
+            id=None,
+            name=args.name,
+            model=args.model,
+            prompt=prompt,
+            created=created,
+            revised_prompt=revised_prompt,
+            blob=buffer.getvalue()
+        )
+        db = application_db()
+        save(img, db)
 
     pimg = PillowImage.open(buffer)
     pimg.show(args.name)
