@@ -1,7 +1,6 @@
 import os
 import asyncio
 import argparse
-from openai import AsyncOpenAI
 from rich.markdown import Markdown
 from rich_argparse import ArgumentDefaultsRichHelpFormatter
 from aergia._cli._command._utilities import TextBuffer, ExitCode
