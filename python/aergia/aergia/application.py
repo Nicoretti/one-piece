@@ -8,6 +8,7 @@ from aergia._cli._io import stderr, stdout
 from aergia._cli._command._utilities import ExitCode
 from aergia._logging import logger
 from rich.logging import RichHandler
+from aergia._config import Settings
 
 
 def _protect(func, *args, **kwargs):
@@ -49,9 +50,11 @@ def main(argv=None):
             handlers=[RichHandler(console=stderr.stderr, rich_tracebacks=True)]
         )
 
+
     if not hasattr(args, "func"):
         parser.error("Subcommand required!")
 
+    #settings = Settings(args)
     app = args.func if args.debug else _protect(args.func)
     exit_code = app(args, stdout, stderr)
     sys.exit(exit_code)

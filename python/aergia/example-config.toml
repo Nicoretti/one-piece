@@ -1,0 +1,26 @@
+[default]
+backend="openai"    # backend which should be used by default
+
+[[backends]]
+name = "openai"
+base_url = "https://api.openai.com/v1"
+token=""
+
+
+[default.image]
+generate.model = "dall-e-3" # default model to use
+generate.name = "unnamed"   # default name to use if none is specified
+list.all = false            # should all images be listed if true, limit will be ignored
+list.limit = 10             # amount of images which should be listed by default
+list.offset = 0             # offset from which the images should be started to be listed
+
+[default.chat]
+model = "gpt-4o"
+# role = None
+# session = None
+# context = None
+
+
+# [default.models]
+# currently does not have any settings
+
