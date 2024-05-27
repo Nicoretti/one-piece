@@ -1,11 +1,12 @@
 from __future__ import annotations
 import os
+from pathlib import Path
+import os
 import tomli
-from typing import Generic, TypeVar
 from collections import ChainMap
-from dataclasses import dataclass
 from pathlib import Path
 from inspect import cleandoc
+
 
 
 def default_config():
@@ -121,6 +122,7 @@ def command_line(arguments):
     return config
 
 
+
 class Settings:
 
     def __init__(self, args, env=None, cfg=None, defaults=None):
@@ -140,65 +142,3 @@ class Settings:
             raise AttributeError(f"'Settings' object has no attribute '{name}'")
 
 
-#
-# @dataclass(frozen=True)
-# class Namespace(Generic[T]):
-#    prefix: str
-#
-T = TypeVar("T")
-
-
-@dataclass(frozen=True)
-class Setting(Generic[T]):
-    name: str
-    type: T
-    default: T | None
-    description: str = ""
-
-
-@dataclass(frozen=True)
-class Namespace(Generic[T]):
-    name: str
-    settings: list
-    description: str = ""
-
-    def add_setting(self):
-        pass
-
-    def add_namespace(self):
-        pass
-
-
-#
-#    def from_toml(f):
-#        pass
-#
-#    def to_toml(f):
-#        pass
-#
-#    
-#    @property
-#    @classmethod
-#    def env(cls, name):
-#        """Environment variable name"""
-#
-#        def normalize(name):
-#            name = name.replace("-", "_")
-#            name = name.upper()
-#            return name
-#
-#        return normalize(name)
-#
-#    @property
-#    @classmethod
-#    def cli(cls):
-#        """Cli argument name"""
-#
-#        def normalize(name):
-#            name = name.replace("_", "-")
-#            name = name.lower()
-#            return name
-#
-#        return f"--{normalize(name)}"
-#
-#
