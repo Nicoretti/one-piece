@@ -5,8 +5,10 @@ import io
 import sqlite3
 from pathlib import Path
 from inspect import cleandoc
+from importlib import resources
 
 from aergia._model._data import Session, Message, Image
+from aergia import _db
 
 TABLES = [Image, Session, Message]
 
@@ -24,11 +26,12 @@ def store(name, directory):
 
 
 def initialize(db, tables=None):
-    tables = tables or []
+    with resources.open_text(_db, 'init.sql') as sql_file:
+        sql_script = sql_file.read()
+
     with sqlite3.connect(db) as con:
         with con as transaction:
-            for table in tables:
-                transaction.execute(table.ddl)
+            con.executescript(sql_script)
 
 
 def application_db():

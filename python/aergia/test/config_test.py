@@ -95,3 +95,43 @@ def test_setting_from_env(setting, env, expected):
 
 def test_setting_in_namespace_to_env():
     pass
+
+def test_iterate_trough_settings():
+    for s in settings: 
+        pass
+
+
+def test_build_settings():
+    ns = Namespace(settings, ns)
+    for s in settings: 
+        pass
+
+def test_access_settings():
+    namespaces = []
+    settings = []
+    aergia_ns = Namespace(name="aergia", settings, namespaces)
+
+    aergia = Settings(aergia_ns) 
+
+    aergia.update(cli={}, env={}, config={})
+
+
+    # only default value is defined
+    aergia.debug
+
+    # default is overwritten by cli
+    aergia.update(cli={"--debug"})
+    aergia.debug
+
+    # default is overwritten by envv
+    aergia.update(env={"DEBUG": "YES"})
+    aergia.debug
+
+    aergia.update_from_cli()
+    aergia.defaults()
+
+    aeargia.stream
+    for s in settings: 
+        pass
+    
+
