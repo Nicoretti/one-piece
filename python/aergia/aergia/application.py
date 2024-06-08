@@ -3,6 +3,9 @@ import sys
 import logging
 
 from functools import wraps
+
+import rich
+
 from aergia._cli._command._parser import make_parser
 from aergia._cli._io import stderr, stdout
 from aergia._cli._command._utilities import ExitCode
@@ -35,26 +38,25 @@ def main(argv=None):
     parser = make_parser()
     args = parser.parse_args(argv)
 
-    if args.log_level:
-        level = {
-            'debug': logging.DEBUG,
-            'info': logging.INFO,
-            'warn': logging.WARN,
-            'error': logging.ERROR,
-            'critical': logging.CRITICAL
-        }
-        logging.basicConfig(
-            level=level[args.log_level],
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S',
-            handlers=[RichHandler(console=stderr.stderr, rich_tracebacks=True)]
-        )
-
+    levels = {
+        'debug': logging.DEBUG,
+        'info': logging.INFO,
+        'warn': logging.WARN,
+        'error': logging.ERROR,
+        'critical': logging.CRITICAL
+    }
+    level = args.log_level or 'error'
+    logging.basicConfig(
+        level=levels[level],
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S',
+        handlers=[RichHandler(console=stderr, rich_tracebacks=True)]
+    )
 
     if not hasattr(args, "func"):
         parser.error("Subcommand required!")
 
-    #settings = Settings(args)
+    # settings = Settings(args)
     app = args.func if args.debug else _protect(args.func)
     exit_code = app(args, stdout, stderr)
     sys.exit(exit_code)
