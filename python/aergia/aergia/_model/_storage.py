@@ -25,20 +25,19 @@ def store(name, directory):
     return db
 
 
-def initialize(db, tables=None):
-    with resources.open_text(_db, 'init.sql') as sql_file:
-        sql_script = sql_file.read()
-
+def initialize(db):
+    sql_file = resources.files(_db) / "init.sql"
+    sql_script = sql_file.read_text()
     with sqlite3.connect(db) as con:
         with con as transaction:
-            con.executescript(sql_script)
+            transaction.executescript(sql_script)
 
 
 def application_db():
     name = 'aergia'
     directory = data_directory(name)
     db = store(name, directory)
-    initialize(db, TABLES)
+    initialize(db)
     return db
 
 

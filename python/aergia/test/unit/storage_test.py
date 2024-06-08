@@ -1,17 +1,7 @@
 import datetime
 
-import pytest
-from inspect import cleandoc
-from aergia._model._storage import store, initialize, TABLES, save, load
+from aergia._model._storage import save, load
 from aergia._model._data import Image
-
-
-@pytest.fixture
-def test_db(tmp_path):
-    name = 'test'
-    db = store(name, tmp_path)
-    initialize(db, TABLES)
-    yield db
 
 
 def test_store_image(test_db):
@@ -44,16 +34,4 @@ def test_store_image_round_trip(test_db):
 
     expected = image
     actual = load(Image, image.name, test_db)
-    assert expected == actual
-
-
-def test_image_ddl():
-    expected = cleandoc("""
-    CREATE TABLE  IF NOT EXISTS images (
-        id INTEGER PRIMARY KEY,
-        name TEXT NOT NULL,
-        blob BLOB NOT NULL
-    );
-    """)
-    actual = Image.ddl
     assert expected == actual
