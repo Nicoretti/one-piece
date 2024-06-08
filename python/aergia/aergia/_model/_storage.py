@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+from typing import Any
 import datetime
 import io
 import sqlite3
@@ -8,10 +8,10 @@ from inspect import cleandoc
 from importlib import resources
 from functools import singledispatch
 
-from aergia._model._data import Session, Message, Image
-from aergia import _db
+from class_singledispatch import class_singledispatch
 
-TABLES = [Image, Session, Message]
+from aergia._model._data import Session, Image
+from aergia import _db
 
 
 def data_directory(name: str) -> Path:
@@ -61,7 +61,7 @@ def _(image: Image, db=None):
                     image.name,
                     image.model,
                     image.prompt,
-                    image.revised_prompt or "[No Revised Prompt]",
+                    image.revised_prompt or "<NO-REVISED-PROMPT>",
                     image.created.timestamp(),
                     image.blob,
                 )
@@ -90,22 +90,49 @@ def _(session: Session, db=None):
         return session
 
 
-def load(type, name, db=None) -> Image:
+@class_singledispatch
+def load(type: type[Any], key, value, db=None):
+    raise TypeError(f"Type {type}, is not supported yet.")
+
+
+@load.register
+def _(image: type[Image], key, value, db):
     with sqlite3.connect(db) as con:
         with con as transaction:
-            stmt = cleandoc("""
+            stmt = cleandoc(f"""
             SELECT id, name, model, prompt, revised_prompt, created, blob FROM images
-            WHERE name = ?;
+            WHERE {key} = ?;
             """)
-            result = transaction.execute(stmt, (name,))
+            result = transaction.execute(stmt, (value,))
             row = result.fetchone()
-            names = Image.model_json_schema()['properties'].keys()
+            names = image.model_json_schema()['properties'].keys()
             kwargs = dict(zip(names, row))
             kwargs['created'] = datetime.datetime.fromtimestamp(kwargs['created'])
             return Image(**kwargs)
 
 
-def load_list(type, db=None, limit=10, offset=0):
+@load.register
+def _(session: type[Session], key, value, db):
+    with sqlite3.connect(db) as con:
+        with con as transaction:
+            stmt = cleandoc(f"""
+            SELECT id, name, model, temperature FROM sessions
+            WHERE {key} = ?;
+            """)
+            result = transaction.execute(stmt, (value,))
+            row = result.fetchone()
+            names = session.model_json_schema()['properties'].keys()
+            kwargs = dict(zip(names, row))
+            return Session(**kwargs)
+
+
+@class_singledispatch
+def load_list(type: type[Any], db=None, limit=10, offset=0):
+    raise TypeError(f"Type {type}, is not supported yet.")
+
+
+@load_list.register
+def _(image: type[Image], db=None, limit=10, offset=0):
     with sqlite3.connect(db) as con:
         if limit is None:
             stmt = "SELECT id, name, model, prompt, revised_prompt, created, blob FROM images;"
@@ -127,9 +154,15 @@ def load_list(type, db=None, limit=10, offset=0):
         return images
 
 
-def load_blob(type, id, db=None):
+@class_singledispatch
+def load_blob(type: type[Any], id, db=None):
+    raise TypeError(f"Type {type}, is not supported yet.")
+
+
+@load_blob.register
+def _(image: type[Image], key, value, db=None):
     with sqlite3.connect(db) as con:
-        stmt = "SELECT blob FROM images WHERE id = ?;"
-        result = con.execute(stmt, (id,))
+        stmt = f"SELECT blob FROM images WHERE {key} = ?;"
+        result = con.execute(stmt, (value,))
         row = result.fetchone()
         return io.BytesIO(row[0])

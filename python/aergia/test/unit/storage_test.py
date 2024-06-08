@@ -33,11 +33,29 @@ def test_store_image_round_trip(test_db):
     save(image, test_db)
 
     expected = image
-    actual = load(Image, image.name, test_db)
+    actual = load(Image, key='name', value=image.name, db=test_db)
     assert expected == actual
 
 
 def test_store_new_session(test_db):
+    session = Session(id=None, name="test-session", model='gpt-4o', temperature=1.0)
+    save(session, test_db)
+    expected = 1
+    actual = session.id
+    assert expected == actual
+
+
+def test_load_session(test_db):
+    session = Session(id=None, name="test-session", model='gpt-4o', temperature=1.0)
+    save(session, test_db)
+
+    expected = session
+    actual = load(Session, key='id', value=1, db=test_db)
+
+    assert expected == actual
+
+
+def test_store_new_message(test_db):
     session = Session(id=None, name="test-session", model='gpt-4o', temperature=1.0)
     save(session, test_db)
     expected = 1

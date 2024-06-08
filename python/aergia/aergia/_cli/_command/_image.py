@@ -82,7 +82,7 @@ def list_images(args, stdout, stderr):
 
 def show_image(args, stdout, stderr):
     db = application_db()
-    blob = load_blob(Image, args.id, db)
+    blob = load_blob(Image, key='id', value=args.id, db=db)
     pimg = PillowImage.open(blob)
     pimg.show()
     return ExitCode.Success
