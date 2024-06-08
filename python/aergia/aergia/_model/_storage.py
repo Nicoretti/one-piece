@@ -15,7 +15,7 @@ from aergia import _db
 
 
 def data_directory(name: str) -> Path:
-    return Path.home() / '.local' / 'share' / name
+    return Path.home() / ".local" / "share" / name
 
 
 def store(name, directory):
@@ -35,7 +35,7 @@ def initialize(db):
 
 
 def application_db():
-    name = 'aergia'
+    name = "aergia"
     directory = data_directory(name)
     db = store(name, directory)
     initialize(db)
@@ -64,7 +64,7 @@ def _(image: Image, db=None):
                     image.revised_prompt or "<NO-REVISED-PROMPT>",
                     image.created.timestamp(),
                     image.blob,
-                )
+                ),
             )
         image.id = result.lastrowid
         return image
@@ -79,12 +79,7 @@ def _(session: Session, db=None):
             VALUES (?, ?, ?);
             """)
             result = transaction.execute(
-                stmt,
-                (
-                    session.name,
-                    session.model,
-                    session.temperature
-                )
+                stmt, (session.name, session.model, session.temperature)
             )
         session.id = result.lastrowid
         return session
@@ -105,9 +100,9 @@ def _(image: type[Image], key, value, db):
             """)
             result = transaction.execute(stmt, (value,))
             row = result.fetchone()
-            names = image.model_json_schema()['properties'].keys()
+            names = image.model_json_schema()["properties"].keys()
             kwargs = dict(zip(names, row))
-            kwargs['created'] = datetime.datetime.fromtimestamp(kwargs['created'])
+            kwargs["created"] = datetime.datetime.fromtimestamp(kwargs["created"])
             return Image(**kwargs)
 
 
@@ -121,7 +116,7 @@ def _(session: type[Session], key, value, db):
             """)
             result = transaction.execute(stmt, (value,))
             row = result.fetchone()
-            names = session.model_json_schema()['properties'].keys()
+            names = session.model_json_schema()["properties"].keys()
             kwargs = dict(zip(names, row))
             return Session(**kwargs)
 
@@ -144,12 +139,12 @@ def _(image: type[Image], db=None, limit=10, offset=0):
                 LIMIT ? OFFSET ?;
             """)
             result = con.execute(stmt, (limit, offset))
-        names = Image.model_json_schema()['properties'].keys()
+        names = Image.model_json_schema()["properties"].keys()
         rows = result.fetchall()
         images = []
         for row in rows:
             kwargs = dict(zip(names, row))
-            kwargs['created'] = datetime.datetime.fromtimestamp(kwargs['created'])
+            kwargs["created"] = datetime.datetime.fromtimestamp(kwargs["created"])
             images.append(Image(**kwargs))
         return images
 

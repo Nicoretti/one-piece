@@ -11,7 +11,7 @@ from pydantic import BaseModel
 
 
 class Session:
-    _TABLE_NAME = 'session'
+    _TABLE_NAME = "session"
 
     id: int
     name: str
@@ -32,7 +32,7 @@ class Session:
 
 
 class Message:
-    _TABLE_NAME = 'messages'
+    _TABLE_NAME = "messages"
 
     id: int
     role: str
@@ -54,7 +54,7 @@ class Message:
 
 
 class Image(BaseModel):
-    _TABLE_NAME = 'images'
+    _TABLE_NAME = "images"
     id: int | None
     name: str
     model: str
@@ -95,7 +95,7 @@ def save(image: Image, db=None):
                     image.revised_prompt or "[No Revised Prompt]",
                     image.created.timestamp(),
                     image.blob,
-                )
+                ),
             )
         image.id = result.lastrowid
         return image
@@ -110,9 +110,9 @@ def load(type, name, db=None) -> Image:
             """)
             result = transaction.execute(stmt, (name,))
             row = result.fetchone()
-            names = Image.model_json_schema()['properties'].keys()
+            names = Image.model_json_schema()["properties"].keys()
             kwargs = dict(zip(names, row))
-            kwargs['created'] = datetime.datetime.fromtimestamp(kwargs['created'])
+            kwargs["created"] = datetime.datetime.fromtimestamp(kwargs["created"])
             return Image(**kwargs)
 
 
@@ -128,12 +128,12 @@ def load_list(type, db=None, limit=10, offset=0):
                 LIMIT ? OFFSET ?;
             """)
             result = con.execute(stmt, (limit, offset))
-        names = Image.model_json_schema()['properties'].keys()
+        names = Image.model_json_schema()["properties"].keys()
         rows = result.fetchall()
         images = []
         for row in rows:
             kwargs = dict(zip(names, row))
-            kwargs['created'] = datetime.datetime.fromtimestamp(kwargs['created'])
+            kwargs["created"] = datetime.datetime.fromtimestamp(kwargs["created"])
             images.append(Image(**kwargs))
         return images
 
@@ -150,7 +150,7 @@ TABLES = [Image, Session, Message]
 
 
 def data_directory(name: str) -> Path:
-    return Path.home() / '.local' / 'share' / name
+    return Path.home() / ".local" / "share" / name
 
 
 def store(name, directory):
@@ -170,7 +170,7 @@ def initialize(db, tables=None):
 
 
 def application_db():
-    name = 'aergia'
+    name = "aergia"
     directory = data_directory(name)
     db = store(name, directory)
     initialize(db, TABLES)

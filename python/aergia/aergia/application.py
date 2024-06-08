@@ -4,14 +4,12 @@ import logging
 
 from functools import wraps
 
-import rich
 
 from aergia._cli._command._parser import make_parser
 from aergia._cli._io import stderr, stdout
 from aergia._cli._command._utilities import ExitCode
 from aergia._logging import logger
 from rich.logging import RichHandler
-from aergia._config import Settings
 
 
 def _protect(func, *args, **kwargs):
@@ -22,12 +20,12 @@ def _protect(func, *args, **kwargs):
         except Exception as ex:
             err_msg = f"Error occurred, details: {ex}"
             logger.error(err_msg)
-            stdout.print(err_msg, style='red')
+            stdout.print(err_msg, style="red")
             exit_code = ExitCode.Failure
         except asyncio.CancelledError as ex:
             err_msg = f"Canceled by user, details: {ex}"
             logger.error(err_msg)
-            stdout.print(err_msg, style='red')
+            stdout.print(err_msg, style="red")
             exit_code = ExitCode.Failure
         return exit_code
 
@@ -39,18 +37,18 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     levels = {
-        'debug': logging.DEBUG,
-        'info': logging.INFO,
-        'warn': logging.WARN,
-        'error': logging.ERROR,
-        'critical': logging.CRITICAL
+        "debug": logging.DEBUG,
+        "info": logging.INFO,
+        "warn": logging.WARN,
+        "error": logging.ERROR,
+        "critical": logging.CRITICAL,
     }
-    level = args.log_level or 'error'
+    level = args.log_level or "error"
     logging.basicConfig(
         level=levels[level],
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S',
-        handlers=[RichHandler(console=stderr, rich_tracebacks=True)]
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        handlers=[RichHandler(console=stderr, rich_tracebacks=True)],
     )
 
     if not hasattr(args, "func"):
