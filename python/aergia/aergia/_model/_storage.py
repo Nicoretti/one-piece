@@ -6,6 +6,7 @@ import sqlite3
 from pathlib import Path
 from inspect import cleandoc
 from importlib import resources
+from functools import singledispatch
 
 from aergia._model._data import Session, Message, Image
 from aergia import _db
@@ -41,7 +42,13 @@ def application_db():
     return db
 
 
-def save(image: Image, db=None):
+@singledispatch
+def save(type, db=None):
+    raise TypeError(f"Type {type.__class__}, is not supported yet.")
+
+
+@save.register
+def _(image: Image, db=None):
     with sqlite3.connect(db) as con:
         with con as transaction:
             stmt = cleandoc("""
@@ -61,6 +68,26 @@ def save(image: Image, db=None):
             )
         image.id = result.lastrowid
         return image
+
+
+@save.register
+def _(session: Session, db=None):
+    with sqlite3.connect(db) as con:
+        with con as transaction:
+            stmt = cleandoc("""
+            INSERT INTO sessions (name, model, temperature)
+            VALUES (?, ?, ?);
+            """)
+            result = transaction.execute(
+                stmt,
+                (
+                    session.name,
+                    session.model,
+                    session.temperature
+                )
+            )
+        session.id = result.lastrowid
+        return session
 
 
 def load(type, name, db=None) -> Image:

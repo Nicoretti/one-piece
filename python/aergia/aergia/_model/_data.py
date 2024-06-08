@@ -13,9 +13,8 @@ class Session(BaseModel):
 
 class Message(BaseModel):
     id: int | None
-    role: str
     content: str
-    model: str | None
+    model: str
     session_id: int | None
 
 

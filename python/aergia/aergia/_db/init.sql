@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS [messages] (
     id INTEGER PRIMARY KEY,
     content TEXT NOT NULL,
     session_id INTEGER,
-    model TEXT, -- tracks the actually used model. only set for assistant or system messages NULL for user messages
+    model TEXT NOT NULL, -- tracks the actually used model. only set for assistant for users it should be set to <USER>
     FOREIGN KEY (session_id) REFERENCES sessions(id)
 );
 
