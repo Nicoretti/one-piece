@@ -1,5 +1,6 @@
 import pytest
-from aergia._model._storage import store, initialize
+from aergia._model._storage import store
+from aergia._db import initialize
 
 
 @pytest.fixture
