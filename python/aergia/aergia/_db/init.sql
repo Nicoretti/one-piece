@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS [sessions] (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
     model TEXT NOT NULL,
+    created INTEGER NOT NULL,
     temperature REAL NOT NULL
 );
 
