@@ -30,6 +30,7 @@ class-singledispatch = "^1.2.3.post2"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.0"
 ruff = "^0.4.4"
+pytest-anyio = "^0.0.0"
 
 [build-system]
 requires = ["poetry-core"]
