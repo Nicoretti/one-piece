@@ -1,6 +1,7 @@
 import datetime
 
-from aergia._model._storage import save, load
+from aergia._model._load import load
+from aergia._model._save import save
 from aergia._model._data import Image, Session, Message
 
 

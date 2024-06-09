@@ -7,7 +7,9 @@ from openai import OpenAI
 from PIL import Image as PillowImage
 from rich.table import Table
 from rich_argparse import ArgumentDefaultsRichHelpFormatter
-from aergia._model._storage import application_db, save, load_list, load_blob
+from aergia._model._storage import application_db
+from aergia._model._save import save
+from aergia._model._load import load_list, load_blob
 from aergia._model._data import Image
 from aergia._cli._command._utilities import ExitCode
 
@@ -24,7 +26,7 @@ def image(args, stdout, stderr):
         prompt = args.prompt if isinstance(args.prompt, str) else " ".join(args.prompt)
 
     with stdout.status(
-        "Generating image ...", spinner="aesthetic", spinner_style="magenta"
+            "Generating image ...", spinner="aesthetic", spinner_style="magenta"
     ):
         response = client.images.generate(prompt=prompt, model=args.model)
         data = response.data[0]
