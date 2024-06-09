@@ -50,7 +50,10 @@ def test_store_chat_session_with_context(client, test_db, model="gpt-4o"):
             },
             {"role": "user", "content": msg},
         ],
+        stream=True
     )
+    for b in response:
+        print(b)
     assistant_msg = response.choices[0].message
     role = assistant_msg.role
     content = assistant_msg.content

@@ -39,6 +39,8 @@ def _(session: type[Session], key, value, db):
             """)
             result = transaction.execute(stmt, (value,))
             row = result.fetchone()
+            if not row:
+                raise Exception("Session not found.")
             names = session.model_json_schema()["properties"].keys()
             kwargs = dict(zip(names, row))
             return Session(**kwargs)
