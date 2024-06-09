@@ -16,6 +16,7 @@ class Message(BaseModel):
     id: int | None
     content: str
     model: str
+    role: str
     created: dt.datetime
     session_id: int | None
 

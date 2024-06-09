@@ -10,7 +10,7 @@ from functools import singledispatch
 
 from class_singledispatch import class_singledispatch
 
-from aergia._model._data import Session, Image
+from aergia._model._data import Session, Image, Message
 from aergia import _db
 
 
@@ -79,10 +79,26 @@ def _(session: Session, db=None):
             VALUES (?, ?, ?, ?);
             """)
             result = transaction.execute(
-                stmt, (session.name, session.model, session.created, session.temperature)
+                stmt,
+                (session.name, session.model, session.created, session.temperature),
             )
         session.id = result.lastrowid
         return session
+
+@save.register
+def _(message: Message, db=None):
+    with sqlite3.connect(db) as con:
+        with con as transaction:
+            stmt = cleandoc("""
+            INSERT INTO messages (content, model, role, created, session_id)
+            VALUES (?, ?, ?, ?, ?);
+            """)
+            result = transaction.execute(
+                stmt,
+                (message.content, message.model, message.role, message.created, message.session_id),
+            )
+        message.id = result.lastrowid
+        return message
 
 
 @class_singledispatch
@@ -119,6 +135,20 @@ def _(session: type[Session], key, value, db):
             names = session.model_json_schema()["properties"].keys()
             kwargs = dict(zip(names, row))
             return Session(**kwargs)
+
+@load.register
+def _(message: type[Message], key, value, db):
+    with sqlite3.connect(db) as con:
+        with con as transaction:
+            stmt = cleandoc(f"""
+            SELECT id, content, model, role, created, session_id FROM messages
+            WHERE {key} = ?;
+            """)
+            result = transaction.execute(stmt, (value,))
+            for row in result:
+                names = message.model_json_schema()["properties"].keys()
+                kwargs = dict(zip(names, row))
+                yield Message(**kwargs)
 
 
 @class_singledispatch

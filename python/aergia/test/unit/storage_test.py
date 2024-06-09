@@ -66,3 +66,63 @@ def test_load_session(test_db):
 
     assert expected == actual
 
+
+def test_store_new_message(test_db):
+    message = Message(
+        id=None,
+        content="some content message",
+        model="gpt-4o",
+        role="user",
+        created=datetime.datetime.now(),
+        session_id=None,
+    )
+    save(message, test_db)
+    expected = 1
+    actual = message.id
+    assert expected == actual
+
+
+def test_load_message(test_db):
+    message = Message(
+        id=None,
+        content="some content message",
+        model="gpt-4o",
+        role="user",
+        created=datetime.datetime.now(),
+        session_id=None,
+    )
+    save(message, test_db)
+
+    expected = [message]
+    actual = list(load(Message, key="id", value=1, db=test_db))
+
+    assert expected == actual
+
+
+def test_load_all_messages_of_session(test_db):
+    session_id = 2
+    messages = [
+        Message(
+            id=None,
+            content="some content message1",
+            model="gpt-4o",
+            role="user",
+            created=datetime.datetime.now(),
+            session_id=session_id,
+        ),
+        Message(
+            id=None,
+            content="this is a reply of reply",
+            model="gpt-4o",
+            role="assistant",
+            created=datetime.datetime.now(),
+            session_id=session_id,
+        ),
+    ]
+    for m in messages:
+        save(m, test_db)
+
+    expected = messages
+    actual = list(load(Message, key="session_id", value=session_id, db=test_db))
+
+    assert expected == actual
