@@ -24,9 +24,8 @@ pillow = "^10.3.0"
 pydantic = "^2.7.1"
 tomli = "^2.0.1"
 tomli-w = "^1.0.0"
-
-
 class-singledispatch = "^1.2.3.post2"
+
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.0"
 ruff = "^0.4.4"

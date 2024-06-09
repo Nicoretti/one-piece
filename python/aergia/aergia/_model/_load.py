@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import Any
 import datetime
 import sqlite3
 import io
@@ -9,7 +8,7 @@ from aergia._model._data import Session, Image, Message
 
 
 @class_singledispatch
-def load(type: type[Any], key, value, db=None):
+def load(type: type[object], key, value, db=None):
     raise TypeError(f"Type {type}, is not supported yet.")
 
 
@@ -62,7 +61,7 @@ def _(message: type[Message], key, value, db):
 
 
 @class_singledispatch
-def load_list(type: type[Any], db=None, limit=10, offset=0):
+def load_list(type: type[object], db=None, limit=10, offset=0):
     raise TypeError(f"Type {type}, is not supported yet.")
 
 
@@ -90,7 +89,7 @@ def _(image: type[Image], db=None, limit=10, offset=0):
 
 
 @class_singledispatch
-def load_blob(type: type[Any], id, db=None):
+def load_blob(type: type[object], id, db=None):
     raise TypeError(f"Type {type}, is not supported yet.")
 
 
