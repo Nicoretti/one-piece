@@ -39,12 +39,12 @@ def _(session: Session, db=None):
     with sqlite3.connect(db) as con:
         with con as transaction:
             stmt = cleandoc("""
-            INSERT INTO sessions (name, model, created, temperature)
-            VALUES (?, ?, ?, ?);
+            INSERT INTO sessions (name, model, created)
+            VALUES (?, ?, ?);
             """)
             result = transaction.execute(
                 stmt,
-                (session.name, session.model, session.created, session.temperature),
+                (session.name, session.model, session.created),
             )
         session.id = result.lastrowid
         return session

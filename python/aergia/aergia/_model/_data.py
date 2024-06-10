@@ -9,7 +9,15 @@ class Session(BaseModel):
     name: str
     model: str
     created: dt.datetime
-    temperature: float
+
+    @classmethod
+    def new(cls, name, model):
+        return cls(
+            id=None,
+            name=name,
+            model=model,
+            created=dt.datetime.now(),
+        )
 
 
 class Message(BaseModel):
@@ -19,6 +27,28 @@ class Message(BaseModel):
     role: str
     created: dt.datetime
     session_id: int | None
+
+    @classmethod
+    def user(cls, content, session_id=None):
+        return cls(
+            id=None,
+            content=content,
+            model="",
+            role="user",
+            created=dt.datetime.now(),
+            session_id=session_id,
+        )
+
+    @classmethod
+    def assistant(cls, content, model, session_id=None):
+        return cls(
+            id=None,
+            content=content,
+            model=model,
+            role="assistant",
+            created=dt.datetime.now(),
+            session_id=session_id,
+        )
 
 
 class Image(BaseModel):

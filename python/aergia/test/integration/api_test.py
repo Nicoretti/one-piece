@@ -1,6 +1,8 @@
 import os
 import pytest
 import datetime
+from aergia._client import build_client, Type
+from aergia._cli._command._utilities import TextBuffer
 
 from openai import OpenAI
 
@@ -22,7 +24,6 @@ def test_image_generation(client):
     response = client.images.generate(prompt=prompt, model=model)
     image_url = response.data[0].url
     created = datetime.datetime.fromtimestamp(response.created)
-    pass
 
 
 @pytest.mark.openai_api
@@ -34,7 +35,6 @@ def test_store_chat_session(client, test_db, model="gpt-4o"):
     assistant_msg = response.choices[0].message
     role = assistant_msg.role
     content = assistant_msg.content
-    print(response)
 
 
 @pytest.mark.openai_api
@@ -50,11 +50,33 @@ def test_store_chat_session_with_context(client, test_db, model="gpt-4o"):
             },
             {"role": "user", "content": msg},
         ],
-        stream=True
+        stream=True,
     )
     for b in response:
         print(b)
     assistant_msg = response.choices[0].message
     role = assistant_msg.role
     content = assistant_msg.content
-    print(response)
+
+
+@pytest.mark.openai_api
+@pytest.mark.anyio
+async def test_async_chat(api_key):
+    def is_chunk_valid(chunk):
+        return chunk.choices is not None and len(chunk.choices) > 0
+
+    client = build_client(backend="openai", api_key=api_key, client_type=Type.Async)
+    result = await client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": "count to 10"}],
+        stream=True,
+    )
+    with TextBuffer() as buffer:
+        stream = (c async for c in result if is_chunk_valid(c))
+        async for chunk in stream:
+            text = chunk.choices[0].delta.content or ""
+            model = chunk.model
+            buffer.append(text)
+
+    assert model.startswith("gpt-4o")
+    assert "" == buffer.content

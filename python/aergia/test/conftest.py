@@ -9,3 +9,8 @@ def test_db(tmp_path):
     db = store(name, tmp_path)
     initialize(db)
     yield db
+
+
+@pytest.fixture
+def anyio_backend():
+    return "asyncio"
