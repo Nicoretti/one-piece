@@ -88,6 +88,28 @@ def _(image: type[Image], db=None, limit=10, offset=0):
         return images
 
 
+@load_list.register
+def _(image: type[Session], db=None, limit=10, offset=0):
+    with sqlite3.connect(db) as con:
+        if limit is None:
+            stmt = "SELECT id, name, model, created FROM sessions;"
+            result = con.execute(stmt)
+        else:
+            stmt = cleandoc("""
+                SELECT id, name, model, created FROM sessions
+                ORDER BY id
+                LIMIT ? OFFSET ?;
+            """)
+            result = con.execute(stmt, (limit, offset))
+        names = Session.model_json_schema()["properties"].keys()
+        rows = result.fetchall()
+        sessions = []
+        for row in rows:
+            kwargs = dict(zip(names, row))
+            sessions.append(Session(**kwargs))
+        return sessions
+
+
 @class_singledispatch
 def load_blob(type: type[object], id, db=None):
     raise TypeError(f"Type {type}, is not supported yet.")
