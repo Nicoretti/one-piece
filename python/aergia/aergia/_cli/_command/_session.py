@@ -1,41 +1,84 @@
-from aergia._cli._command._utilities import default
+import argparse
+
+from rich.table import Table
+from rich.markdown import Markdown
 from rich_argparse import ArgumentDefaultsRichHelpFormatter
+
+from aergia._cli._command._utilities import ExitCode, default
+from aergia._model._data import Session, Message
+from aergia._model._load import load_list, load
+from aergia._model._storage import application_db
+
+
+def list_sessions(args, stdout, stderr):
+    table = Table(title="Chat Sessions")
+    table.add_column("Id", justify="right")
+    table.add_column("Name", justify="left", style="green")
+    table.add_column("Model", justify="left", style="cyan")
+    table.add_column("Created", justify="left", style="yellow")
+
+    db = application_db()
+    limit = None if args.all else args.limit
+    sessions = load_list(Session, db, limit=limit, offset=args.offset)
+    for s in sessions:
+        table.add_row(
+            f"{s.id}",
+            s.name,
+            s.model,
+            f"{s.created}",
+        )
+
+    stdout.print(table)
+
+    return ExitCode.Success
+
+
+def show_session(args, stdout, stderr):
+    from rich import print
+    from rich.panel import Panel
+    db = application_db()
+    messages = list(load(Message, key="session_id", value=args.id, db=db))
+    for m in messages:
+        color = "blue" if m.role == 'user' else 'magenta'
+        p = Panel(Markdown(m.content), title=m.role, style=color)
+        stdout.print(p)
+
+    return ExitCode.Success
 
 
 def add_session_subcommand(subparsers):
     subcommand = subparsers.add_parser(
         "session",
-        help="Manage sessions",
+        help="manage sessions",
         formatter_class=ArgumentDefaultsRichHelpFormatter,
     )
-    subcommand.set_defaults(func=default)
 
     sub_subparsers = subcommand.add_subparsers(
         dest="session_subcommand", help="Sessions commands"
     )
 
-    search_command = sub_subparsers.add_parser(
-        "search",
-        help="Search for text in sessions",
-        formatter_class=ArgumentDefaultsRichHelpFormatter,
-    )
-    search_command.add_argument("text", type=str, help="Text to search")
-
     list_command = sub_subparsers.add_parser(
         "list",
-        help="List all sessions",
+        help="list all sessions",
         formatter_class=ArgumentDefaultsRichHelpFormatter,
     )
+    list_command.add_argument(
+        "-a", "--all", action="store_true", default=False, help="list all images"
+    )
+    list_command.add_argument(
+        "-l", "--limit", type=int, default=10, help="amount of images to list"
+    )
+    list_command.add_argument(
+        "-o", "--offset", type=int, default=0, help="offset for listing images"
+    )
+    list_command.set_defaults(func=list_sessions)
 
     show_command = sub_subparsers.add_parser(
         "show",
-        help="Show contents of a session",
+        help="show contents of a session",
         formatter_class=ArgumentDefaultsRichHelpFormatter,
     )
+    show_command.add_argument("id", type=int, help="session id of session to show")
+    show_command.set_defaults(func=show_session)
 
-    alias_command = sub_subparsers.add_parser(
-        "alias",
-        help="Alias for session command",
-        formatter_class=ArgumentDefaultsRichHelpFormatter,
-    )
     return subcommand
