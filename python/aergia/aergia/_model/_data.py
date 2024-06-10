@@ -1,56 +1,57 @@
 from __future__ import annotations
 
 import datetime as dt
-from inspect import cleandoc
-
 from pydantic import BaseModel
 
 
-class Session:
-    _TABLE_NAME = 'session'
-
-    id: int
+class Session(BaseModel):
+    id: int | None
     name: str
     model: str
-    temperature: float
+    created: dt.datetime
 
     @classmethod
-    @property
-    def ddl(cls):
-        return cleandoc(f"""
-        CREATE TABLE IF NOT EXISTS {cls._TABLE_NAME} (
-            id INTEGER PRIMARY KEY,
-            name TEXT NOT NULL UNIQUE,
-            model TEXT NOT NULL,
-            temperature REAL NOT NULL
-        );
-        """)
+    def new(cls, name, model):
+        return cls(
+            id=None,
+            name=name,
+            model=model,
+            created=dt.datetime.now(),
+        )
 
 
-class Message:
-    _TABLE_NAME = 'messages'
-
-    id: int
-    role: str
+class Message(BaseModel):
+    id: int | None
     content: str
-    session_id: int
+    model: str
+    role: str
+    created: dt.datetime
+    session_id: int | None
 
     @classmethod
-    @property
-    def ddl(cls):
-        return cleandoc(f"""
-        CREATE TABLE IF NOT EXISTS {cls._TABLE_NAME} (
-            id INTEGER PRIMARY KEY,
-            role TEXT NOT NULL,
-            content TEXT NOT NULL,
-            session_id INTEGER,
-            FOREIGN KEY (session_id) REFERENCES sessions(id)
-        );
-        """)
+    def user(cls, content, session_id=None):
+        return cls(
+            id=None,
+            content=content,
+            model="",
+            role="user",
+            created=dt.datetime.now(),
+            session_id=session_id,
+        )
+
+    @classmethod
+    def assistant(cls, content, model, session_id=None):
+        return cls(
+            id=None,
+            content=content,
+            model=model,
+            role="assistant",
+            created=dt.datetime.now(),
+            session_id=session_id,
+        )
 
 
 class Image(BaseModel):
-    _TABLE_NAME = 'images'
     id: int | None
     name: str
     model: str
@@ -58,18 +59,3 @@ class Image(BaseModel):
     revised_prompt: str | None
     created: dt.datetime
     blob: bytes
-
-    @classmethod
-    @property
-    def ddl(cls):
-        return cleandoc(f"""
-        CREATE TABLE  IF NOT EXISTS {cls._TABLE_NAME.default} (
-            id INTEGER PRIMARY KEY,
-            name TEXT NOT NULL,
-            model TEXT NOT NULL,
-            prompt TEXT NOT NULL,
-            revised_prompt TEXT NOT NULL,
-            created INTEGER NOT NULL, 
-            blob BLOB NOT NULL
-        );
-        """)

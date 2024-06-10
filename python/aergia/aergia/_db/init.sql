@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS [sessions] (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
     model TEXT NOT NULL,
-    temperature REAL NOT NULL
+    created INTEGER NOT NULL
 );
 
 
@@ -17,6 +17,9 @@ CREATE TABLE IF NOT EXISTS [messages] (
     id INTEGER PRIMARY KEY,
     content TEXT NOT NULL,
     session_id INTEGER,
+    model TEXT NOT NULL, -- tracks the actually used model. only set for assistant for users it should be set to <USER>
+    role TEXT NOT NULL,
+    created INTEGER NOT NULL,
     FOREIGN KEY (session_id) REFERENCES sessions(id)
 );
 

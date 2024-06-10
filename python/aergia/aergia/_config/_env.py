@@ -1,5 +1,6 @@
 import os
 
+
 def env(obj):
     return (obj.__to_envkey__(), obj.__to_str__())
 
@@ -10,8 +11,8 @@ def env_key(obj):
 
 def from_env(type, name, env=None):
     def boolean(v):
-        true = ['yes', 'true', 'on', 'enabled']
-        false = ['no', 'false', 'off', 'disabled']
+        true = ["yes", "true", "on", "enabled"]
+        false = ["no", "false", "off", "disabled"]
         v = v.lower()
         if v in true:
             return True
@@ -20,12 +21,7 @@ def from_env(type, name, env=None):
 
         raise ValueError(f"Connot convert value: {v}, to bool.")
 
-    converts = {
-        int: int,
-        float: float,
-        str: str,
-        bool: boolean
-    }
+    converts = {int: int, float: float, str: str, bool: boolean}
     if type not in converts:
         converter = getattr(type, "__from_str__", str)
     else:

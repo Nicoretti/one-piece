@@ -7,24 +7,21 @@ from rich_argparse import ArgumentDefaultsRichHelpFormatter
 
 def make_parser():
     parser = argparse.ArgumentParser(
-        prog='ae[rgia]', formatter_class=ArgumentDefaultsRichHelpFormatter
+        prog="ae[rgia]", formatter_class=ArgumentDefaultsRichHelpFormatter
     )
     parser.add_argument(
-        '-b', '--backend', type=str, default='openai', help='select backend type'
+        "-b", "--backend", type=str, default="openai", help="select backend type"
     )
+    parser.add_argument("--version", action="store_true", help="print the version")
+    parser.add_argument("--debug", action="store_true", help="enable debug mode")
     parser.add_argument(
-        '--version', action='store_true', help='print the version'
-    )
-    parser.add_argument(
-        '--debug', action='store_true', help='enable debug mode'
-    )
-    parser.add_argument(
-        '--log-level', default=None,
-        choices=['debug', 'info', 'warn', 'error', 'critical'],
-        help='configure the log-level of the application'
+        "--log-level",
+        default=None,
+        choices=["debug", "info", "warn", "error", "critical"],
+        help="configure the log-level of the application",
     )
 
-    subparsers = parser.add_subparsers(dest='subcommand')
+    subparsers = parser.add_subparsers(dest="subcommand")
 
     add_chat_subcommand(subparsers)
     # add_tui_subcommand(subparsers)
