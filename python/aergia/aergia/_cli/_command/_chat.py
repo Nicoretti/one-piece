@@ -1,59 +1,66 @@
 import os
-import asyncio
 import argparse
+import uuid
 from rich.markdown import Markdown
 from rich_argparse import ArgumentDefaultsRichHelpFormatter
 from aergia._cli._command._utilities import TextBuffer, ExitCode
 from aergia._client import build_client, Type
+from aergia._model._save import save
+from aergia._model._load import load
+from aergia._model._data import Session, Message
+from aergia._model._storage import application_db
 
 
 def chat(args, stdout, stderr):
     def is_chunk_valid(chunk):
         return chunk.choices is not None and len(chunk.choices) > 0
 
-    async def async_chat(client, model, message):
-        stream = await client.chat.completions.create(
+    def sync_chat(client, model, messages):
+        response = client.chat.completions.create(
             model=model,
-            messages=[{"role": "user", "content": message}],
+            messages=messages,
             stream=True,
         )
         with stdout.status(
             "Processing request ...", spinner="aesthetic", spinner_style="cyan"
         ):
             with TextBuffer() as buffer:
-                stream = (c async for c in stream if is_chunk_valid(c))
-                async for chunk in stream:
-                    text = chunk.choices[0].delta.content or ""
-                    buffer.append(text)
-                return buffer.content
-
-    def sync_chat(client, model, message):
-        stream = client.chat.completions.create(
-            model=model,
-            messages=[{"role": "user", "content": message}],
-            stream=True,
-        )
-        with stdout.status(
-            "Processing request ...", spinner="aesthetic", spinner_style="cyan"
-        ):
-            with TextBuffer() as buffer:
-                stream = (c for c in stream if is_chunk_valid(c))
+                stream = (c for c in response if is_chunk_valid(c))
                 for chunk in stream:
                     text = chunk.choices[0].delta.content or ""
+                    model = chunk.model
                     buffer.append(text)
-                return buffer.content
+                return buffer.content, model
 
-    client_type = Type.Async
+    def create_session(name=None):
+        name = name or f"Temp-{uuid.uuid4()}"
+        try:
+            session = load(Session, key="name", value=args.session, db=db)
+        except Exception:
+            session = Session.new(name, args.model)
+            save(session, db)
+        return session
+
     api_key = os.environ.get("OPENAI_API_KEY")
-    client = build_client(backend="openai", api_key=api_key, client_type=client_type)
-    msg = " ".join(args.text)
+    client = build_client(backend="openai", api_key=api_key, client_type=Type.Sync)
+    db = application_db()
+    session = create_session(args.session)
     context = "" if not args.context else args.context.read()
-    msg = msg + context
-    if client_type == Type.Async:
-        content = asyncio.run(async_chat(client=client, model=args.model, message=msg))
-    else:
-        content = sync_chat(client, model=args.model, message=msg)
-    stdout.print(Markdown(content))
+    content = " ".join(args.text) + context
+
+    user_msg = Message.user(content, session.id)
+    save(user_msg, db)
+
+    messages = list(load(Message, key="session_id", value=session.id, db=db))
+    messages = [{"role": m.role, "content": m.content} for m in messages]
+    messages.append({"role": user_msg.role, "content": user_msg.content})
+
+    content, model = sync_chat(client, model=args.model, messages=messages)
+
+    assistant_msg = Message.assistant(content, model, session.id)
+    save(assistant_msg, db)
+
+    stdout.print(Markdown(assistant_msg.content))
     return ExitCode.Success
 
 
@@ -71,7 +78,7 @@ def add_chat_subcommand(subparsers):
         "-s", "--session", nargs="?", const=True, help="Create or reuse a session"
     )
     subcommand.add_argument(
-        "-c", "--context", type=argparse.FileType("r"), help="File directory or stdin"
+        "-c", "--context", type=argparse.FileType("r"), help="File or stdin (-)"
     )
     subcommand.add_argument(
         "-m",

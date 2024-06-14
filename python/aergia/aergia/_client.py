@@ -1,6 +1,7 @@
 from openai import OpenAI, AsyncClient
 from enum import Enum, auto
 
+
 class Type(Enum):
     Async = auto()
     Sync = auto()

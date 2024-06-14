@@ -1,12 +1,9 @@
 from __future__ import annotations
 import os
 from pathlib import Path
-import os
 import tomli
 from collections import ChainMap
-from pathlib import Path
 from inspect import cleandoc
-
 
 
 def default_config():
@@ -37,15 +34,15 @@ def default_config():
     # currently does not have any associated settings
     """)
     config = tomli.loads(DEFAULT_CONFIG)
-    config['commands']['chat']['role'] = None
-    config['commands']['chat']['session'] = None
-    config['commands']['chat']['context'] = None
-    config['commands']['models'] = {}
+    config["commands"]["chat"]["role"] = None
+    config["commands"]["chat"]["session"] = None
+    config["commands"]["chat"]["context"] = None
+    config["commands"]["models"] = {}
     return config
 
 
 def load_config_file(path: Path):
-    with open(path, 'rb') as f:
+    with open(path, "rb") as f:
         return tomli.load(f)
 
 
@@ -75,7 +72,7 @@ def env_config(env):
             cfg[cfg_name] = env[env_name]
 
         if len(cfg) > 0:
-            cfg['name'] = 'openai'
+            cfg["name"] = "openai"
         return cfg
 
     config = {
@@ -89,30 +86,23 @@ def env_config(env):
 
 def command_line(arguments):
     command = arguments.subcommand
-    config = {'defaults': {'db_name': 'aergia', 'backend': 'openai'}}
+    config = {"defaults": {"db_name": "aergia", "backend": "openai"}}
 
     def chat_args(args):
-        return {'chat': {'model': args.model}}
+        return {"chat": {"model": args.model}}
 
     def image_args(args):
         match args.subcommand:
             case "generate":
-                return {
-                    "model": args.model,
-                    "name": args.name
-                }
+                return {"model": args.model, "name": args.name}
             case "list":
-                return {
-                    "all": args.all,
-                    "limit": args.limit,
-                    "offset": args.offset
-                }
+                return {"all": args.all, "limit": args.limit, "offset": args.offset}
             case _:
                 return {}
 
     dispatcher = {
-        'chat': chat_args,
-        'image': image_args,
+        "chat": chat_args,
+        "image": image_args,
     }
     try:
         config[command] = dispatcher[command](arguments)
@@ -122,9 +112,7 @@ def command_line(arguments):
     return config
 
 
-
 class Settings:
-
     def __init__(self, args, env=None, cfg=None, defaults=None):
         env = env or os.environ.copy()
         cfg = cfg or (Path.home() / "aergia.toml")
@@ -132,7 +120,7 @@ class Settings:
             command_line(args),
             env_config(env),
             user_config(cfg),
-            defaults or default_config()
+            defaults or default_config(),
         )
 
     def __getattr__(self, name):
@@ -140,5 +128,3 @@ class Settings:
             return self._settings[name]
         except KeyError:
             raise AttributeError(f"'Settings' object has no attribute '{name}'")
-
-
