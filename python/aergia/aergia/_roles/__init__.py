@@ -32,7 +32,7 @@ def execute(role_spec, input=None, role_paths=None):
     return prompt
 
 
-def load(role, paths=None):
+def create_env(paths=None):
     paths = paths or []
     builtin_roles = PackageLoader(package_name='aergia', package_path='_roles')
     custom_roles = FileSystemLoader(list(paths))
@@ -40,7 +40,11 @@ def load(role, paths=None):
         builtin_roles,
         custom_roles
     ])
-    env = Environment(loader=loader)
+    return Environment(loader=loader)
+
+
+def load(role, paths=None):
+    env = create_env(paths)
     try:
         template = env.get_template(f"{role}.role")
     except jinja2.exceptions.TemplateNotFound as ex:
