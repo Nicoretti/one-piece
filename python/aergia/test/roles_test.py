@@ -44,9 +44,9 @@ def test_parse_role(role_spec, expected):
 
 
 def test_load_builtin_role_template():
-    expected = "typos.role"
-    template = load("typos")
-    actual = template.name
+    expected = ("typos.role", {'arguments': {'amount': 0}})
+    template, metadata = load("typos")
+    actual = (template.name, metadata)
     assert actual == expected
 
 
@@ -70,15 +70,15 @@ def test_role_on_fs(tmp_path, test_role):
 
 def test_load_custom_role_template(test_role_on_fs):
     name, path = test_role_on_fs
-    template = load(name, paths=[path])
-    expected = "test.role"
-    actual = template.name
+    template, metadata = load(name, paths=[path])
+    expected = ("test.role", {})
+    actual = (template.name, metadata)
     assert actual == expected
 
 
 def test_failed_to_load_role():
     with pytest.raises(RoleNotFound):
-        template = load("this-role-should-not-exist")
+        template, metadata = load("this-role-should-not-exist")
 
 
 def test_render():
@@ -87,7 +87,7 @@ def test_render():
         "only fix all typos and spelling errors in the text below:\n"
         "Helo, how are you?"
     )
-    template = load("typos")
+    template, _ = load("typos")
     actual = render(template, [], kwargs={}, input="Helo, how are you?")
     assert actual == expected
 

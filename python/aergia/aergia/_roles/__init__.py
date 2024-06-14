@@ -1,3 +1,5 @@
+import json
+
 import jinja2.exceptions
 from jinja2 import FileSystemLoader, ChoiceLoader, PackageLoader, Environment
 
@@ -24,7 +26,8 @@ def execute(role_spec, input=None, role_paths=None):
     role_paths = role_paths or []
     role_paths = role_paths if not isinstance(role_spec, str) else list(role_paths)
     role, args, kwargs = parse(role_spec)
-    template = load(role, role_paths)
+    template, _metadata = load(role, role_paths)
+    # TODO: Add parameter check etc. based on metadata etc.
     prompt = render(template, args, kwargs, input)
     return prompt
 
@@ -43,7 +46,13 @@ def load(role, paths=None):
     except jinja2.exceptions.TemplateNotFound as ex:
         raise RoleNotFound(f"Role [{role}] not found, details: File {ex} not found.") from ex
 
-    return template
+    try:
+        metadata = env.get_template(f"{role}.role.meta")
+        metadata = json.loads(metadata.render())
+    except jinja2.exceptions.TemplateNotFound:
+        metadata = {}
+
+    return template, metadata
 
 
 def render(template, args, kwargs, input):
