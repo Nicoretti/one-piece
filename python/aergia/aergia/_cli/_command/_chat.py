@@ -9,6 +9,7 @@ from aergia._model._save import save
 from aergia._model._load import load
 from aergia._model._data import Session, Message
 from aergia._model._storage import application_db
+from aergia._roles import parse, execute
 
 
 def chat(args, stdout, stderr):
@@ -22,7 +23,7 @@ def chat(args, stdout, stderr):
             stream=True,
         )
         with stdout.status(
-            "Processing request ...", spinner="aesthetic", spinner_style="cyan"
+                "Processing request ...", spinner="aesthetic", spinner_style="cyan"
         ):
             with TextBuffer() as buffer:
                 stream = (c for c in response if is_chunk_valid(c))
@@ -44,21 +45,43 @@ def chat(args, stdout, stderr):
     api_key = os.environ.get("OPENAI_API_KEY")
     client = build_client(backend="openai", api_key=api_key, client_type=Type.Sync)
     db = application_db()
-    session = create_session(args.session)
-    context = "" if not args.context else args.context.read()
-    content = " ".join(args.text) + context
+    assert (not args.session) or (not args.role)  # should also be enforced by cli interface
+    if args.role:
+        context = "" if not args.context else args.context.read()
+        content = " ".join(args.text) + context
+        role_spec = args.role
+        # TODO: Add check for role_spec
+        role, _, _ = parse(role_spec)
+        # TODO: Load custom role paths
+        role_paths = []
+        content = execute(role_spec, input=content, role_paths=role_paths)
+        session = create_session(f"{role}-role-{uuid.uuid4()}")
 
-    user_msg = Message.user(content, session.id)
-    save(user_msg, db)
+        user_msg = Message.user(content, session.id)
+        save(user_msg, db)
 
-    messages = list(load(Message, key="session_id", value=session.id, db=db))
-    messages = [{"role": m.role, "content": m.content} for m in messages]
-    messages.append({"role": user_msg.role, "content": user_msg.content})
+        messages = [{"role": user_msg.role, "content": user_msg.content}]
+        content, model = sync_chat(client, model=args.model, messages=messages)
 
-    content, model = sync_chat(client, model=args.model, messages=messages)
+        assistant_msg = Message.assistant(content, model, session.id)
+        save(assistant_msg, db)
 
-    assistant_msg = Message.assistant(content, model, session.id)
-    save(assistant_msg, db)
+    else:
+        session = create_session(args.session)
+        context = "" if not args.context else args.context.read()
+        content = " ".join(args.text) + context
+
+        user_msg = Message.user(content, session.id)
+        save(user_msg, db)
+
+        messages = list(load(Message, key="session_id", value=session.id, db=db))
+        messages = [{"role": m.role, "content": m.content} for m in messages]
+        messages.append({"role": user_msg.role, "content": user_msg.content})
+
+        content, model = sync_chat(client, model=args.model, messages=messages)
+
+        assistant_msg = Message.assistant(content, model, session.id)
+        save(assistant_msg, db)
 
     stdout.print(Markdown(assistant_msg.content))
     return ExitCode.Success
