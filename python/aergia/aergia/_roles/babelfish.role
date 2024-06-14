@@ -1,0 +1,2 @@
+Please translate the text below to {{ role.kwargs.get('lang', None) or role.args[0] }}:
+{{ role.input }}
