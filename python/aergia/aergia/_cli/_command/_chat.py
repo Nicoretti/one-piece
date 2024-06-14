@@ -73,10 +73,6 @@ def add_chat_subcommand(subparsers):
     subcommand.add_argument(
         "text", type=str, nargs=argparse.REMAINDER, help="Text input"
     )
-    subcommand.add_argument("-r", "--role", type=str, help="Choose a role")
-    subcommand.add_argument(
-        "-s", "--session", nargs="?", const=True, help="Create or reuse a session"
-    )
     subcommand.add_argument(
         "-c", "--context", type=argparse.FileType("r"), help="File or stdin (-)"
     )
@@ -86,6 +82,13 @@ def add_chat_subcommand(subparsers):
         default="gpt-4o",
         choices=["gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"],
         help="Select a model",
+    )
+    group = subcommand.add_mutually_exclusive_group()
+    group.add_argument(
+        "-s", "--session", nargs="?", const=True, help="Create or reuse a session"
+    )
+    group.add_argument(
+        "-r", "--role", type=str, help="role-spec <name>[:<arg>[:kwarg=value]]..."
     )
     subcommand.set_defaults(func=chat)
     return subcommand
