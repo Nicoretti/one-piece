@@ -9,7 +9,7 @@ from aergia._model._save import save
 from aergia._model._load import load
 from aergia._model._data import Session, Message
 from aergia._model._storage import application_db
-from aergia._roles import parse, execute
+from aergia._roles import parse, prompt
 
 
 def chat(args, stdout, stderr):
@@ -54,14 +54,14 @@ def chat(args, stdout, stderr):
         role, _, _ = parse(role_spec)
         # TODO: Load custom role paths
         role_paths = []
-        content = execute(role_spec, input=content, role_paths=role_paths)
+        content, model = prompt(role_spec, input=content, role_paths=role_paths)
         session = create_session(f"{role}-role-{uuid.uuid4()}")
 
         user_msg = Message.user(content, session.id)
         save(user_msg, db)
 
         messages = [{"role": user_msg.role, "content": user_msg.content}]
-        content, model = sync_chat(client, model=args.model, messages=messages)
+        content, model = sync_chat(client, model=model or args.model, messages=messages)
 
         assistant_msg = Message.assistant(content, model, session.id)
         save(assistant_msg, db)
