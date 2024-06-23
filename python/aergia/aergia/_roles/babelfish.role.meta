@@ -1,0 +1,7 @@
+{
+  "description": "Role to translate text from one language to another",
+  "arguments": {
+    "amount": 1,
+    "required": true
+  }
+}
