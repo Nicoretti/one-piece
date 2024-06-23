@@ -1,6 +1,4 @@
 {
-  "arguments": {
-    "amount": 1,
-    "required": true
-  }
+    "description": "Role of an idomatic senior programming, providing alternatives and improvements for the given source code.",
+    "model": "gpt-4o"
 }

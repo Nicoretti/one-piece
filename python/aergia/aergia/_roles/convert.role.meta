@@ -1,6 +1,4 @@
 {
-  "arguments": {
-    "amount": 1,
-    "required": true
-  }
+    "description": "Role to convert data from a given format to a specified format.",
+    "model": "gpt-4o"
 }

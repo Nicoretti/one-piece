@@ -1,5 +1,4 @@
 {
-  "arguments": {
-    "amount": 0
-  }
+    "description": "Role of an editor: Providing improvements for a given text.",
+    "model": "gpt-4o"
 }

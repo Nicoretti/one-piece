@@ -1,6 +1,4 @@
 {
-  "arguments": {
-    "amount": 1,
-    "required": true
-  }
+    "description": "Provide synonoums for a given word.",
+    "model": "gpt-4o"
 }

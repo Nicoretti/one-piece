@@ -1,5 +1,4 @@
 {
-  "arguments": {
-    "amount": 0
-  }
+    "description": "Role to add rust doc strings to the given rust source code.",
+    "model": "gpt-4o"
 }

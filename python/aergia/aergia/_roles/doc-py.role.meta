@@ -1,5 +1,4 @@
 {
-  "arguments": {
-    "amount": 0
-  }
+    "description": "Role to add python doc strings to the given python source code.",
+    "model": "gpt-4o"
 }
