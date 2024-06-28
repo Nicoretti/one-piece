@@ -12,7 +12,7 @@ from aergia._model._storage import application_db
 from aergia._roles import parse, prompt
 
 
-def chat(args, stdout, stderr):
+def chat(settings, stdout, stderr):
     def is_chunk_valid(chunk):
         return chunk.choices is not None and len(chunk.choices) > 0
 
@@ -36,20 +36,22 @@ def chat(args, stdout, stderr):
     def create_session(name=None):
         name = name or f"Temp-{uuid.uuid4()}"
         try:
-            session = load(Session, key="name", value=args.session, db=db)
+            session = load(Session, key="name", value=settings['session'], db=db)
         except Exception:
-            session = Session.new(name, args.model)
+            session = Session.new(name, settings['model'])
             save(session, db)
         return session
 
-    api_key = os.environ.get("OPENAI_API_KEY")
-    client = build_client(backend="openai", api_key=api_key, client_type=Type.Sync)
     db = application_db()
-    assert (not args.session) or (not args.role)  # should also be enforced by cli interface
-    if args.role:
-        context = "" if not args.context else args.context.read()
-        content = " ".join(args.text) + context
-        role_spec = args.role
+    backend = settings['backend']
+    backend_settings = settings[backend]
+    client = build_client(backend=backend, settings=backend_settings)
+    assert (not settings['session']) or (not settings['role'])  # should also be enforced by cli interface
+
+    if settings['role']:
+        context = "" if not settings['context'] else settings['context'].read()
+        content = " ".join(settings['text']) + context
+        role_spec = settings['role']
         # TODO: Add check for role_spec
         role, _, _ = parse(role_spec)
         # TODO: Load custom role paths
@@ -61,15 +63,15 @@ def chat(args, stdout, stderr):
         save(user_msg, db)
 
         messages = [{"role": user_msg.role, "content": user_msg.content}]
-        content, model = sync_chat(client, model=model or args.model, messages=messages)
+        content, model = sync_chat(client, model=model or settings['model'], messages=messages)
 
         assistant_msg = Message.assistant(content, model, session.id)
         save(assistant_msg, db)
 
     else:
-        session = create_session(args.session)
-        context = "" if not args.context else args.context.read()
-        content = " ".join(args.text) + context
+        session = create_session(settings['session'])
+        context = "" if not settings['context'] else settings['context'].read()
+        content = " ".join(settings['text']) + context
 
         user_msg = Message.user(content, session.id)
         save(user_msg, db)
@@ -78,7 +80,7 @@ def chat(args, stdout, stderr):
         messages = [{"role": m.role, "content": m.content} for m in messages]
         messages.append({"role": user_msg.role, "content": user_msg.content})
 
-        content, model = sync_chat(client, model=args.model, messages=messages)
+        content, model = sync_chat(client, model=settings['model'], messages=messages)
 
         assistant_msg = Message.assistant(content, model, session.id)
         save(assistant_msg, db)

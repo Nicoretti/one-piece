@@ -70,12 +70,12 @@ class TextBuffer:
         return self._buffer.getvalue()
 
 
-def default(args, stdout, stderr):
+def default(settings, stdout, stderr):
     err_msg = cleandoc(f"""
     This function is not implemented yet!
 
         Details:
-            Args: {args}
+            Settings: {settings}
 
         In case you need more details, consider running the command with the `--debug` flag.
     """)

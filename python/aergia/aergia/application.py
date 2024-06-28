@@ -8,6 +8,7 @@ from functools import wraps
 from aergia._cli._command._parser import make_parser
 from aergia._cli._io import stderr, stdout
 from aergia._cli._command._utilities import ExitCode
+from aergia._config._settings import DEFAULT_CONFIG, settings_from
 from aergia._logging import logger
 from rich.logging import RichHandler
 
@@ -54,9 +55,9 @@ def main(argv=None):
     if not hasattr(args, "func"):
         parser.error("Subcommand required!")
 
-    # settings = Settings(args)
+    settings = settings_from(args, DEFAULT_CONFIG)
     app = args.func if args.debug else _protect(args.func)
-    exit_code = app(args, stdout, stderr)
+    exit_code = app(settings, stdout, stderr)
     sys.exit(exit_code)
 
 

@@ -26,8 +26,8 @@ def _select_client(backend, client_type):
     return klass
 
 
-def build_client(backend, api_key, base_url=None, client_type=Type.Sync):
-    if base_url is None:
-        base_url = "https://api.openai.com/v1"
-    Client = _select_client(backend, client_type)
+def build_client(backend, settings):
+    Client = _select_client(backend, Type.Sync)
+    base_url = settings['base-url']
+    api_key = settings['api-key']
     return Client(base_url=base_url, api_key=api_key)

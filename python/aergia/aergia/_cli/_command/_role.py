@@ -1,16 +1,14 @@
-from aergia._cli._command._utilities import default
 from rich.json import JSON
 import json
 from rich_argparse import ArgumentDefaultsRichHelpFormatter
 from rich.table import Table
 from aergia._roles import create_env, load
 from aergia._cli._command._utilities import ExitCode
-from inspect import cleandoc
-from rich.markdown import Markdown
 from pathlib import Path
+from rich.syntax import Syntax
 
 
-def list_roles(args, stdout, stderr):
+def list_roles(settings, stdout, stderr):
     table = Table(title="Available Roles")
     table.add_column("Role", justify="left", style="green")
     table.add_column("Description", justify="left", style="cyan")
@@ -31,16 +29,13 @@ def list_roles(args, stdout, stderr):
     return ExitCode.Success
 
 
-def show_role(args, stdout, stderr):
-    name = args.name
+def show_role(settings, stdout, stderr):
+    name = settings['name']
     table = Table(title=f"{name}")
     table.add_column("Definition", justify="left")
     table.add_column("Metadata", justify="left", style="cyan")
 
-    from rich.syntax import Syntax
-    paths = None
-    env = create_env(paths=paths)
-    template, metadata = load(args.name)
+    template, metadata = load(settings['name'])
 
     content = Path(template.filename).read_text()
     table.add_row(

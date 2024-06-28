@@ -1,16 +1,14 @@
-import argparse
-
 from rich.table import Table
 from rich.markdown import Markdown
 from rich_argparse import ArgumentDefaultsRichHelpFormatter
 
-from aergia._cli._command._utilities import ExitCode, default
+from aergia._cli._command._utilities import ExitCode
 from aergia._model._data import Session, Message
 from aergia._model._load import load_list, load
 from aergia._model._storage import application_db
 
 
-def list_sessions(args, stdout, stderr):
+def list_sessions(settings, stdout, stderr):
     table = Table(title="Chat Sessions")
     table.add_column("Id", justify="right")
     table.add_column("Name", justify="left", style="green")
@@ -18,8 +16,8 @@ def list_sessions(args, stdout, stderr):
     table.add_column("Created", justify="left", style="yellow")
 
     db = application_db()
-    limit = None if args.all else args.limit
-    sessions = load_list(Session, db, limit=limit, offset=args.offset)
+    limit = None if settings['all'] else settings['limit']
+    sessions = load_list(Session, db, limit=limit, offset=settings['offset'])
     for s in sessions:
         table.add_row(
             f"{s.id}",
@@ -33,11 +31,10 @@ def list_sessions(args, stdout, stderr):
     return ExitCode.Success
 
 
-def show_session(args, stdout, stderr):
-    from rich import print
+def show_session(settings, stdout, stderr):
     from rich.panel import Panel
     db = application_db()
-    messages = list(load(Message, key="session_id", value=args.id, db=db))
+    messages = list(load(Message, key="session_id", value=settings['id'], db=db))
     for m in messages:
         color = "blue" if m.role == 'user' else 'magenta'
         p = Panel(Markdown(m.content), title=m.role, style=color)

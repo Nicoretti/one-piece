@@ -1,12 +1,13 @@
-import os
 from aergia._cli._command._utilities import ExitCode
-from openai import OpenAI
 from rich.table import Table
 from rich_argparse import ArgumentDefaultsRichHelpFormatter
+from aergia._client import build_client
 
 
-def models(args, stdout, stderr):
-    client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+def models(settings, stdout, stderr):
+    backend = settings['backend']
+    backend_settings = settings[backend]
+    client = build_client(backend=backend, settings=backend_settings)
     models = client.models.list()
 
     table = Table(title="Available Models of Backend")

@@ -1,9 +1,7 @@
 import io
-import os
 import sys
 import httpx
 import datetime as dt
-from openai import OpenAI
 from PIL import Image as PillowImage
 from rich.table import Table
 from rich_argparse import ArgumentDefaultsRichHelpFormatter
@@ -12,23 +10,27 @@ from aergia._model._save import save
 from aergia._model._load import load_list, load_blob
 from aergia._model._data import Image
 from aergia._cli._command._utilities import ExitCode
+from aergia._client import build_client
 
 
-def image(args, stdout, stderr):
+def image(settings, stdout, stderr):
     def download(url, file):
         resp = httpx.get(url)
         file.write(resp.content)
 
-    client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-    if not args.prompt:
+    backend = settings['backend']
+    backend_settings = settings[backend]
+    client = build_client(backend=backend, settings=backend_settings)
+
+    if not settings['prompt']:
         prompt = sys.stdin.read()
     else:
-        prompt = args.prompt if isinstance(args.prompt, str) else " ".join(args.prompt)
+        prompt = settings['prompt'] if isinstance(settings['prompt'], str) else " ".join(settings['prompt'])
 
     with stdout.status(
             "Generating image ...", spinner="aesthetic", spinner_style="magenta"
     ):
-        response = client.images.generate(prompt=prompt, model=args.model)
+        response = client.images.generate(prompt=prompt, model=settings['model'])
         data = response.data[0]
         image_url = data.url
         revised_prompt = data.revised_prompt
@@ -37,8 +39,8 @@ def image(args, stdout, stderr):
         created = dt.datetime.fromtimestamp(response.created)
         img = Image(
             id=None,
-            name=args.name,
-            model=args.model,
+            name=settings['name'],
+            model=settings['model'],
             prompt=prompt,
             created=created,
             revised_prompt=revised_prompt,
@@ -48,12 +50,12 @@ def image(args, stdout, stderr):
         save(img, db)
 
     pimg = PillowImage.open(buffer)
-    pimg.show(args.name)
+    pimg.show(settings['name'])
 
     return ExitCode.Success
 
 
-def list_images(args, stdout, stderr):
+def list_images(settings, stdout, stderr):
     table = Table(title="Generated Images")
     table.add_column("Id", justify="right")
     table.add_column("Name", justify="left", style="green")
@@ -63,8 +65,8 @@ def list_images(args, stdout, stderr):
     table.add_column("Revised-Prompt", justify="left", style="magenta")
 
     db = application_db()
-    limit = None if args.all else args.limit
-    images = load_list(Image, db, limit=limit, offset=args.offset)
+    limit = None if settings['all'] else settings['limit']
+    images = load_list(Image, db, limit=limit, offset=settings['offset'])
     for img in images:
         table.add_row(
             f"{img.id}",
@@ -80,9 +82,9 @@ def list_images(args, stdout, stderr):
     return ExitCode.Success
 
 
-def show_image(args, stdout, stderr):
+def show_image(settings, stdout, stderr):
     db = application_db()
-    blob = load_blob(Image, key="id", value=args.id, db=db)
+    blob = load_blob(Image, key="id", value=settings['id'], db=db)
     pimg = PillowImage.open(blob)
     pimg.show()
     return ExitCode.Success
