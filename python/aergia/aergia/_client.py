@@ -1,4 +1,4 @@
-from openai import OpenAI, AsyncClient
+from openai import OpenAI, AsyncClient, AzureOpenAI
 from enum import Enum, auto
 
 
@@ -9,7 +9,8 @@ class Type(Enum):
 
 def _select_client(backend, client_type):
     OPENAI = {Type.Async: AsyncClient, Type.Sync: OpenAI}
-    backends = {"openai": OPENAI}
+    AZURE = { Type.Sync: AzureOpenAI }
+    backends = {"openai": OPENAI, "azure": AZURE}
 
     try:
         selected_backend = backends[backend]
@@ -26,8 +27,18 @@ def _select_client(backend, client_type):
     return klass
 
 
+def _kwargs(backend, settings):
+    kwargs = {"api_key": settings["api-key"]}
+    klass = _select_client(backend, Type.Sync)
+    if issubclass(klass, AzureOpenAI):
+        kwargs["api_version"] = settings.get("api-version", "2023-07-01-preview")
+        kwargs["azure_endpoint"] = settings["base-url"]
+    else:
+        kwargs["base_url"] = settings["base-url"]
+    return kwargs
+
+
 def build_client(backend, settings):
     Client = _select_client(backend, Type.Sync)
-    base_url = settings['base-url']
-    api_key = settings['api-key']
-    return Client(base_url=base_url, api_key=api_key)
+    kwargs = _kwargs(backend, settings)
+    return Client(**kwargs)
