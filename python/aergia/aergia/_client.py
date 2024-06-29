@@ -31,7 +31,7 @@ def _kwargs(backend, settings):
     kwargs = {"api_key": settings["api-key"]}
     klass = _select_client(backend, Type.Sync)
     if issubclass(klass, AzureOpenAI):
-        kwargs["api_version"] = settings.get("api-version", "2023-07-01-preview")
+        kwargs["api_version"] = settings.get("api-version", "2024-02-01")
         kwargs["azure_endpoint"] = settings["base-url"]
     else:
         kwargs["base_url"] = settings["base-url"]
