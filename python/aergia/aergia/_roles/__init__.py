@@ -1,9 +1,9 @@
 import json
 from pathlib import Path
-from typing import Dict, List, Any, Tuple
+from typing import Any, Dict, List, Tuple
 
-from jinja2.exceptions import TemplateNotFound
 from jinja2 import ChoiceLoader, Environment, FileSystemLoader, PackageLoader, Template
+from jinja2.exceptions import TemplateNotFound
 
 
 class RoleNotFound(Exception):

@@ -1,16 +1,18 @@
+import datetime as dt
 import io
 import sys
+
 import httpx
-import datetime as dt
 from PIL import Image as PillowImage
 from rich.table import Table
 from rich_argparse import ArgumentDefaultsRichHelpFormatter
-from aergia._model._storage import application_db
-from aergia._model._save import save
-from aergia._model._load import load_list, load_blob
-from aergia._model._data import Image
+
 from aergia._cli._command._utilities import ExitCode
 from aergia._client import build_client
+from aergia._model._data import Image
+from aergia._model._load import load_blob, load_list
+from aergia._model._save import save
+from aergia._model._storage import application_db
 
 
 def image(settings, stdout, stderr):

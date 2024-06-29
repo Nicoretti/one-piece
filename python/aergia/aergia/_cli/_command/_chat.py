@@ -1,13 +1,14 @@
-import os
 import argparse
 import uuid
+
 from rich.markdown import Markdown
 from rich_argparse import ArgumentDefaultsRichHelpFormatter
-from aergia._cli._command._utilities import TextBuffer, ExitCode
-from aergia._client import build_client, Type
-from aergia._model._save import save
+
+from aergia._cli._command._utilities import ExitCode, TextBuffer
+from aergia._client import build_client
+from aergia._model._data import Message, Session
 from aergia._model._load import load
-from aergia._model._data import Session, Message
+from aergia._model._save import save
 from aergia._model._storage import application_db
 from aergia._roles import parse, prompt
 

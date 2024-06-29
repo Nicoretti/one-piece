@@ -1,16 +1,15 @@
 import asyncio
-import sys
 import logging
-
+import sys
 from functools import wraps
 
+from rich.logging import RichHandler
 
 from aergia._cli._command._parser import make_parser
-from aergia._cli._io import stderr, stdout
 from aergia._cli._command._utilities import ExitCode
+from aergia._cli._io import stderr, stdout
 from aergia._config._settings import DEFAULT_CONFIG, settings_from
 from aergia._logging import logger
-from rich.logging import RichHandler
 
 
 def _protect(func, *args, **kwargs):

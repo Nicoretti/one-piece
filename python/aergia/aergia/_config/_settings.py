@@ -1,5 +1,6 @@
-from pathlib import Path
 from collections import ChainMap
+from pathlib import Path
+
 from aergia._config._toml import from_toml
 
 DEFAULT_CONFIG = Path.home() / ".aergia.toml"

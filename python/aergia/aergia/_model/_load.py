@@ -1,10 +1,13 @@
 from __future__ import annotations
+
 import datetime
-import sqlite3
 import io
+import sqlite3
 from inspect import cleandoc
+
 from class_singledispatch import class_singledispatch
-from aergia._model._data import Session, Image, Message
+
+from aergia._model._data import Image, Message, Session
 
 
 @class_singledispatch

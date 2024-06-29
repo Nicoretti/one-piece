@@ -1,5 +1,6 @@
-from openai import OpenAI, AsyncClient, AzureOpenAI
 from enum import Enum, auto
+
+from openai import AsyncClient, AzureOpenAI, OpenAI
 
 
 class Type(Enum):

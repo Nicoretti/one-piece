@@ -1,9 +1,10 @@
 from __future__ import annotations
-import sqlite3
-from inspect import cleandoc
-from functools import singledispatch
 
-from aergia._model._data import Session, Image, Message
+import sqlite3
+from functools import singledispatch
+from inspect import cleandoc
+
+from aergia._model._data import Image, Message, Session
 
 
 @singledispatch

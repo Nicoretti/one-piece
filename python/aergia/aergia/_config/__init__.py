@@ -1,9 +1,11 @@
 from __future__ import annotations
+
 import os
-from pathlib import Path
-import tomli
 from collections import ChainMap
 from inspect import cleandoc
+from pathlib import Path
+
+import tomli
 
 
 def default_config():

@@ -1,10 +1,12 @@
 import argparse
+
+from rich_argparse import ArgumentDefaultsRichHelpFormatter
+
 from aergia._cli._command._chat import add_chat_subcommand
 from aergia._cli._command._image import add_image_subcommand
 from aergia._cli._command._models import add_models_subcommand
-from aergia._cli._command._session import add_session_subcommand
 from aergia._cli._command._role import add_role_subcommand
-from rich_argparse import ArgumentDefaultsRichHelpFormatter
+from aergia._cli._command._session import add_session_subcommand
 
 
 def make_parser():

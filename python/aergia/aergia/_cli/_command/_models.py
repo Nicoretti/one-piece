@@ -1,6 +1,7 @@
-from aergia._cli._command._utilities import ExitCode
 from rich.table import Table
 from rich_argparse import ArgumentDefaultsRichHelpFormatter
+
+from aergia._cli._command._utilities import ExitCode
 from aergia._client import build_client
 
 

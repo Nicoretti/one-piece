@@ -1,11 +1,13 @@
-from rich.json import JSON
 import json
-from rich_argparse import ArgumentDefaultsRichHelpFormatter
-from rich.table import Table
-from aergia._roles import create_env, load
-from aergia._cli._command._utilities import ExitCode
 from pathlib import Path
+
+from rich.json import JSON
 from rich.syntax import Syntax
+from rich.table import Table
+from rich_argparse import ArgumentDefaultsRichHelpFormatter
+
+from aergia._cli._command._utilities import ExitCode
+from aergia._roles import create_env, load
 
 
 def list_roles(settings, stdout, stderr):

@@ -1,5 +1,6 @@
-from aergia._cli._command._utilities import default
 from rich_argparse import ArgumentDefaultsRichHelpFormatter
+
+from aergia._cli._command._utilities import default
 
 
 def add_tui_subcommand(subparsers):

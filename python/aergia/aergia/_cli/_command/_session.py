@@ -1,10 +1,10 @@
-from rich.table import Table
 from rich.markdown import Markdown
+from rich.table import Table
 from rich_argparse import ArgumentDefaultsRichHelpFormatter
 
 from aergia._cli._command._utilities import ExitCode
-from aergia._model._data import Session, Message
-from aergia._model._load import load_list, load
+from aergia._model._data import Message, Session
+from aergia._model._load import load, load_list
 from aergia._model._storage import application_db
 
 

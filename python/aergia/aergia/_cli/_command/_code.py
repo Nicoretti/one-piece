@@ -1,6 +1,8 @@
 import argparse
-from aergia._cli._command._utilities import default
+
 from rich_argparse import ArgumentDefaultsRichHelpFormatter
+
+from aergia._cli._command._utilities import default
 
 
 def add_code_subcommand(subparsers):
