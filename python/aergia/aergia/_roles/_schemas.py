@@ -4,9 +4,7 @@ from pydantic import BaseModel, Field
 
 
 class RoleMetadata(BaseModel):
-    description: str = Field(
-        description="Basic description of the role and its purpose."
-    )
+    description: str = Field(description="Basic description of the role and its purpose.")
     model: str | None = Field(description="Model to be used for executing this role.")
 
 

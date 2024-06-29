@@ -24,5 +24,3 @@ def application_db():
     db = store(name, directory)
     initialize(db)
     return db
-
-

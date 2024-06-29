@@ -16,8 +16,8 @@ def list_sessions(settings, stdout, stderr):
     table.add_column("Created", justify="left", style="yellow")
 
     db = application_db()
-    limit = None if settings['all'] else settings['limit']
-    sessions = load_list(Session, db, limit=limit, offset=settings['offset'])
+    limit = None if settings["all"] else settings["limit"]
+    sessions = load_list(Session, db, limit=limit, offset=settings["offset"])
     for s in sessions:
         table.add_row(
             f"{s.id}",
@@ -33,10 +33,11 @@ def list_sessions(settings, stdout, stderr):
 
 def show_session(settings, stdout, stderr):
     from rich.panel import Panel
+
     db = application_db()
-    messages = list(load(Message, key="session_id", value=settings['id'], db=db))
+    messages = list(load(Message, key="session_id", value=settings["id"], db=db))
     for m in messages:
-        color = "blue" if m.role == 'user' else 'magenta'
+        color = "blue" if m.role == "user" else "magenta"
         p = Panel(Markdown(m.content), title=m.role, style=color)
         stdout.print(p)
 
@@ -44,6 +45,7 @@ def show_session(settings, stdout, stderr):
 
 
 def add_session_subcommand(subparsers):
+    # fmt: off
     subcommand = subparsers.add_parser(
         "session",
         help="manage sessions",
@@ -77,5 +79,5 @@ def add_session_subcommand(subparsers):
     )
     show_command.add_argument("id", type=int, help="session id of session to show")
     show_command.set_defaults(func=show_session)
-
+    # fmt: on
     return subcommand

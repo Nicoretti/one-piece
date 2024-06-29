@@ -29,15 +29,11 @@ def parse(role_spec: str) -> Tuple[str, List[str], Dict[str, Any]]:
     parts = role_spec.split(":")
     role = parts.pop(0)
     args = [arg for arg in parts if not is_kwarg(arg)]
-    kwargs = {
-        k: v for k, v in [tuple(kwarg.split("=")) for kwarg in parts if is_kwarg(kwarg)]
-    }
+    kwargs = {k: v for k, v in [tuple(kwarg.split("=")) for kwarg in parts if is_kwarg(kwarg)]}
     return role, args, kwargs
 
 
-def prompt(
-    role_spec: str, input: str = None, role_paths: str | List = None
-) -> Tuple[str, str]:
+def prompt(role_spec: str, input: str = None, role_paths: str | List = None) -> Tuple[str, str]:
     """
     Create a prompt based on given role spec and input.
 
@@ -76,9 +72,7 @@ def create_env(paths: List | None = None) -> Environment:
     return Environment(loader=loader)
 
 
-def load(
-    role: str, paths: List[str | Path] | None = None
-) -> Tuple[Template, Dict[str, Any]]:
+def load(role: str, paths: List[str | Path] | None = None) -> Tuple[Template, Dict[str, Any]]:
     """
     Load role template and role metadata.
 
@@ -123,7 +117,7 @@ def render(
         input: User input provided to the role.
 
     Returns:
-        Final role prompt rendered as from the template string.                                
+        Final role prompt rendered as from the template string.
     """
     args = args or list()
     kwargs = kwargs or dict()

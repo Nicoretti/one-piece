@@ -4,6 +4,7 @@ from aergia._cli._command._utilities import default
 
 
 def add_info_subcommand(subparsers):
+    # fmt: off
     subcommand = subparsers.add_parser(
         subparsers,
         "info",
@@ -11,4 +12,5 @@ def add_info_subcommand(subparsers):
         formatter_class=ArgumentDefaultsRichHelpFormatter,
     )
     subcommand.set_defaults(func=default)
+    # fmt: on
     return subcommand

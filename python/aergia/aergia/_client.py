@@ -10,7 +10,7 @@ class Type(Enum):
 
 def _select_client(backend, client_type):
     OPENAI = {Type.Async: AsyncClient, Type.Sync: OpenAI}
-    AZURE = { Type.Sync: AzureOpenAI }
+    AZURE = {Type.Sync: AzureOpenAI}
     backends = {"openai": OPENAI, "azure": AZURE}
 
     try:

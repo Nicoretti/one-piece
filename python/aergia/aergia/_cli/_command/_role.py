@@ -17,14 +17,11 @@ def list_roles(settings, stdout, stderr):
 
     paths = None
     env = create_env(paths=paths)
-    roles = env.list_templates(extensions='role')
+    roles = env.list_templates(extensions="role")
     for role in roles:
-        name = role.split('.')[0]
+        name = role.split(".")[0]
         template, metadata = load(name)
-        table.add_row(
-            name,
-            metadata["description"] if "description" in metadata else ""
-        )
+        table.add_row(name, metadata["description"] if "description" in metadata else "")
 
     stdout.print(table)
 
@@ -32,18 +29,15 @@ def list_roles(settings, stdout, stderr):
 
 
 def show_role(settings, stdout, stderr):
-    name = settings['name']
+    name = settings["name"]
     table = Table(title=f"{name}")
     table.add_column("Definition", justify="left")
     table.add_column("Metadata", justify="left", style="cyan")
 
-    template, metadata = load(settings['name'])
+    template, metadata = load(settings["name"])
 
     content = Path(template.filename).read_text()
-    table.add_row(
-        Syntax(content, "jinja"),
-        JSON(json.dumps(metadata))
-    )
+    table.add_row(Syntax(content, "jinja"), JSON(json.dumps(metadata)))
 
     stdout.print(table)
 
@@ -51,6 +45,7 @@ def show_role(settings, stdout, stderr):
 
 
 def add_role_subcommand(subparsers):
+    # fmt: off
     subcommand = subparsers.add_parser(
         "role", help="Manage roles", formatter_class=ArgumentDefaultsRichHelpFormatter
     )
@@ -92,4 +87,6 @@ def add_role_subcommand(subparsers):
     # )
     # alias_command.add_argument("role", type=str, help="Role name")
     # alias_command.add_argument("alias", type=str, help="Alias name")
+
+    # fmt: on
     return subcommand

@@ -20,19 +20,17 @@ def image(settings, stdout, stderr):
         resp = httpx.get(url)
         file.write(resp.content)
 
-    backend = settings['backend']
+    backend = settings["backend"]
     backend_settings = settings[backend]
     client = build_client(backend=backend, settings=backend_settings)
 
-    if not settings['prompt']:
+    if not settings["prompt"]:
         prompt = sys.stdin.read()
     else:
-        prompt = settings['prompt'] if isinstance(settings['prompt'], str) else " ".join(settings['prompt'])
+        prompt = settings["prompt"] if isinstance(settings["prompt"], str) else " ".join(settings["prompt"])
 
-    with stdout.status(
-            "Generating image ...", spinner="aesthetic", spinner_style="magenta"
-    ):
-        response = client.images.generate(prompt=prompt, model=settings['model'])
+    with stdout.status("Generating image ...", spinner="aesthetic", spinner_style="magenta"):
+        response = client.images.generate(prompt=prompt, model=settings["model"])
         data = response.data[0]
         image_url = data.url
         revised_prompt = data.revised_prompt
@@ -41,8 +39,8 @@ def image(settings, stdout, stderr):
         created = dt.datetime.fromtimestamp(response.created)
         img = Image(
             id=None,
-            name=settings['name'],
-            model=settings['model'],
+            name=settings["name"],
+            model=settings["model"],
             prompt=prompt,
             created=created,
             revised_prompt=revised_prompt,
@@ -52,7 +50,7 @@ def image(settings, stdout, stderr):
         save(img, db)
 
     pimg = PillowImage.open(buffer)
-    pimg.show(settings['name'])
+    pimg.show(settings["name"])
 
     return ExitCode.Success
 
@@ -67,8 +65,8 @@ def list_images(settings, stdout, stderr):
     table.add_column("Revised-Prompt", justify="left", style="magenta")
 
     db = application_db()
-    limit = None if settings['all'] else settings['limit']
-    images = load_list(Image, db, limit=limit, offset=settings['offset'])
+    limit = None if settings["all"] else settings["limit"]
+    images = load_list(Image, db, limit=limit, offset=settings["offset"])
     for img in images:
         table.add_row(
             f"{img.id}",
@@ -86,13 +84,14 @@ def list_images(settings, stdout, stderr):
 
 def show_image(settings, stdout, stderr):
     db = application_db()
-    blob = load_blob(Image, key="id", value=settings['id'], db=db)
+    blob = load_blob(Image, key="id", value=settings["id"], db=db)
     pimg = PillowImage.open(blob)
     pimg.show()
     return ExitCode.Success
 
 
 def add_image_subcommand(subparsers):
+    # fmt: off
     subcommand = subparsers.add_parser(
         "image",
         help="manage and generate images",
@@ -152,4 +151,5 @@ def add_image_subcommand(subparsers):
     )
     show_subcommand.add_argument("id", type=int, help="image to show")
     show_subcommand.set_defaults(func=show_image)
+    # fmt: on
     return subcommand

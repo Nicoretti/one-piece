@@ -10,6 +10,7 @@ from aergia._cli._command._session import add_session_subcommand
 
 
 def make_parser():
+    # fmt: off
     parser = argparse.ArgumentParser(
         prog="ae[rgia]", formatter_class=ArgumentDefaultsRichHelpFormatter
     )
@@ -24,7 +25,7 @@ def make_parser():
         choices=["debug", "info", "warn", "error", "critical"],
         help="configure the log-level of the application",
     )
-
+    # fmt: on
     subparsers = parser.add_subparsers(dest="subcommand")
 
     add_chat_subcommand(subparsers)

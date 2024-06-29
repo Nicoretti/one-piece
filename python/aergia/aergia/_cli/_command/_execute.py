@@ -6,6 +6,7 @@ from aergia._cli._command._utilities import default
 
 
 def add_execute_subcommand(subparsers):
+    # fmt: off
     subcommand = subparsers.add_parser(
         "execute",
         help="Generate and execute a command",
@@ -21,4 +22,5 @@ def add_execute_subcommand(subparsers):
         "-r", "--role", type=str, help="Role to be taken into account"
     )
     subcommand.set_defaults(func=default)
+    # fmt: on
     return subcommand

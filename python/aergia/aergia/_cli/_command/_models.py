@@ -6,7 +6,7 @@ from aergia._client import build_client
 
 
 def models(settings, stdout, stderr):
-    backend = settings['backend']
+    backend = settings["backend"]
     backend_settings = settings[backend]
     client = build_client(backend=backend, settings=backend_settings)
     models = client.models.list()
@@ -28,10 +28,12 @@ def models(settings, stdout, stderr):
 
 
 def add_models_subcommand(subparsers):
+    # fmt: off
     subcommand = subparsers.add_parser(
         "models",
         help="list available models of the backend",
         formatter_class=ArgumentDefaultsRichHelpFormatter,
     )
     subcommand.set_defaults(func=models)
+    # fmt: on
     return subcommand

@@ -23,9 +23,7 @@ def chat(settings, stdout, stderr):
             messages=messages,
             stream=True,
         )
-        with stdout.status(
-                "Processing request ...", spinner="aesthetic", spinner_style="cyan"
-        ):
+        with stdout.status("Processing request ...", spinner="aesthetic", spinner_style="cyan"):
             with TextBuffer() as buffer:
                 stream = (c for c in response if is_chunk_valid(c))
                 for chunk in stream:
@@ -37,22 +35,22 @@ def chat(settings, stdout, stderr):
     def create_session(name=None):
         name = name or f"Temp-{uuid.uuid4()}"
         try:
-            session = load(Session, key="name", value=settings['session'], db=db)
+            session = load(Session, key="name", value=settings["session"], db=db)
         except Exception:
-            session = Session.new(name, settings['model'])
+            session = Session.new(name, settings["model"])
             save(session, db)
         return session
 
     db = application_db()
-    backend = settings['backend']
+    backend = settings["backend"]
     backend_settings = settings[backend]
     client = build_client(backend=backend, settings=backend_settings)
-    assert (not settings['session']) or (not settings['role'])  # should also be enforced by cli interface
+    assert (not settings["session"]) or (not settings["role"])  # should also be enforced by cli interface
 
-    if settings['role']:
-        context = "" if not settings['context'] else settings['context'].read()
-        content = " ".join(settings['text']) + context
-        role_spec = settings['role']
+    if settings["role"]:
+        context = "" if not settings["context"] else settings["context"].read()
+        content = " ".join(settings["text"]) + context
+        role_spec = settings["role"]
         # TODO: Add check for role_spec
         role, _, _ = parse(role_spec)
         # TODO: Load custom role paths
@@ -64,15 +62,15 @@ def chat(settings, stdout, stderr):
         save(user_msg, db)
 
         messages = [{"role": user_msg.role, "content": user_msg.content}]
-        content, model = sync_chat(client, model=model or settings['model'], messages=messages)
+        content, model = sync_chat(client, model=model or settings["model"], messages=messages)
 
         assistant_msg = Message.assistant(content, model, session.id)
         save(assistant_msg, db)
 
     else:
-        session = create_session(settings['session'])
-        context = "" if not settings['context'] else settings['context'].read()
-        content = " ".join(settings['text']) + context
+        session = create_session(settings["session"])
+        context = "" if not settings["context"] else settings["context"].read()
+        content = " ".join(settings["text"]) + context
 
         user_msg = Message.user(content, session.id)
         save(user_msg, db)
@@ -81,7 +79,7 @@ def chat(settings, stdout, stderr):
         messages = [{"role": m.role, "content": m.content} for m in messages]
         messages.append({"role": user_msg.role, "content": user_msg.content})
 
-        content, model = sync_chat(client, model=settings['model'], messages=messages)
+        content, model = sync_chat(client, model=settings["model"], messages=messages)
 
         assistant_msg = Message.assistant(content, model, session.id)
         save(assistant_msg, db)
@@ -91,6 +89,7 @@ def chat(settings, stdout, stderr):
 
 
 def add_chat_subcommand(subparsers):
+    # fmt: off
     subcommand = subparsers.add_parser(
         "chat",
         help="chat with the ai system",
@@ -117,4 +116,5 @@ def add_chat_subcommand(subparsers):
         "-r", "--role", type=str, help="role-spec <name>[:<arg>[:kwarg=value]]..."
     )
     subcommand.set_defaults(func=chat)
+    # fmt: on
     return subcommand
