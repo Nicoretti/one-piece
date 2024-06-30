@@ -8,17 +8,33 @@ def app():
 
 
 @pytest.fixture
-def level():
+def default_level():
     yield "debug"
 
+
 @pytest.fixture
-def timeout():
+def env_level():
+    yield "error"
+
+
+@pytest.fixture
+def default_timeout():
     yield 45
 
 
 @pytest.fixture
-def defaults(level, timeout):
-    yield {"logging": {"level": level}, "timeout": timeout}
+def env_timeout():
+    yield 60
+
+
+@pytest.fixture
+def defaults(default_level, default_timeout):
+    yield {"logging": {"level": default_level}, "timeout": default_timeout}
+
+
+@pytest.fixture
+def env(env_level, env_timeout):
+    yield {"logging": {"level": env_level}, "timeout": env_timeout}
 
 
 @pytest.fixture
@@ -33,6 +49,18 @@ def konfy(app, defaults):
         defaults=defaults,
     )
 
+@pytest.fixture
+def konfy_with_env_and_default(app, env, defaults):
+    yield Konfy(
+        application=app,
+        cli=None,
+        environment=env,
+        app_config=None,
+        user_config=None,
+        system_config=None,
+        defaults=defaults,
+    )
+
 
 def test_konfy_configuration_with_defaults_only(konfy, defaults):
     expected = defaults
@@ -40,24 +68,41 @@ def test_konfy_configuration_with_defaults_only(konfy, defaults):
     assert actual == expected
 
 
-def test_access_configuration_using_index_operator(konfy, level):
+def test_access_configuration_using_index_operator(konfy, default_level):
     cfg = konfy.config
-    expected = level 
+    expected = default_level
     actual = cfg["logging"]["level"]
     assert actual == expected
 
 
-def test_access_configuration_using_attribute_access(konfy, timeout):
+def test_access_configuration_using_attribute_access(konfy, default_timeout):
     cfg = konfy.config
-    expected = timeout
+    expected = default_timeout
     actual = cfg.timeout
     assert actual == expected
 
 
-def test_access_configuration_using_nested_attribute_access(konfy, level):
+def test_access_configuration_using_nested_attribute_access(konfy, default_level):
     cfg = konfy.config
-    expected = level
+    expected = default_level
     actual = cfg.logging.level
+    assert actual == expected
+
+
+def test_env_has_higher_priority_than_defaults(
+    konfy_with_env_and_default, env_level, env_timeout
+):
+    konfy = konfy_with_env_and_default
+    cfg = konfy.config
+
+    expected = env_level
+    actual = cfg.logging.level
+
+    assert actual == expected
+
+    expected = env_timeout
+    actual = cfg.timeout
+
     assert actual == expected
 
 
