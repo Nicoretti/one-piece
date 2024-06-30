@@ -61,7 +61,9 @@ class Attributes:
         try:
             value = self._dict[name]
         except KeyError as ex:
-            raise AttributeError(f"'Attributes' object has no attribute '{name}'") from ex
+            raise AttributeError(
+                f"'Attributes' object has no attribute '{name}'"
+            ) from ex
 
         value = Attributes(value) if issubclass(type(value), abc.Mapping) else value
         return value
@@ -78,14 +80,13 @@ class Attributes:
         return len(self._dict)
 
     def __repr__(self):
-        return f"Config({self._dict})"
+        return f"{type(self).__name___}({self._dict})"
 
     def __str__(self):
         return str(self._dict)
 
 
 class Resolver(abc.Mapping):
-
     def __init__(self, *dicts):
         self._config = ChainMap(*dicts)
         self._dict = Attributes(self._config)
@@ -103,9 +104,7 @@ class Resolver(abc.Mapping):
         return len(self._dict)
 
     def __repr__(self):
-        return f"Config({self._dict})"
+        return f"{type(self).__name___}({self._dict})"
 
     def __str__(self):
         return str(self._dict)
-
-
