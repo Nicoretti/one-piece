@@ -1,9 +1,63 @@
 from __future__ import annotations
+from typing import Iterable, TypeVar, Generic
 
+from dataclasses import dataclass
 from collections import ChainMap, abc
+
+from konfy._normalize import Identifier
+
+
+T = TypeVar("T")
+
+
+@dataclass(slots=True)
+class Setting(Generic[T]):
+    name: Identifier
+    type: T
+    default: T | None = None
+    description: str = ""
+    help: str = ""
+
+
+class Namespace:
+    def __init__(self, name=None):
+        self._elements = {}
+        self._name = name
+
+    def __getitem__(self, key):
+        return self._elements[key]
+
+    def __iter__(self):
+        return iter(self._dict)
+
+    def __len__(self):
+        return len(self._dict)
+
+    def add_setting(self, name, type, default=None, description=None, help=None):
+        names = [n for n in (self._name, name) if n is not None]
+        full_name = ":".join(names)
+        setting = Setting(
+            name=Identifier(full_name), type=type, default=default, description=description, help=help
+        )
+        self._elements[name] = setting
+        return setting
+
+    def add_namespace(self, name=None):
+        names = [n for n in (self._name, name) if n is not None]
+        full_name = ":".join(names)
+        ns = Namespace(full_name)
+        self._elements[name] = ns
+        return ns
+
+def Configuration():
+    return Namespace()
 
 
 class Konfy:
+    @staticmethod
+    def new(settings: Iterable[Setting | Namespace]) -> "Konfy":
+        pass
+
     def __init__(
         self,
         application: str,

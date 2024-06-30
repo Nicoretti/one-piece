@@ -1,5 +1,6 @@
 import pytest
-from konfy import Konfy
+from konfy import Konfy, Namespace, Setting, Identifier, Configuration
+from dataclasses import asdict
 
 
 @pytest.fixture
@@ -48,6 +49,7 @@ def konfy(app, defaults):
         system_config=None,
         defaults=defaults,
     )
+
 
 @pytest.fixture
 def konfy_with_env_and_default(app, env, defaults):
@@ -104,6 +106,58 @@ def test_env_has_higher_priority_than_defaults(
     actual = cfg.timeout
 
     assert actual == expected
+
+
+@pytest.fixture
+def configuration():
+    config = Configuration()
+    logging_ns = config.add_namespace("logging")
+    logging_ns.add_setting(
+        "level",
+        str,
+        default="info",
+        description="The log level to use",
+        help="Log level of the application, possible values[debug, info, warn, error]",
+    )
+    timeout_ns = config.add_namespace("timeout")
+    hard_ns = timeout_ns.add_namespace("hard")
+    hard_ns.add_setting("timeout", int, default=45, description="desc", help="some help")
+    soft_ns = timeout_ns.add_namespace("soft")
+    soft_ns.add_setting("timeout", int, default=45, description="desc", help="some help")
+    yield config
+
+def test_create_nested_namespace(configuration):
+    logging_ns = configuration.add_namespace("logging")
+    logging_ns.add_setting(
+        "level",
+        str,
+        default="info",
+        description="The log level to use",
+        help="Log level of the application, possible values[debug, info, warn, error]",
+    )
+
+    timeout_ns = configuration.add_namespace("timeout")
+
+    hard_ns = timeout_ns.add_namespace("hard")
+    hard_ns.add_setting("timeout", int, default=45, description="desc", help="some help")
+    soft_ns = timeout_ns.add_namespace("soft")
+    soft_ns.add_setting("timeout", int, default=45, description="desc", help="some help")
+
+    expected = asdict(Setting(
+        name=Identifier("logging:level"),
+        type=str,
+        default="info",
+        description="The log level to use",
+        help="Log level of the application, possible values[debug, info, warn, error]",
+    ))
+    actual = asdict(configuration["logging"]["level"])
+
+    assert actual == expected
+
+@pytest.mark.skip()
+def test_idea_smoke(configuration):
+    settings = configuration
+    #konfy = Konfy.from_settings(name="foo", settings, argparser, env)
 
 
 @pytest.mark.skip(reason="just a outline for the future")

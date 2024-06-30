@@ -87,6 +87,12 @@ class Identifier:
         Identifier.validate_identifier(name)
         self._name = name
 
+    def __str__(self) -> str:
+        return self._name
+
+    def __repr__(self) -> str:
+        return self._name
+
     @property
     def name(self) -> str:
         """
