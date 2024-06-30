@@ -41,8 +41,8 @@ class Konfy:
         self._defaults = defaults or {}
 
     @property
-    def config(self) -> Config:
-        return Config(
+    def config(self) -> Resolver:
+        return Resolver(
             self._cli,
             self._environment,
             self._app_config,
@@ -84,7 +84,7 @@ class Attributes:
         return str(self._dict)
 
 
-class Config(abc.Mapping):
+class Resolver(abc.Mapping):
 
     def __init__(self, *dicts):
         self._config = ChainMap(*dicts)

@@ -1,4 +1,4 @@
-from konfy._config import Konfy, Config, Attributes
+from konfy._config import Konfy, Resolver, Attributes
 from konfy._convert import (
     env_key,
     to_string,
@@ -12,7 +12,7 @@ from konfy._convert import (
 
 __all__ = [
     "Konfy",
-    "Config",
+    "Resolver",
     "Attributes",
     "env_key",
     "to_string",
