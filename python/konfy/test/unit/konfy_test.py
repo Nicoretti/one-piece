@@ -1,43 +1,86 @@
+import pytest
 from konfy import Konfy
 
-def test_create_Konfy_object():
 
-    konfy = Konfy(
-        application,  # name of the application the konfy object is for
-        cli=None,  # Dict (parsed) / Could be argsparser (argparse object)
-        environment=None,  # default os.environ
-        app_config=None,  # default <cwd>app_name.toml
-        user_config=None,  # default os sepecific e.g. linux = ~/config/app_name/config.toml
-        system_config=None,  # default os specific e.g. linux /etc/<cwd>app_name.toml
-        defaults=None,  # A dictironary containg the defautls for settings
+@pytest.fixture
+def app():
+    yield "testapp"
+
+
+@pytest.fixture
+def level():
+    yield "debug"
+
+@pytest.fixture
+def timeout():
+    yield 45
+
+
+@pytest.fixture
+def defaults(level, timeout):
+    yield {"logging": {"level": level}, "timeout": timeout}
+
+
+@pytest.fixture
+def konfy(app, defaults):
+    yield Konfy(
+        application=app,
+        cli=None,
+        environment=None,
+        app_config=None,
+        user_config=None,
+        system_config=None,
+        defaults=defaults,
     )
 
+
+def test_konfy_configuration_with_defaults_only(konfy, defaults):
+    expected = defaults
+    actual = dict(konfy.config)
+    assert actual == expected
+
+
+def test_access_configuration_using_index_operator(konfy, level):
     cfg = konfy.config
-    level = cfg.logging.level
-    facitlity = cfg['logging']['facitlity']
+    expected = level 
+    actual = cfg["logging"]["level"]
+    assert actual == expected
 
 
+def test_access_configuration_using_attribute_access(konfy, timeout):
+    cfg = konfy.config
+    expected = timeout
+    actual = cfg.timeout
+    assert actual == expected
+
+
+def test_access_configuration_using_nested_attribute_access(konfy, level):
+    cfg = konfy.config
+    expected = level
+    actual = cfg.logging.level
+    assert actual == expected
+
+
+@pytest.mark.skip(reason="just a outline for the future")
 def test_create_defaults():
     from konfy import Konfy, Defaults, Setting
 
-    defaults = { "logging:level": "debug" }
-    defaults = Defaults([
-        Setting(
-            name="logging:level", 
-
-        ),
-        Setting(
-            ns="logging",
-            name="facitlity", 
-            type=int,
-            value=2,
-            description="",
-            help=""
-        ),
-
-        ])
-
-
+    defaults = {"logging:level": "debug"}
+    defaults = Defaults(
+        [
+            Setting(
+                name="logging:level",
+            ),
+            Setting(
+                ns="logging",
+                name="facitlity",
+                type=int,
+                value=2,
+                description="",
+                help="",
+            ),
+        ]
+    )
 
     settings = Konfy(
         name="foo",  # name of the application the konfy object is for
