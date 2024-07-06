@@ -27,10 +27,10 @@
 | `Python` | ⬤⬤⬤⬤⬤⬤⬤◯◯◯ | 2.7, 3.x, tooling, testing, backend           | :fontawesome-solid-sun:  |
 | `Rust`   | ⬤⬤⬤⬤◯◯◯◯◯◯ | edition [2015, 2018, 2021], embedded, tooling | :fontawesome-solid-sun:  |
 | `SQL`    | ⬤⬤⬤◯◯◯◯◯◯◯ | backend, sqlite, exasol, postgres             | :fontawesome-solid-sun:  |
-| `Go`     | ⬤⬤⬤◯◯◯◯◯◯  | tooling                                       |  :fontawesome-solid-cloud:  |
+| `Lua`    | ⬤⬤◯◯◯◯◯◯◯◯ | scripting, 5.1, elua, nvim                    |  :fontawesome-solid-cloud:  |
 | `Shell`  | ⬤⬤◯◯◯◯◯◯◯◯ | scripting, sh, bash, zsh                      |  :fontawesome-solid-cloud:  |
-| `Lua`    | ⬤⬤◯◯◯◯◯◯◯◯ | scripting, 5.1, elua                          |  :fontawesome-solid-cloud:  |
-| `ASM`    | ⬤⬤◯◯◯◯◯◯◯◯ | arm, ppc, x86, x86_64                         |  :fontawesome-solid-cloud:  |
+| `Go`     | ⬤◯◯◯◯◯◯◯◯  | tooling                                       |  :fontawesome-solid-cloud:  |
+| `ASM`    | ⬤◯◯◯◯◯◯◯◯◯ | arm, ppc, x86, x86_64                         |  :fontawesome-solid-cloud:  |
 | `Ruby`   | ⬤◯◯◯◯◯◯◯◯◯ | web application, tooling                      | :fontawesome-solid-cloud-rain: |
 | `js`     | ⬤◯◯◯◯◯◯◯◯◯ | web requests                                  | :fontawesome-solid-cloud-rain: |
 | `C#`     | ⬤◯◯◯◯◯◯◯◯◯ | web frontend (silverlight)                    |  :fontawesome-solid-cloud-bolt:   |
