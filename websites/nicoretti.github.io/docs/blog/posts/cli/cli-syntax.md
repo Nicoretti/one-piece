@@ -20,7 +20,7 @@ This blog article is essentially a repost of a small summary about CLI syntax on
 
 Before you start reading this article you may consider reading the [POSIX Utility Conventions](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html). It is approximately a 10-20 minute read which will provide a solid base when it comes to CLIs and their syntax.
 
-Let's start getting some content going:material-exclamation-thick:
+Let's get some content going:material-exclamation-thick:
 
 ## Terminology
 
