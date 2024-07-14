@@ -1,0 +1,14 @@
+[project]
+name = "dukh"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Nicola Coretti", email = "nico.coretti@gmail.com" }
+]
+dependencies = [
+    "fabric>=3.2.2",
+]
+
+[tool.rye.workspace]
+members = ["dukh-*"]
+
