@@ -41,5 +41,5 @@ def buckets(
     stdout.print(tree)
 
 
-ns = Collection('exasol')
-ns.add_task(buckets, name='bfs')
+ns = Collection("exasol")
+ns.add_task(buckets, name="bfs")

@@ -49,5 +49,5 @@ def explain(_context, id: None, code=None):
     stdout.print(table)
 
 
-ns = Collection('errno')
-ns.add_task(explain, 'explain')
+ns = Collection("errno")
+ns.add_task(explain, "explain")
