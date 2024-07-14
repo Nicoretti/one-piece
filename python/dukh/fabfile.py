@@ -4,7 +4,8 @@ from dukh import (
     ssh,
     tls,
     exasol,
-    errno
+    errno,
+    shell
 )
 
-ns = Collection(packages.ns, ssh.ns, tls.ns, exasol.ns, errno.ns)
+ns = Collection(packages.ns, ssh.ns, tls.ns, exasol.ns, errno.ns, shell.ns)

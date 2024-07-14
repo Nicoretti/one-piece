@@ -1,5 +1,5 @@
 [project]
-name = "dukh-errno"
+name = "dukh-shell"
 version = "0.1.0"
 description = "Add your description here"
 authors = [
