@@ -1,0 +1,28 @@
+[project]
+name = "dukh-exasol"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Nicola Coretti", email = "nico.coretti@gmail.com" }
+]
+dependencies = [
+    "rich>=13.7.1",
+    "invoke>=2.2.0",
+    "exasol-bucketfs==0.7.0",
+]
+readme = "README.md"
+requires-python = ">= 3.8"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/dukh"]
