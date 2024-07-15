@@ -30,7 +30,7 @@ sudo su -s /bin/fish certbot
 ### Various Commands
 
 ```shell
-certbot certonly -n --agree-tos --email nico.coretti@gmail.com --expand --webroot -d blog.nicoretti.dev -d nicoretti.dev
+certbot certonly -n --agree-tos --email foo@gmail.com --expand --webroot -d blog.foo.dev -d foo.dev
 ```
 
 ```shell
@@ -39,6 +39,6 @@ sudo chown root:acme /var/log/nginx/error.log
 ```
 
 ```shell
-certbot certonly -n --agree-tos --email nico.coretti@gmail.com --webroot -w /usr/share/nginx/html -d nicoretti.dev -d blog.nicoretti.dev 
+certbot certonly -n --agree-tos --email foo@gmail.com --webroot -w /usr/share/nginx/html -d foo.dev -d blog.foo.dev 
 ```
 
