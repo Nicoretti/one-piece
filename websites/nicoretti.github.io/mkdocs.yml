@@ -9,14 +9,14 @@ nav:
   - "talks.md"
   - Blog:
       - "blog/index.md"
-  - Developer Log:
-      - "dev-log/index.md"
-      - "dev-log/ldap.md"
-      - "dev-log/letsencrypt.md"
-      - "dev-log/technical-user.md"
-      - "dev-log/priviledged-ports.md"
-      - "dev-log/tls.md"
-      - "dev-log/maven.md"
+  - Dev Notes:
+      - "dev-notes/index.md"
+      - "dev-notes/ldap.md"
+      - "dev-notes/letsencrypt.md"
+      - "dev-notes/technical-user.md"
+      - "dev-notes/priviledged-ports.md"
+      - "dev-notes/tls.md"
+      - "dev-notes/maven.md"
 theme:
   name: material
   logo: images/nicoretti.svg
