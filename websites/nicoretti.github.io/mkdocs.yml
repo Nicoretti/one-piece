@@ -16,6 +16,7 @@ nav:
       - "dev-log/technical-user.md"
       - "dev-log/priviledged-ports.md"
       - "dev-log/tls.md"
+      - "dev-log/maven.md"
 theme:
   name: material
   logo: images/nicoretti.svg
