@@ -8,8 +8,38 @@ categories:
 
 # AI / LLM - Roles
 
+Disclaimer: Usage side, not an expert when it comes how llm ai etc. work
 
-## What are roles
+My Knowlege about AI, ... 
+My take on AI TL;DR: ...
+
+
+## What are roles about
+role vs session, what is a session, how does is usally work
+## Types of prompts
+
+* Embedded prompt
+* system prompt
+* structured prompt
+
+
+### Commands
+
+#### List existing roles
+
+### Roles
+- Typos / Git commit message
+- Translation
+- Doc comments
+- Parameterized Roles
+- Conversation
+
+### Remarks
+- Make sure you assing a role to a model
+- Start with ta basic role
+- Enhance by making it Parameterized
+- Extract refined roles, if necessary for specific parameterization
+- Exxperiment with different prompt types
 
 ## Difference role session
 
