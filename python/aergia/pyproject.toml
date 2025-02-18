@@ -1,8 +1,10 @@
-[tool.poetry]
+[project]
 name = "aergia"
 version = "0.4.0"
 description = ""
-authors = ["Nicola Coretti <nico.coretti@gmail.com>"]
+authors = [
+  {name = "Nicola Coretti", email = "nico.coretti@gmail.com"},
+]
 readme = "README.md"
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
@@ -11,32 +13,37 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
+requires-python = ">=3.12"
 keywords = ['ai', 'openai', 'llm', 'tui', 'cli', 'repl']
 repository = "https://github.com/Nicoretti/one-piece/python/aergia"
 
 
-[tool.poetry.dependencies]
-python = ">=3.10"
-openai = "^1.30.1"
-rich-argparse = "^1.4.0"
-pillow = "^10.3.0"
-pydantic = "^2.7.1"
-tomli = "^2.0.1"
-tomli-w = "^1.0.0"
-class-singledispatch = "^1.2.3.post2"
-jinja2 = "^3.1.4"
+dependencies = [
+    "openai>=1.63.2",
+    "rich-argparse>=1.7.0",
+    "pillow>=11.1.0",
+    "pydantic>=2.10.6",
+    "tomli>=2.2.1",
+    "tomli-w>=1.2.0",
+    "class-singledispatch>=1.2.3.post2",
+    "jinja2>=3.1.5",
+]
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.2.0"
-ruff = "^0.4.4"
-pytest-anyio = "^0.0.0"
+[dependency-groups]
+dev = [
+    "pytest-anyio>=0.0.0",
+    "pytest>=8.3.4",
+    "ruff>=0.9.6",
+    "rust-just>=1.39.0",
+]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.poetry.scripts]
+[project.scripts]
 aergia = "aergia.application:main"
 ae = "aergia.application:main"
 
