@@ -7,7 +7,7 @@ from aergia._client import build_client
 
 def models(settings, stdout, stderr):
     backend = settings["backend"]
-    backend_settings = settings[backend]
+    backend_settings = settings["backends"][backend]
     client = build_client(backend=backend, settings=backend_settings)
     models = client.models.list()
 

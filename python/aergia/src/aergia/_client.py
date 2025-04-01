@@ -3,6 +3,23 @@ from enum import Enum, auto
 from openai import AsyncClient, AzureOpenAI, OpenAI
 
 
+class Client:
+
+    @property
+    def models():
+        """List all available models"""
+
+    def chat():
+        """"""
+
+    def image():
+        """"""
+
+    @property
+    def api_key():
+        """"""
+
+
 class Type(Enum):
     Async = auto()
     Sync = auto()
@@ -29,17 +46,17 @@ def _select_client(backend, client_type):
 
 
 def _kwargs(backend, settings):
-    kwargs = {"api_key": settings["api-key"]}
+    kwargs = {"api_key": settings["token"]}
     klass = _select_client(backend, Type.Sync)
     if issubclass(klass, AzureOpenAI):
         kwargs["api_version"] = settings.get("api-version", "2024-02-01")
-        kwargs["azure_endpoint"] = settings["base-url"]
+        kwargs["azure_endpoint"] = settings["base_url"]
     else:
-        kwargs["base_url"] = settings["base-url"]
+        kwargs["base_url"] = settings["base_url"]
     return kwargs
 
 
 def build_client(backend, settings):
-    Client = _select_client(backend, Type.Sync)
+    Klass = _select_client(backend, Type.Sync)
     kwargs = _kwargs(backend, settings)
-    return Client(**kwargs)
+    return Klass(**kwargs)

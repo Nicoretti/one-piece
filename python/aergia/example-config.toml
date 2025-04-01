@@ -1,13 +1,14 @@
 [default]
 backend="openai"    # backend which should be used by default
 
-[[backends]]
+[backends.openai]
 name = "openai"
 base_url = "https://api.openai.com/v1"
 token=""
 
 
 [default.image]
+backend = "openai"
 generate.model = "dall-e-3" # default model to use
 generate.name = "unnamed"   # default name to use if none is specified
 list.all = false            # should all images be listed if true, limit will be ignored

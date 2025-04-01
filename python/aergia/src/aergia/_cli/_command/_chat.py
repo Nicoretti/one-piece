@@ -43,7 +43,7 @@ def chat(settings, stdout, stderr):
 
     db = application_db()
     backend = settings["backend"]
-    backend_settings = settings[backend]
+    backend_settings = settings["backends"][backend]
     client = build_client(backend=backend, settings=backend_settings)
     assert (not settings["session"]) or (not settings["role"])  # should also be enforced by cli interface
 
