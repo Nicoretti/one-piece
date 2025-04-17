@@ -1,0 +1,9 @@
+alias b := test
+alias t := test
+
+build:
+    uv build
+
+test *args:
+    uv run pytest test {{ args }}
+
