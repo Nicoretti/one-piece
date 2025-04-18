@@ -1,7 +1,8 @@
-alias b := test
+alias b := build
+alias c := check
+alias f := fix
+alias m := mypy
 alias t := test
-alias c := test
-alias f := test
 
 build:
     uv build
@@ -14,3 +15,6 @@ fix *args:
 
 check *args:
     uv run ruff check src test {{ args }}
+
+mypy *args:
+    uv run mypy konfy {{ args }}
