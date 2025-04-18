@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import os
 from collections import defaultdict
+from collections.abc import MutableMapping
 from typing import (
     Any,
     Callable,
-    MutableMapping,
 )
 
 
@@ -90,7 +90,7 @@ def from_env(
 
 
 def to_env(
-    name: str, obj: Any, prefix: str = "", env: MutableMapping[str, str] | None = None
+    name: str, obj: Any, prefix: str = "", env: MutableMapping[str, str] | None = None,
 ) -> MutableMapping[str, str]:
     """Write a specific value back to the environment."""
     env = env if env is not None else os.environ

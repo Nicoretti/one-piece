@@ -1,11 +1,11 @@
 from __future__ import annotations
-from typing import Iterable, TypeVar, Generic
 
-from dataclasses import dataclass
 from collections import ChainMap, abc
+from collections.abc import Iterable
+from dataclasses import dataclass
+from typing import Generic, TypeVar
 
 from konfy._normalize import Identifier
-
 
 T = TypeVar("T")
 
@@ -37,7 +37,7 @@ class Namespace:
         names = [n for n in (self._name, name) if n is not None]
         full_name = ":".join(names)
         setting = Setting(
-            name=Identifier(full_name), type=type, default=default, description=description, help=help
+            name=Identifier(full_name), type=type, default=default, description=description, help=help,
         )
         self._elements[name] = setting
         return setting
@@ -54,8 +54,9 @@ def Configuration():
 
 
 class Konfy:
+
     @staticmethod
-    def new(settings: Iterable[Setting | Namespace]) -> "Konfy":
+    def new(settings: Iterable[Setting | Namespace]) -> Konfy:
         pass
 
     def __init__(
@@ -68,10 +69,10 @@ class Konfy:
         system_config=None,
         defaults=None,
     ):
-        """
-        Initializes a Konfy object to manage configuration settings.
+        """Initializes a Konfy object to manage configuration settings.
 
         Args:
+        ----
             application: str. Name of the application the Konfy object is for.
             cli: dict or argparse.Namespace, optional. Parsed command line arguments.
                 Default is None.
@@ -85,6 +86,7 @@ class Konfy:
                 Default is OS-specific (e.g., Linux: /etc/<application>.toml).
             defaults: dict, optional. A dictionary containing the default settings
                 for the application. Default is None.
+
         """
         self._app = application
         self._cli = cli or {}
@@ -116,7 +118,7 @@ class Attributes:
             value = self._dict[name]
         except KeyError as ex:
             raise AttributeError(
-                f"'Attributes' object has no attribute '{name}'"
+                f"'Attributes' object has no attribute '{name}'",
             ) from ex
 
         value = Attributes(value) if issubclass(type(value), abc.Mapping) else value

@@ -6,10 +6,10 @@
 # 4. cli setting
 from __future__ import annotations
 
+from collections.abc import MutableMapping
 from dataclasses import dataclass
 from typing import (
     Any,
-    MutableMapping,
     TypeVar,
 )
 
@@ -132,7 +132,7 @@ def test_to_string(expected: str, obj: Any) -> None:
     ],
 )
 def test_from_env(
-    expected: Any, name: str, type: TypeVar, prefix: str, env: MutableMapping[str, str]
+    expected: Any, name: str, type: TypeVar, prefix: str, env: MutableMapping[str, str],
 ) -> None:
     assert expected == from_env(name, type, prefix, env)
 

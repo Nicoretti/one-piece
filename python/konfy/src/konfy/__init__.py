@@ -1,15 +1,14 @@
-from konfy._normalize import Identifier
-from konfy._config import Konfy, Resolver, Attributes, Namespace, Setting, Configuration
+from konfy._config import Attributes, Configuration, Konfy, Namespace, Resolver, Setting
 from konfy._convert import (
     env_key,
-    to_string,
-    to_float,
-    to_bool,
-    from_string,
     from_env,
+    from_string,
+    to_bool,
     to_env,
+    to_float,
+    to_string,
 )
-
+from konfy._normalize import Identifier
 
 __all__ = [
     "Konfy",

@@ -1,46 +1,48 @@
-import pytest
-from konfy import Konfy, Namespace, Setting, Identifier, Configuration
 from dataclasses import asdict
 
+import pytest
 
-@pytest.fixture
+from konfy import Configuration, Identifier, Konfy, Setting
+
+
+@pytest.fixture()
 def app():
-    yield "testapp"
+    return "testapp"
 
 
-@pytest.fixture
+@pytest.fixture()
 def default_level():
-    yield "debug"
+    return "debug"
 
 
-@pytest.fixture
+@pytest.fixture()
 def env_level():
-    yield "error"
+    return "error"
 
 
-@pytest.fixture
+@pytest.fixture()
 def default_timeout():
-    yield 45
+    return 45
 
 
-@pytest.fixture
+@pytest.fixture()
 def env_timeout():
-    yield 60
+    return 60
 
 
-@pytest.fixture
+@pytest.fixture()
 def defaults(default_level, default_timeout):
-    yield {"logging": {"level": default_level}, "timeout": default_timeout}
+    return {"logging": {"level": default_level}, "timeout": default_timeout}
 
 
-@pytest.fixture
+@pytest.fixture()
 def env(env_level, env_timeout):
-    yield {"logging": {"level": env_level}, "timeout": env_timeout}
+    return {"logging": {"level": env_level}, "timeout": env_timeout}
 
 
-@pytest.fixture
+@pytest.fixture()
 def konfy(app, defaults):
-    yield Konfy(
+    return Konfy(
         application=app,
         cli=None,
         environment=None,
@@ -51,9 +53,9 @@ def konfy(app, defaults):
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def konfy_with_env_and_default(app, env, defaults):
-    yield Konfy(
+    return Konfy(
         application=app,
         cli=None,
         environment=env,
@@ -92,7 +94,7 @@ def test_access_configuration_using_nested_attribute_access(konfy, default_level
 
 
 def test_env_has_higher_priority_than_defaults(
-    konfy_with_env_and_default, env_level, env_timeout
+    konfy_with_env_and_default, env_level, env_timeout,
 ):
     konfy = konfy_with_env_and_default
     cfg = konfy.config
@@ -108,7 +110,7 @@ def test_env_has_higher_priority_than_defaults(
     assert actual == expected
 
 
-@pytest.fixture
+@pytest.fixture()
 def configuration():
     config = Configuration()
     logging_ns = config.add_namespace("logging")
@@ -124,7 +126,7 @@ def configuration():
     hard_ns.add_setting("timeout", int, default=45, description="desc", help="some help")
     soft_ns = timeout_ns.add_namespace("soft")
     soft_ns.add_setting("timeout", int, default=45, description="desc", help="some help")
-    yield config
+    return config
 
 def test_create_nested_namespace(configuration):
     logging_ns = configuration.add_namespace("logging")
@@ -162,7 +164,7 @@ def test_idea_smoke(configuration):
 
 @pytest.mark.skip(reason="just a outline for the future")
 def test_create_defaults():
-    from konfy import Konfy, Defaults, Setting
+    from konfy import Defaults, Konfy, Setting
 
     defaults = {"logging:level": "debug"}
     defaults = Defaults(
@@ -178,7 +180,7 @@ def test_create_defaults():
                 description="",
                 help="",
             ),
-        ]
+        ],
     )
 
     settings = Konfy(
