@@ -54,10 +54,6 @@ class Namespace:
         return ns
 
 
-def Configuration():
-    return Namespace()
-
-
 class Konfy:
     @staticmethod
     def new(settings: Iterable[Setting | Namespace]) -> Konfy:
@@ -101,8 +97,8 @@ class Konfy:
         self._defaults = defaults or {}
 
     @property
-    def config(self) -> Resolver:
-        return Resolver(
+    def config(self) -> Config:
+        return Config(
             self._cli,
             self._environment,
             self._app_config,
@@ -146,7 +142,7 @@ class Attributes:
         return str(self._dict)
 
 
-class Resolver(abc.Mapping):
+class Config(abc.Mapping):
     def __init__(self, *dicts):
         self._config = ChainMap(*dicts)
         self._dict = Attributes(self._config)
