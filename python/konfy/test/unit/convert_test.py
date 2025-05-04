@@ -132,7 +132,11 @@ def test_to_string(expected: str, obj: Any) -> None:
     ],
 )
 def test_from_env(
-    expected: Any, name: str, type: TypeVar, prefix: str, env: MutableMapping[str, str],
+    expected: Any,
+    name: str,
+    type: TypeVar,
+    prefix: str,
+    env: MutableMapping[str, str],
 ) -> None:
     assert expected == from_env(name, type, prefix, env)
 
@@ -162,4 +166,3 @@ def test_to_env(
     env: MutableMapping[str, str],
 ) -> None:
     assert expected == to_env(name, obj, prefix, env)
-

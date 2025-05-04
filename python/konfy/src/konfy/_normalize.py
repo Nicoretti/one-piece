@@ -99,10 +99,14 @@ class Identifier:
     def __repr__(self) -> str:
         return self._name
 
+    def __eq__(self, other):
+        if not isinstance(other, Identifier):
+            raise NotImplementedError
+        return self._name == other._name
+
     @property
     def name(self) -> str:
-        """The normalized identifier name.
-        """
+        """The normalized identifier name."""
         return self._name
 
     def __str__(self) -> str:

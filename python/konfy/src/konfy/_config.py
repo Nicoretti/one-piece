@@ -37,7 +37,11 @@ class Namespace:
         names = [n for n in (self._name, name) if n is not None]
         full_name = ":".join(names)
         setting = Setting(
-            name=Identifier(full_name), type=type, default=default, description=description, help=help,
+            name=Identifier(full_name),
+            type=type,
+            default=default,
+            description=description,
+            help=help,
         )
         self._elements[name] = setting
         return setting
@@ -49,12 +53,12 @@ class Namespace:
         self._elements[name] = ns
         return ns
 
+
 def Configuration():
     return Namespace()
 
 
 class Konfy:
-
     @staticmethod
     def new(settings: Iterable[Setting | Namespace]) -> Konfy:
         pass

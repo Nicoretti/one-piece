@@ -94,7 +94,9 @@ def test_access_configuration_using_nested_attribute_access(konfy, default_level
 
 
 def test_env_has_higher_priority_than_defaults(
-    konfy_with_env_and_default, env_level, env_timeout,
+    konfy_with_env_and_default,
+    env_level,
+    env_timeout,
 ):
     konfy = konfy_with_env_and_default
     cfg = konfy.config
@@ -128,6 +130,7 @@ def configuration():
     soft_ns.add_setting("timeout", int, default=45, description="desc", help="some help")
     return config
 
+
 def test_create_nested_namespace(configuration):
     logging_ns = configuration.add_namespace("logging")
     logging_ns.add_setting(
@@ -145,21 +148,24 @@ def test_create_nested_namespace(configuration):
     soft_ns = timeout_ns.add_namespace("soft")
     soft_ns.add_setting("timeout", int, default=45, description="desc", help="some help")
 
-    expected = asdict(Setting(
-        name=Identifier("logging:level"),
-        type=str,
-        default="info",
-        description="The log level to use",
-        help="Log level of the application, possible values[debug, info, warn, error]",
-    ))
+    expected = asdict(
+        Setting(
+            name=Identifier("logging:level"),
+            type=str,
+            default="info",
+            description="The log level to use",
+            help="Log level of the application, possible values[debug, info, warn, error]",
+        ),
+    )
     actual = asdict(configuration["logging"]["level"])
 
     assert actual == expected
 
+
 @pytest.mark.skip()
 def test_idea_smoke(configuration):
     settings = configuration
-    #konfy = Konfy.from_settings(name="foo", settings, argparser, env)
+    # konfy = Konfy.from_settings(name="foo", settings, argparser, env)
 
 
 @pytest.mark.skip(reason="just a outline for the future")
