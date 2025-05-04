@@ -10,8 +10,12 @@ build:
 test *args:
     uv run pytest test {{ args }}
 
+fmt *args:
+    uv run ruff format src test {{ args }}
+
 fix *args:
-    uv run ruff check --fix --show-fixes src test {{ args }}
+    uv run ruff format src test
+    uv run ruff check --fix src test
 
 check *args:
     uv run ruff check src test {{ args }}
