@@ -1,12 +1,16 @@
+[build-system]
+requires = ["maturin>=1.8,<2.0"]
+build-backend = "maturin"
+
 [project]
 name = "konfy"
 version = "0.1.0"
 description = "Configure gui, tui, repl and cli applications"
 authors = [{ name = "Nicola Coretti", email = "nico.coretti@gmail.com" }]
-requires-python = "~=3.9"
+maintainers = [{ name = "Nicola Coretti", email = "nico.coretti@gmail.com" }]
 readme = "README.md"
 license = "MIT"
-maintainers = [{ name = "Nicola Coretti", email = "nico.coretti@gmail.com" }]
+requires-python = "~=3.9"
 keywords = [
     "config",
     "env",
@@ -17,7 +21,9 @@ keywords = [
     "cli",
 ]
 classifiers = [
-    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -25,27 +31,16 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
-
-[project.urls]
-Repository = "https://github.com/Nicoretti/one-piece/tree/grand-line/python/konfy"
+dynamic = ["version"]
+[tool.maturin]
+python-source = "python"
+features = ["pyo3/extension-module"]
 
 [dependency-groups]
 dev = [
+    "pytest>=8.3.5",
     "ruff>=0.5.0,<0.6",
     "pytest>=8.2.2,<9",
     "rust-just>=1.40.0",
     "mypy>=1.15.0",
 ]
-
-[tool.hatch.build.targets.sdist]
-include = ["src/konfy"]
-
-[tool.hatch.build.targets.wheel]
-include = ["src/konfy"]
-
-[tool.hatch.build.targets.wheel.sources]
-"src/konfy" = "konfy"
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
