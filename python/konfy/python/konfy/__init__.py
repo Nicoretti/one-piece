@@ -1,3 +1,4 @@
+from .konfy import hello_from_konfy
 from konfy._config import Attributes, Configuration, Konfy, Namespace, Resolver, Setting
 from konfy._convert import (
     env_key,
@@ -11,6 +12,7 @@ from konfy._convert import (
 from konfy._normalize import Identifier
 
 __all__ = [
+    "hello_from_konfy",
     "Konfy",
     "Namespace",
     "Setting",
