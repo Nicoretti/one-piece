@@ -21,11 +21,13 @@
  
         I worked well in other sizes too (10, 20, 50), but personaly I think 3-5 people are the most effective.
 
-* I prefer my working place being remote by default, additionally having an office I can go to possible scenario
+* While I have worked in the office exclusively, in a hybrid setting, and fully remotely, all for extended periods, I can't say I have a specific favorite.
+
 
     !!! Note
 
-        If the office is not near by, multiday office visits with over night stays work well for me too.
+        No matter the setting, having a remote-aware team, even in an onsite environment, is beneficial from my point of view. 
+        Additionally, in an onsite setting, the option for an occasional remote day or week is desirable.
 
 * I like to work on an powerful but lightweight notebook
  
