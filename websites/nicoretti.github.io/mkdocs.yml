@@ -24,15 +24,15 @@ theme:
   palette:
     - media: '(prefers-color-scheme: light)'
       scheme: default
-      primary: orange
-      accent: yellow
+      primary: yellow
+      accent: amber
       toggle:
         icon: material/toggle-switch
         name: Switch to light mode
     - media: '(prefers-color-scheme: dark)'
       scheme: slate
-      primary: orange
-      accent: yellow
+      primary: yellow
+      accent: amber
       toggle:
         icon: material/toggle-switch-off-outline
         name: Switch to dark mode
