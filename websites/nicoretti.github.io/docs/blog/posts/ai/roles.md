@@ -3,7 +3,6 @@ draft: true
 date: 2024-08-01
 categories:
   - Category
-  -
 ---
 
 # AI / LLM - Roles
