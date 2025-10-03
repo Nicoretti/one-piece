@@ -52,7 +52,44 @@ Although the general workflow should be consistent, package names and paths may 
 
 ??? tip "Tip: Fedora and Dracut Users"
 
-    For those using Fedora or systems that employ Dracut, a similar setup can be achived using Dracut and [dracut-crypt-ssh](https://github.com/dracut-crypt-ssh/dracut-crypt-ssh).
+    For those using Fedora or systems that employ Dracut, a similar setup can be achived using Dracut and [dracut-sshd](https://github.com/gsauthof/dracut-sshd).
+
+Detailed steps for Fedora 42:
+
+    # Install dracut-sshd
+    sudo dnf install dracut-sshd
+    
+    # Confirm 46sshd exists in dracut
+    ls /usr/lib/dracut/modules.d/46sshd
+    
+    # Copy ssh key into root
+    sudo cp .ssh/authorized_keys /root/.ssh/dracut_authorized_keys
+    
+    # Install networkd dracut module and networkd itself
+    sudo dnf install -y dracut-network systemd-networkd
+    
+    # Create a non-NetworkManager network config
+    $ cat /etc/systemd/network/20-wired.network
+    [Match]
+    Name=e*
+    
+    [Network]
+    DHCP=yes
+    
+    # Create a dracut networkd config
+    $ cat /etc/dracut.conf.d/90-networkd.conf
+    install_items+=" /etc/systemd/network/20-wired.network "
+    add_dracutmodules+=" systemd-networkd "
+    
+    # Finally regenerate the initramfs
+    sudo dracut -f -v
+    
+    # Verify that the sshd module is included in lsinitrd
+    $ sudo lsinitrd | grep 'authorized\|bin/sshd\|network/20'
+    
+    # Reboot and test (remember to ssh as root):
+    ssh root@headless.example.org
+
 
 ## Setting Up the Basic System
 
