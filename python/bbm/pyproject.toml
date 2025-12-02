@@ -7,7 +7,10 @@ authors = [
     { name = "Nicola Coretti", email = "nico.coretti@gmail.com" }
 ]
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "loguru>=0.7.0",
+    "sqlglot>=28.1.0",
+]
 
 [project.scripts]
 bbm = "bbm:main"
