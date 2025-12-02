@@ -1,0 +1,17 @@
+[project]
+name = "bbm"
+version = "0.1.0"
+description = "Better Bookmark Manager is a command line based Bookmark Manager"
+readme = "README.md"
+authors = [
+    { name = "Nicola Coretti", email = "nico.coretti@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = []
+
+[project.scripts]
+bbm = "bbm:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
