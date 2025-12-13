@@ -3,6 +3,7 @@
 # dependencies = [
 #     "index-503",
 #     "pip",
+#     "rich",
 # ]
 # ///
 #
@@ -24,10 +25,12 @@
 import logging
 import shutil
 import subprocess
-import sys
 import tempfile
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from pathlib import Path
+
+from rich.console import Console
+from rich.logging import RichHandler
 
 
 def _create_parser() -> ArgumentParser:
@@ -44,7 +47,11 @@ def _create_parser() -> ArgumentParser:
 
 
 def main() -> None:
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s", stream=sys.stderr)
+    console = Console(stderr=True)
+    logging.basicConfig(
+        level=logging.INFO,
+        handlers=[RichHandler(console=console, rich_tracebacks=True, show_path=False)],
+    )
     logger = logging.getLogger(__name__)
 
     parser = _create_parser()
@@ -71,9 +78,9 @@ def main() -> None:
             "--output-file",
             dest,
         ]
-        logger.debug("Executing command: %", " ".join(str(c) for c in command))
+        logger.debug(f"Executing command: {' '.join(str(c) for c in command)}")
         subprocess.run(command, check=True)
-        logger.info("Requirements file created at: %", dest)
+        logger.info(f"Requirements file created at: {dest}")
 
     def create_wheels(project: Path, requirements_txt: Path, dest: Path):
         uv = shutil.which("uv")
