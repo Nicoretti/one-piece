@@ -1,0 +1,9 @@
+[project]
+name = "ai-container"
+version = "0.1.0"
+description = "AI - Tool/Agent isolation"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "rust-just>=1.46.0",
+]

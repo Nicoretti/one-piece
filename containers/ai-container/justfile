@@ -1,0 +1,11 @@
+alias b := build
+
+default := '_list'
+
+_list:
+    just --list
+
+# Build AI-Container Image
+[group: 'Container']
+build:
+    podman build .
