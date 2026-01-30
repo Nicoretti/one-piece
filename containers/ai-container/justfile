@@ -1,3 +1,8 @@
+# Todo's:
+# * Share of give access to volume(s) which keep state
+# * Add roles and Agent files
+
+
 alias b := build
 
 default := '_list'
@@ -8,4 +13,65 @@ _list:
 # Build AI-Container Image
 [group: 'Container']
 build:
-    podman build .
+    podman build . -t aic
+
+# Get a Shell in a AI-Container
+[group: 'Container']
+shell path:
+    podman run --volume $(realpath {{path}}):/workspace:rw,z -it aic /bin/bash
+
+# Run PI 
+[group: 'AI']
+pi path args="": configure
+    podman run --volume $(realpath {{path}}):/workspace:rw,z \
+            --volume state:/root/.local/state \
+            --volume share:/root/.local/share \
+            --volume config:/root/.config \
+            --volume pi-config:/root/.pi \
+            -it aic pi {{args}} .
+
+# Run opencode
+[group: 'AI']
+opc path +args="": configure
+    podman run --volume $(realpath {{path}}):/workspace:rw,z \
+            --volume state:/root/.local/state \
+            --volume share:/root/.local/share \
+            --volume config:/root/.config \
+            -it aic opencode {{args}} . 
+
+# Run aichat tool
+[group: 'AI']
+aic path +args="": configure
+    podman run --volume $(realpath {{path}}):/workspace:rw,z \
+            --volume state:/root/.local/state \
+            --volume share:/root/.local/share \
+            --volume config:/root/.config \
+            -it aic aichat {{args}}
+
+# Run LLM
+[group: 'AI']
+llm path +args="": configure
+    podman run --volume $(realpath {{path}}):/workspace:rw,z \
+            --volume state:/root/.local/state \
+            --volume share:/root/.local/share \
+            --volume config:/root/.config \
+            -it aic llm {{args}}
+
+# This task can be used to configure a specific tool
+[group: 'Status']
+configure:
+    podman volume exists state || podman volume create state -l "aic"
+    podman volume exists share || podman volume create share -l "aic"
+    podman volume exists config || podman volume create config -l "aic"
+    podman volume exists pi-config || podman volume create pi-config -l "aic"
+
+
+[group: 'Status']
+info:
+    @echo "Supported Clients/Agents:"
+    @echo ""
+    @echo "- PI         https://shittycodingagent.ai"
+    @echo "- OpenCode   https://opencode.ai"
+    @echo "- Aichat     https://github.com/sigoden/aichat"
+    @echo "- llm        https://github.com/simonw/llm"
+    @echo ""

@@ -1,3 +1,24 @@
+FROM fedora:43 AS build
+
+WORKDIR /workdir
+ADD https://github.com/sigoden/aichat/releases/download/v0.30.0/aichat-v0.30.0-i686-unknown-linux-musl.tar.gz aichat.tar.gz
+RUN tar xvf aichat.tar.gz
+
 FROM fedora:43
 
+RUN sudo dnf update -y \
+    && sudo dnf upgrade -y \
+    && sudo dnf install curl nodejs -y
 
+# Install Aichat
+COPY --from=build /workdir/aichat /usr/local/bin/aichat
+# Install UV
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+# Install llm
+RUN uv tool install llm
+# Install OpenCode
+RUN npm i -g opencode-ai
+# Install PI
+RUN npm install -g @mariozechner/pi-coding-agent
+
+WORKDIR /workspace
