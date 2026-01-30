@@ -13,7 +13,7 @@ RUN sudo dnf update -y \
 # Install Aichat
 COPY --from=build /workdir/aichat /usr/local/bin/aichat
 # Install UV
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="/usr/local/bin" sh
 # Install llm
 RUN uv tool install llm
 # Install OpenCode
