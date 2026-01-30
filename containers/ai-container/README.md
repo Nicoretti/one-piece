@@ -10,6 +10,73 @@ On one occasion, for example, file access was explicitly restricted (e.g., the p
 
 For this reason, I believe it is essential to implement clear restrictions or a contextual sandbox that is shared with the AI, and which it cannot as easily circumvent by simply invoking a different command.
 
+
+## Prerequisites
+
+- **Podman** (>= 4.0) - Container runtime. [Install](https://podman.io/docs/installation)
+- **Python** (>= 3.13) - Required for the CLI. [Install](https://www.python.org/downloads/)
+
+## Installation
+
+Install the `ai-container` package:
+
+```bash
+uv tool install ai-container
+```
+
+Or from source:
+
+```bash
+git clone https://github.com/yourusername/ai-container.git
+cd ai-container
+uv tool install .
+```
+
+The `ai` command will then be available.
+
+## Usage
+
+### Basic Commands
+
+```bash
+ai pi /path/to/project              # Run PI coding agent
+ai opc /path/to/project             # Run OpenCode coding agent
+ai aic /path/to/project             # Run aichat
+ai llm /path/to/project             # Run llm
+ai shell /path/to/project           # Interactive shell in container
+```
+
+Pass additional arguments directly to the tool:
+```bash
+ai pi /path/to/project --verbose --model claude-3-sonnet
+```
+### Provided Tools
+- **[PI](https://shittycodingagent.ai)** - Coding agent for generation, analysis, and refactoring
+- **[OpenCode](https://opencode.ai)** - AI-powered coding assistant
+- **[aichat](https://github.com/sigoden/aichat)** - Interactive AI chat interface
+- **[llm](https://github.com/simonw/llm)** - Command-line tool for LLM interaction
+
+### Configuration & Persistence
+
+**First run:** The container image is built (one-time, takes a few minutes).
+
+**Tools use their standard configuration methods** (within the container):
+- aichat: `~/.config/aichat/config.toml`
+- llm: `~/.config/llm/` + environment variables
+- PI: `~/.pi/`
+- OpenCode: `~/.config/opencode/`
+
+**Configuration persists automatically across all runs and containers** through named Podman volumes (`config`, `state`, `share`, `pi-config`). Configure once, use everywhere:
+
+```bash
+# First run: setup credentials
+ai shell /path/to/project
+# Inside container: aichat, llm keys set openai <key>, etc.
+
+# Subsequent runs: credentials available automatically
+ai pi /path/to/project
+```
+
 ## Other/Previous Work
 * [agent-containers](https://github.com/faileon/agent-containers)
 * [agent-container](https://github.com/asfaload/agents_container)
