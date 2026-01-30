@@ -1,8 +1,3 @@
-# Todo's:
-# * Share of give access to volume(s) which keep state
-# * Add roles and Agent files
-
-
 alias b := build
 
 default := '_list'
@@ -55,7 +50,7 @@ llm path +args="": configure
             --volume state:/root/.local/state \
             --volume share:/root/.local/share \
             --volume config:/root/.config \
-            -it aic llm {{args}}
+            -it aic uvx llm {{args}}
 
 # This task can be used to configure a specific tool
 [group: 'Status']
