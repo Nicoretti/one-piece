@@ -13,7 +13,12 @@ build:
 # Get a Shell in a AI-Container
 [group: 'Container']
 shell path:
-    podman run --volume $(realpath {{path}}):/workspace:rw,z -it aic /bin/bash
+    podman run --volume $(realpath {{path}}):/workspace:rw,z \
+            --volume state:/root/.local/state \
+            --volume share:/root/.local/share \
+            --volume config:/root/.config \
+            --volume pi-config:/root/.pi \
+            -it aic /bin/bash
 
 # Run PI 
 [group: 'AI']
@@ -23,7 +28,7 @@ pi path args="": configure
             --volume share:/root/.local/share \
             --volume config:/root/.config \
             --volume pi-config:/root/.pi \
-            -it aic pi {{args}} .
+            -it aic pi {{args}}
 
 # Run opencode
 [group: 'AI']
