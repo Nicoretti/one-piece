@@ -1,0 +1,45 @@
+
+### Binary Version
+
+The binary version involves a structured approach using binary data fields:
+
+1. **Transformation**: A single byte:
+   - `0x00`: No transformation
+   - `0x01`: Convert to uppercase
+   - `0x02`: Convert to lowercase
+
+2. **Length**: A single byte indicating the length of the string (0-255 characters).
+
+3. **String**: The actual string in bytes, where the number of bytes is specified by the Length field.
+
+#### Example in Binary:
+For transforming a string "hello" to uppercase:
+
+- **Transformation**: `0x01` (Uppercase)
+- **Length**: `0x05` (Length of "hello")
+- **String**: `0x68 0x65 0x6C 0x6C 0x6F` (The ASCII representation for "hello")
+
+**Binary Representation**: `01 05 68 65 6C 6C 6F`
+
+### JSON Version
+
+The JSON version of the protocol is human-readable:
+```json
+{
+  "Transformation": "Upper",
+  "String": "hello"
+}
+```
+
+#### Description:
+- **Transformation**: 
+  - An integer where:
+    - `0`: No transformation
+    - `1`: Convert to uppercase
+    - `2`: Convert to lowercase
+
+- **Length**: The integer value specifying the number of characters in the string. This field should match the actual length of the string provided.
+
+- **String**: The text that needs to be transformed, represented as a string in JSON.
+
+JSON, being more verbose, is convenient for debugging and human readability, whereas the binary protocol is more compact and efficient for machine processing or network transmission. Both formats need to handle character encoding consistently (e.g., UTF-8) when dealing with the string data to avoid mismatches.

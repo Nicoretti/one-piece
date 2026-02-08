@@ -1,0 +1,77 @@
+default_theme := 'black'
+
+[group('Slides')]
+@default:
+    just --list
+
+[group('Slides')]
+@list-themes:
+    echo "* black"
+    echo "* white"
+    echo "* league"
+    echo "* beige"
+    echo "* night"
+    echo "* serif"
+    echo "* simple"
+    echo "* solarized"
+    echo "* moon"
+    echo "* dracula"
+    echo "* sky"
+    echo "* blood"
+
+
+[group('Slides')]
+@build theme=default_theme:
+    echo "Building Presentation..."
+    pandoc --to=revealjs --embed-resources --standalone \
+    --resource-path=./images \
+    00-metadata.yml  *.md \
+    --slide-level=3 --variable "progress=true" --variable "theme={{theme}}" \
+    --highlight-style haddock \
+    -o socat-data-stream-alchemy.html
+
+
+[group('Slides')]
+@open:
+    open socat-data-stream-alchemy.html
+
+
+# Expose serial connection via a tcp server
+[group('Demo1')]
+serial-to-tcpserver:
+    socat -v -v -d -d TCP-LISTEN:2345,reuseaddr,fork /dev/cu.usbmodemflip_I10stare1,ispeed=115200,ospeed=115200,rawer
+
+# Connect TCP client to tcpserver which serves the serial
+[group('Demo1')]
+connect-to-tcpserver:
+    telnet 127.0.0.1 2345
+    # Alternatively we could use socat too
+    # socat -,rawer tcp:127.0.0.1:2345
+
+# Connect TCP client to tcpserver and serve the connection as udp server
+[group('Demo1')]
+tcpclient-to-udpserver:
+    socat -v -v -d -d  UDP-LISTEN:2222,fork tcp:127.0.0.1:2345
+
+
+# Connect UDP client to udpserver
+[group('Demo1')]
+connect-to-udpserver:
+    socat -,rawer UDP:127.0.0.1:2222
+
+
+[group('Demo2')]
+round-trip:
+    uv run to_json.py "How are you" -t Upper | uv run python encode.py | uv run python server.py | uv run python decode.py
+
+
+[group('Demo2')]
+server:
+    socat -x TCP-LISTEN:2345,reuseaddr,fork SHELL:'uv run python -u decode.py | uv run python -u server.py | uv run python -u encode.py' 
+
+
+[group('Demo2')]
+client msg="How are you":
+    socat SHELL:'uv run python -u to_json.py \"{{msg}}\" -t Upper | uv run python -u encode.py'\!\!SHELL:'uv run python -u decode.py | jq .String'  tcp:127.0.0.1:2345 
+
+
