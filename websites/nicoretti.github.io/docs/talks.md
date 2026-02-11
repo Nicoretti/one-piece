@@ -1,5 +1,13 @@
 # Talks
 
+## Socat data stream alchemy
+
+!!! Abstract
+
+    Socat is the Swiss Army knife for data streams, making it indispensable for hackers, administrators, and developers alike. Whether you're setting up encrypted tunnels, forwarding ports, or facilitating communication between two data streams, Socat provides the necessary tools. Imagine it as the Gardena adapter for data streams, seamlessly connecting digtial data sinks and sources in your environment.
+
+    [:material-file-document: Slides](talks/socat/socat-data-stream-alchemy.html){:target="_blank"}
+
 ## Because it is relevant
 
 !!! Abstract
