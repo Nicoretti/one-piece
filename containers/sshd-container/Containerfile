@@ -1,0 +1,15 @@
+FROM fedora:43
+
+RUN dnf update -y && dnf upgrade -y
+RUN dnf install -y passwd sudo openssh-server python util-linux-user
+
+RUN useradd -m -s /bin/bash nc && \
+    echo "nc:userpw" | chpasswd && \
+    echo "nc ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/user
+
+RUN ssh-keygen -A
+RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+RUN sed -ri 's/UsePAM yes/UsePAM yes/g' /etc/ssh/sshd_config
+
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]

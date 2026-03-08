@@ -1,0 +1,20 @@
+NAME := "sshd-testpod"
+
+
+default:
+    just --list
+
+build:
+    podman build -t {{ NAME }} .
+
+start:
+    podman run --name {{ NAME }} -d -p 2222:22 {{ NAME }}
+
+shell:
+    podman exec -it {{ NAME }} /bin/bash
+
+stop:
+    podman kill {{ NAME }}
+
+clean:
+    podman rm $(podman ps -a -q) || true
