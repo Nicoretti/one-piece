@@ -1,0 +1,14 @@
+default:
+    just --list
+
+build:
+    podman build -t ssh-testpod .
+
+start:
+    podman run --name ssh-testpod -d -p 2222:22 ssh-testpod
+
+stop:
+    podman kill ssh-testpod
+
+clean:
+    pdoman rm $(podman ps -a -q) || true
