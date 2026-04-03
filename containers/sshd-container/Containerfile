@@ -9,7 +9,7 @@ RUN useradd -m -s /bin/bash nc && \
 
 RUN ssh-keygen -A
 RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
-RUN sed -ri 's/UsePAM yes/UsePAM yes/g' /etc/ssh/sshd_config
+RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
 
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]
