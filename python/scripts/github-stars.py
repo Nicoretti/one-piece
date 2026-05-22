@@ -103,6 +103,10 @@ def to_jsonl(stars):
         }
         yield json.dumps(json_star)
 
+def to_json(stars):
+    stars = list(stars)
+    yield json.dumps(stars)
+
 
 def _create_parser():
     parser = argparse.ArgumentParser(
@@ -110,6 +114,7 @@ def _create_parser():
     )
     parser.add_argument("username", help="GitHub username")
     parser.add_argument("-r", "--rate-limit", type=float, default=0.2, help="Seconds to wait between requests")
+    parser.add_argument("-f", "--format", choices=('jsonl', 'json'), default='jsonl', help="Output format")
     return parser
 
 
@@ -117,9 +122,11 @@ def main():
     parser = _create_parser()
     args = parser.parse_args()
     stars = fetch_stars(args.username, args.rate_limit)
-    stars = to_jsonl(stars)
-    for star in stars:
-        print(star)
+    formatter = { 'jsonl': to_jsonl, 'json': to_json }
+    formatter = formatter[args.format]
+    output = formatter(stars)
+    for entry in output:
+        print(entry)
     sys.exit(0)
 
 
