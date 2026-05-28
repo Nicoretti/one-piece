@@ -1,0 +1,70 @@
+DB_FILE := join(home_dir(), ".bookmarks.db")
+SQL_FILES := join(justfile_directory(), "sql")
+SCRIPTS := join(justfile_directory(), "scripts")
+GH_USER := "nicoretti"
+
+default:
+    just -l
+
+[group: 'bookmarks']
+insert:
+    #!/usr/bin/env bash -u
+    echo -n "Title: "
+    read TITLE
+    echo -n "URL: "
+    read URL
+    echo -n "Description: "
+    read DESC
+    echo -n "Tags: "
+    read TAGS
+
+    sqlite3 {{DB_FILE}}  \
+        ".parameter set :title '$TITLE'" \
+        ".parameter set :url '$URL'" \
+        ".parameter set :description '$DESC'" \
+        ".parameter set :tags '$TAGS'" \
+        ".read {{join(SQL_FILES, "insert.sql")}}"
+
+[group: 'bookmarks']
+remove url:
+    #!/usr/bin/env bash -u
+    sqlite3 {{DB_FILE}}  \
+        ".parameter set :url '{{url}}'" \
+        ".read {{join(SQL_FILES, "remove.sql")}}"
+
+
+[group: 'bookmarks']
+search query:
+    sqlite3 {{DB_FILE}} -line ".parameter set :query '{{query}}'"  ".read {{join(SQL_FILES, "query.sql")}}"
+
+# Creates bookmarks db if it does not exist yet
+[group: 'db']
+create-db:
+    #!/usr/bin/env bash
+    if [[ ! -f "{{DB_FILE}}" ]]; then
+        echo "Database {{DB_FILE}} not found — creating it from schema..."
+        sqlite3 "{{DB_FILE}}" < {{join(SQL_FILES, "bookmarks.sql")}}
+        echo "Database '{{DB_FILE}}' created successfully."
+    fi
+
+# Import github stars into bookmarks db
+[group: 'db']
+import-gh-stars USER=GH_USER: create-db
+    #!/usr/bin/env bash
+    set -euo pipefail
+    SCRIPTS_DIR="{{SCRIPTS}}"
+    TEMP_DIR=$(mktemp -d)
+    trap 'rm -rf "$TEMP_DIR"' EXIT
+
+    echo "Downloading github stars for user '{{USER}}'..."
+    uv run --script "$SCRIPTS_DIR/github-stars.py" -f jsonl "{{USER}}" > "$TEMP_DIR/stars.jsonl"
+
+    echo "Transforming github stars data..."
+    cat "$TEMP_DIR/stars.jsonl" \
+        | "$SCRIPTS_DIR/transform-to-table-data.sh" \
+        | "$SCRIPTS_DIR/replace-null-values.sh" > "$TEMP_DIR/import-data.jsonl"
+
+    echo "Inserting github stars into {{DB_FILE}}..."
+    sqlite-utils insert --nl "{{DB_FILE}}" bookmarks.web "$TEMP_DIR/import-data.jsonl"
+
+    echo "Import complete."
