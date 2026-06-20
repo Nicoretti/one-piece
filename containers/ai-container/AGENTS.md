@@ -73,9 +73,13 @@ README.md
 
 ## Conventions
 
-- **CLI:** use `rich_click as click`. Add new commands in `cli.py` and register
-  them with `ai.add_command(...)`. Call `_prepare(rebuild_image)` before any
-  container run so the image and volumes exist.
+- **CLI:** use `rich_click as click`. The palette is intentionally small:
+  `agent` (invoke any tool via the `TOOLS` registry), `shell`, and the `image`
+  group (`ai image rebuild`). To add a tool, add an entry to `TOOLS` rather
+  than a new command; group related admin commands under a `click.group` (as
+  with `image`). Register top-level commands/groups with `ai.add_command(...)`
+  and call `_prepare()` before any container run so the image and volumes
+  exist.
 - **Podman work:** put any image/volume/network logic in `_podman.py`
   using the SDK (`PodmanClient`). Only fall back to `podman run` subprocess for
   interactive TTY sessions.

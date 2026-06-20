@@ -45,36 +45,29 @@ The `ai` command will then be available.
 ### Basic Commands
 
 ```bash
-ai pi /path/to/project              # Run PI coding agent
-ai opc /path/to/project             # Run OpenCode coding agent
-ai aic /path/to/project             # Run aichat
-ai llm /path/to/project             # Run llm
+ai agent pi /path/to/project        # Run PI coding agent
+ai agent opc /path/to/project       # Run OpenCode coding agent
+ai agent aic /path/to/project       # Run aichat
+ai agent llm /path/to/project       # Run llm
 ai shell /path/to/project           # Interactive shell in container
 ```
 
+`ai agent <tool> <path> [args]` is the single entry point for every tool.
+Valid tools: `pi`, `opc`, `aic`, `llm`.
+
 Pass additional arguments directly to the tool:
 ```bash
-ai pi /path/to/project --verbose --model claude-3-sonnet
+ai agent pi /path/to/project --verbose --model claude-3-sonnet
 ```
 
 ### Rebuilding the Container Image
 
 The container image is built automatically on first use via the Podman SDK.
-When you want to pull in the latest tool versions, you can force a rebuild in
-two ways:
+When you want to pull in the latest tool versions, force a rebuild with the
+`image rebuild` command:
 
-**Standalone rebuild command** — rebuilds the image without running any tool:
 ```bash
-ai rebuild-image
-```
-
-**Inline `--rebuild-image` flag** — rebuilds the image and then immediately runs the chosen tool:
-```bash
-ai pi /path/to/project --rebuild-image
-ai opc /path/to/project --rebuild-image
-ai aic /path/to/project --rebuild-image
-ai llm /path/to/project --rebuild-image
-ai shell /path/to/project --rebuild-image
+ai image rebuild
 ```
 ### Provided Tools
 - **[PI](https://shittycodingagent.ai)** - Coding agent for generation, analysis, and refactoring
@@ -100,7 +93,7 @@ ai shell /path/to/project
 # Inside container: aichat, llm keys set openai <key>, etc.
 
 # Subsequent runs: credentials available automatically
-ai pi /path/to/project
+ai agent pi /path/to/project
 ```
 
 ## Other/Previous Work
