@@ -50,6 +50,24 @@ Pass additional arguments directly to the tool:
 ```bash
 ai pi /path/to/project --verbose --model claude-3-sonnet
 ```
+
+### Rebuilding the Container Image
+
+The container image is built automatically on first use. When you want to pull in the latest tool versions, you can force a rebuild in two ways:
+
+**Standalone rebuild command** — rebuilds the image without running any tool:
+```bash
+ai rebuild-image
+```
+
+**Inline `--rebuild-image` flag** — rebuilds the image and then immediately runs the chosen tool:
+```bash
+ai pi /path/to/project --rebuild-image
+ai opc /path/to/project --rebuild-image
+ai aic /path/to/project --rebuild-image
+ai llm /path/to/project --rebuild-image
+ai shell /path/to/project --rebuild-image
+```
 ### Provided Tools
 - **[PI](https://shittycodingagent.ai)** - Coding agent for generation, analysis, and refactoring
 - **[OpenCode](https://opencode.ai)** - AI-powered coding assistant

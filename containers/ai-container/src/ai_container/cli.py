@@ -28,7 +28,8 @@ def ai() -> None:
 @click.command("pi")
 @click.argument("path")
 @click.argument("args", nargs=-1)
-def run_pi(path: str, args: Tuple[str, ...]) -> None:
+@click.option("--rebuild-image", is_flag=True, default=False, help="Rebuild the container image before running.")
+def run_pi(path: str, args: Tuple[str, ...], rebuild_image: bool) -> None:
     """Run PI coding agent.
     
     PI is a powerful coding agent that helps with code generation,
@@ -37,6 +38,7 @@ def run_pi(path: str, args: Tuple[str, ...]) -> None:
     Args:
         path: Directory or file path to work on.
         args: Additional arguments to pass to PI.
+        rebuild_image: If set, rebuild the container image before running.
     """
     path = f"{Path(path).resolve()}"
     subprocess.run(["just", "--justfile", justfile(), "pi", path, *args])
@@ -45,7 +47,8 @@ def run_pi(path: str, args: Tuple[str, ...]) -> None:
 @click.command("opc")
 @click.argument("path")
 @click.argument("args", nargs=-1)
-def run_opc(path: str, args: Tuple[str, ...]) -> None:
+@click.option("--rebuild-image", is_flag=True, default=False, help="Rebuild the container image before running.")
+def run_opc(path: str, args: Tuple[str, ...], rebuild_image: bool) -> None:
     """Run OpenCode coding agent.
     
     OpenCode is an AI-powered coding assistant designed for
@@ -54,6 +57,7 @@ def run_opc(path: str, args: Tuple[str, ...]) -> None:
     Args:
         path: Directory or file path to work on.
         args: Additional arguments to pass to OpenCode.
+        rebuild_image: If set, rebuild the container image before running.
     """
     path = f"{Path(path).resolve()}"
     subprocess.run(["just", "--justfile", justfile(), "opc", path, *args])
@@ -62,7 +66,8 @@ def run_opc(path: str, args: Tuple[str, ...]) -> None:
 @click.command("aic")
 @click.argument("path")
 @click.argument("args", nargs=-1)
-def run_aic(path: str, args: Tuple[str, ...]) -> None:
+@click.option("--rebuild-image", is_flag=True, default=False, help="Rebuild the container image before running.")
+def run_aic(path: str, args: Tuple[str, ...], rebuild_image: bool) -> None:
     """Run aichat/aichat-command.
     
     AIChat is an interactive AI chat interface for code assistance
@@ -71,6 +76,7 @@ def run_aic(path: str, args: Tuple[str, ...]) -> None:
     Args:
         path: Directory or file path to work on.
         args: Additional arguments to pass to AIChat.
+        rebuild_image: If set, rebuild the container image before running.
     """
     path = f"{Path(path).resolve()}"
     subprocess.run(["just", "--justfile", justfile(), "aic", path, *args])
@@ -79,7 +85,8 @@ def run_aic(path: str, args: Tuple[str, ...]) -> None:
 @click.command("llm")
 @click.argument("path")
 @click.argument("args", nargs=-1)
-def run_llm(path: str, args: Tuple[str, ...]) -> None:
+@click.option("--rebuild-image", is_flag=True, default=False, help="Rebuild the container image before running.")
+def run_llm(path: str, args: Tuple[str, ...], rebuild_image: bool) -> None:
     """Run llm/llm-command.
     
     LLM is a command-line tool for interacting with large language models
@@ -88,6 +95,7 @@ def run_llm(path: str, args: Tuple[str, ...]) -> None:
     Args:
         path: Directory or file path to work on.
         args: Additional arguments to pass to LLM.
+        rebuild_image: If set, rebuild the container image before running.
     """
     path = f"{Path(path).resolve()}"
     subprocess.run(["just", "--justfile", justfile(), "llm", path, *args])
@@ -95,7 +103,8 @@ def run_llm(path: str, args: Tuple[str, ...]) -> None:
 
 @click.command("shell")
 @click.argument("path")
-def shell(path: str) -> None:
+@click.option("--rebuild-image", is_flag=True, default=False, help="Rebuild the container image before running.")
+def shell(path: str, rebuild_image: bool) -> None:
     """Open a shell in the AI container.
     
     Launch an interactive shell session within the AI container
@@ -103,6 +112,7 @@ def shell(path: str) -> None:
     
     Args:
         path: Directory or file path to mount in the container.
+        rebuild_image: If set, rebuild the container image before running.
     """
     path = f"{Path(path).resolve()}"
     subprocess.run(["just", "--justfile", justfile(), "shell", path])
@@ -118,6 +128,13 @@ def _image(rebuild: bool = False) -> None:
     if result.returncode != 0 or rebuild:
         subprocess.run(["just", "--justfile", justfile(), "build"])
 
+@click.command("rebuild-image")
+def rebuild_image() -> None:
+    """Rebuilds the container image.
+
+    Running an image rebuild ensures the latest tool versions are persistently installed in the container.
+    """
+    subprocess.run(["just", "--justfile", justfile(), "build"])
 
 # Overriding commands to include image existence check
 def ensure_image(original_func: Callable[..., Any]) -> Callable[..., Any]:
@@ -130,7 +147,7 @@ def ensure_image(original_func: Callable[..., Any]) -> Callable[..., Any]:
         Callable: A wrapper function that checks the image before execution.
     """
     def wrapper(*args: Any, **kwargs: Any) -> Any:
-        _image(rebuild=False)
+        _image(rebuild=kwargs.pop("rebuild_image", False))
         return original_func(*args, **kwargs)
 
     return wrapper
@@ -141,6 +158,7 @@ ai.add_command(run_opc)
 ai.add_command(run_aic)
 ai.add_command(run_llm)
 ai.add_command(shell)
+ai.add_command(rebuild_image)
 run_pi.callback = ensure_image(run_pi.callback)
 run_opc.callback = ensure_image(run_opc.callback)
 run_aic.callback = ensure_image(run_aic.callback)
