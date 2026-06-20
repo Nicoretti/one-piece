@@ -8,6 +8,7 @@ dependencies = [
     "click",
     "rich-click>=1.8.0",
     "podman>=5.8.0",
+    "rich>=14.3.1",
 ]
 
 # Include the Containerfile in the package

@@ -4,32 +4,52 @@ The actual interactive container launches still go through ``podman run -it``
 (see :func:`run_container`) because attaching an interactive TTY is handled far
 more reliably by the CLI than over the REST socket.
 """
+
 from __future__ import annotations
 
 import importlib.resources
+import logging
 import subprocess
 import sys
+from inspect import cleandoc
+from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Iterator, Sequence
 
-import rich_click as click
 from podman import PodmanClient
 from podman.errors import APIError, PodmanError
 
+log = logging.getLogger(__name__)
+
 IMAGE_NAME = "aic"
 CONTAINERFILE = "Containerfile"
+VOLUME_LABEL = "aic"
+WORKSPACE_MOUNT = "/workspace"
+PI_VOLUME = "pi-config"
 
-# Named volumes that persist tool configuration/state across runs.
-VOLUMES = ("state", "share", "config", "pi-config")
-
-# Where each named volume is mounted inside the container.
 VOLUME_MOUNTS = {
     "state": "/root/.local/state",
     "share": "/root/.local/share",
     "config": "/root/.config",
-    "pi-config": "/root/.pi",
+    PI_VOLUME: "/root/.pi",
 }
+
+VOLUMES = tuple(VOLUME_MOUNTS)
+
+SERVICE_HINT = (
+    cleandoc(
+        """
+    Could not reach the Podman service.
+    Start it with:
+      systemctl --user enable --now podman.socket
+    or run it directly:
+      podman system service --time=0
+
+    Underlying error: {error}
+    """
+    )
+    + "\n"
+)
 
 
 def package_dir() -> Path:
@@ -53,16 +73,7 @@ def podman_client() -> Iterator[PodmanClient]:
             raise PodmanError("Podman service did not respond to ping.")
         yield client
     except (APIError, PodmanError, FileNotFoundError, ConnectionError) as exc:
-        click.secho(
-            "Could not reach the Podman service.\n"
-            "Start it with:\n"
-            "  systemctl --user enable --now podman.socket\n"
-            "or run it directly:\n"
-            "  podman system service --time=0\n"
-            f"\nUnderlying error: {exc}",
-            fg="red",
-            err=True,
-        )
+        log.error(SERVICE_HINT.format(error=exc))
         client.close()
         sys.exit(1)
     finally:
@@ -78,7 +89,7 @@ def image_exists() -> bool:
 def build_image() -> None:
     """Build the ``aic`` image from the packaged Containerfile."""
     context = package_dir()
-    click.secho(f"Building image '{IMAGE_NAME}' from {context}...", fg="cyan")
+    log.info("Building image '%s' from %s...", IMAGE_NAME, context)
     with podman_client() as client:
         _, logs = client.images.build(
             path=str(context),
@@ -87,37 +98,43 @@ def build_image() -> None:
             rm=True,
             pull=True,
         )
-        for chunk in logs:
-            stream = chunk.get("stream") if isinstance(chunk, dict) else None
-            if stream:
-                click.echo(stream, nl=False)
-            error = chunk.get("error") if isinstance(chunk, dict) else None
-            if error:
-                click.secho(error, fg="red", err=True)
+        for chunk in (c for c in logs if isinstance(c, dict)):
+            if stream := chunk.get("stream"):
+                if line := stream.strip():
+                    log.info(line)
+            if error := chunk.get("error"):
+                log.error(error)
                 sys.exit(1)
-    click.secho(f"Image '{IMAGE_NAME}' built.", fg="green")
+    log.info("Image '%s' built.", IMAGE_NAME)
 
 
 def ensure_volumes() -> None:
-    """Create the persistence volumes if they do not already exist."""
+    """Create the persistence volumes that do not already exist."""
     with podman_client() as client:
-        for name in VOLUMES:
-            if not client.volumes.exists(name):
-                client.volumes.create(name=name, labels={"aic": ""})
+        missing = (name for name in VOLUMES if not client.volumes.exists(name))
+        for name in missing:
+            client.volumes.create(name=name, labels={VOLUME_LABEL: ""})
 
 
-def ensure_image(rebuild: bool = False) -> None:
+def ensure_image(*, rebuild: bool = False) -> None:
     """Ensure the image is available, building it when needed."""
     if rebuild or not image_exists():
         build_image()
 
 
-def _volume_args() -> list[str]:
-    """Build the ``--volume`` arguments for the named persistence volumes."""
-    args: list[str] = []
-    for name, target in VOLUME_MOUNTS.items():
-        args += ["--volume", f"{name}:{target}"]
-    return args
+def _volume_specs(path: str, *, include_pi_volume: bool) -> list[str]:
+    """Return ``name:target`` volume specs for a container run.
+
+    Selection (which volumes to mount) is kept separate from the host
+    workspace bind mount.
+    """
+    host_path = str(Path(path).resolve())
+    named = (
+        f"{name}:{target}"
+        for name, target in VOLUME_MOUNTS.items()
+        if include_pi_volume or name != PI_VOLUME
+    )
+    return [f"{host_path}:{WORKSPACE_MOUNT}:rw,z", *named]
 
 
 def run_container(
@@ -138,16 +155,9 @@ def run_container(
     Returns:
         The container process exit code.
     """
-    host_path = str(Path(path).resolve())
+    specs = _volume_specs(path, include_pi_volume=include_pi_volume)
+    volume_args = [arg for spec in specs for arg in ("--volume", spec)]
+    trailing = ["."] if workdir_arg else []
 
-    volume_args: list[str] = ["--volume", f"{host_path}:/workspace:rw,z"]
-    for name, target in VOLUME_MOUNTS.items():
-        if name == "pi-config" and not include_pi_volume:
-            continue
-        volume_args += ["--volume", f"{name}:{target}"]
-
-    cmd = ["podman", "run", *volume_args, "-it", IMAGE_NAME, *command]
-    if workdir_arg:
-        cmd.append(".")
-
+    cmd = ["podman", "run", *volume_args, "-it", IMAGE_NAME, *command, *trailing]
     return subprocess.run(cmd).returncode

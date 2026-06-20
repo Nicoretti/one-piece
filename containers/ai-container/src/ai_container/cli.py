@@ -1,5 +1,7 @@
-from typing import Tuple
+import logging
+
 import rich_click as click
+from rich.logging import RichHandler
 
 from ai_container._podman import (
     build_image,
@@ -9,20 +11,30 @@ from ai_container._podman import (
 )
 
 
+def _configure_logging() -> None:
+    """Route library log records to the console via rich."""
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(message)s",
+        datefmt="[%X]",
+        handlers=[RichHandler(show_path=False, rich_tracebacks=True)],
+    )
+
+
 @click.group()
 def ai() -> None:
     """AI Container Command Tools.
 
     A unified interface for running various AI coding agents and tools
-    within containers. Supports PI, OpenCode, aichat, and llm commands.
+    within an isolated container. Supports PI, OpenCode, aichat, and llm commands.
 
     Podman setup (image build, volume creation) is handled through the
     Podman SDK.
     """
-    pass
+    _configure_logging()
 
 
-def _prepare(rebuild_image: bool) -> None:
+def _prepare(*, rebuild_image: bool) -> None:
     """Ensure the image and persistence volumes are ready before a run."""
     ensure_image(rebuild=rebuild_image)
     ensure_volumes()
@@ -32,7 +44,7 @@ def _prepare(rebuild_image: bool) -> None:
 @click.argument("path")
 @click.argument("args", nargs=-1)
 @click.option("--rebuild-image", is_flag=True, help="Rebuild the container image before running.")
-def run_pi(path: str, args: Tuple[str, ...], rebuild_image: bool = False) -> None:
+def run_pi(path: str, args: tuple[str, ...], rebuild_image: bool = False) -> None:
     """Run PI coding agent.
 
     PI is a powerful coding agent that helps with code generation,
@@ -43,7 +55,7 @@ def run_pi(path: str, args: Tuple[str, ...], rebuild_image: bool = False) -> Non
         args: Additional arguments to pass to PI.
         rebuild_image: If set, rebuild the container image before running.
     """
-    _prepare(rebuild_image)
+    _prepare(rebuild_image=rebuild_image)
     run_container(path, ["pi", *args])
 
 
@@ -51,7 +63,7 @@ def run_pi(path: str, args: Tuple[str, ...], rebuild_image: bool = False) -> Non
 @click.argument("path")
 @click.argument("args", nargs=-1)
 @click.option("--rebuild-image", is_flag=True, help="Rebuild the container image before running.")
-def run_opc(path: str, args: Tuple[str, ...], rebuild_image: bool = False) -> None:
+def run_opc(path: str, args: tuple[str, ...], rebuild_image: bool = False) -> None:
     """Run OpenCode coding agent.
 
     OpenCode is an AI-powered coding assistant designed for
@@ -62,7 +74,7 @@ def run_opc(path: str, args: Tuple[str, ...], rebuild_image: bool = False) -> No
         args: Additional arguments to pass to OpenCode.
         rebuild_image: If set, rebuild the container image before running.
     """
-    _prepare(rebuild_image)
+    _prepare(rebuild_image=rebuild_image)
     run_container(path, ["opencode", *args], include_pi_volume=False, workdir_arg=True)
 
 
@@ -70,7 +82,7 @@ def run_opc(path: str, args: Tuple[str, ...], rebuild_image: bool = False) -> No
 @click.argument("path")
 @click.argument("args", nargs=-1)
 @click.option("--rebuild-image", is_flag=True, help="Rebuild the container image before running.")
-def run_aic(path: str, args: Tuple[str, ...], rebuild_image: bool = False) -> None:
+def run_aic(path: str, args: tuple[str, ...], rebuild_image: bool = False) -> None:
     """Run aichat/aichat-command.
 
     AIChat is an interactive AI chat interface for code assistance
@@ -81,7 +93,7 @@ def run_aic(path: str, args: Tuple[str, ...], rebuild_image: bool = False) -> No
         args: Additional arguments to pass to AIChat.
         rebuild_image: If set, rebuild the container image before running.
     """
-    _prepare(rebuild_image)
+    _prepare(rebuild_image=rebuild_image)
     run_container(path, ["aichat", *args], include_pi_volume=False)
 
 
@@ -89,7 +101,7 @@ def run_aic(path: str, args: Tuple[str, ...], rebuild_image: bool = False) -> No
 @click.argument("path")
 @click.argument("args", nargs=-1)
 @click.option("--rebuild-image", is_flag=True, help="Rebuild the container image before running.")
-def run_llm(path: str, args: Tuple[str, ...], rebuild_image: bool = False) -> None:
+def run_llm(path: str, args: tuple[str, ...], rebuild_image: bool = False) -> None:
     """Run llm/llm-command.
 
     LLM is a command-line tool for interacting with large language models
@@ -100,7 +112,7 @@ def run_llm(path: str, args: Tuple[str, ...], rebuild_image: bool = False) -> No
         args: Additional arguments to pass to LLM.
         rebuild_image: If set, rebuild the container image before running.
     """
-    _prepare(rebuild_image)
+    _prepare(rebuild_image=rebuild_image)
     run_container(path, ["uvx", "llm", *args], include_pi_volume=False)
 
 
@@ -117,7 +129,7 @@ def shell(path: str, rebuild_image: bool = False) -> None:
         path: Directory or file path to mount in the container.
         rebuild_image: If set, rebuild the container image before running.
     """
-    _prepare(rebuild_image)
+    _prepare(rebuild_image=rebuild_image)
     run_container(path, ["/bin/bash"])
 
 

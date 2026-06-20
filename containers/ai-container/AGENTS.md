@@ -66,7 +66,7 @@ uv.lock                     # locked dependency set (commit this)
 .python-version             # pinned Python version
 src/ai_container/
   cli.py                    # Click command definitions
-  podman_setup.py           # Podman SDK helpers (build/volumes/run)
+  _podman.py           # Podman SDK helpers (build/volumes/run)
   Containerfile             # image definition, shipped as package data
 README.md
 ```
@@ -76,12 +76,12 @@ README.md
 - **CLI:** use `rich_click as click`. Add new commands in `cli.py` and register
   them with `ai.add_command(...)`. Call `_prepare(rebuild_image)` before any
   container run so the image and volumes exist.
-- **Podman work:** put any image/volume/network logic in `podman_setup.py`
+- **Podman work:** put any image/volume/network logic in `_podman.py`
   using the SDK (`PodmanClient`). Only fall back to `podman run` subprocess for
   interactive TTY sessions.
 - **Type hints:** all functions are typed; keep docstrings (Google style) on
   public functions.
-- **Imports:** use absolute imports (`from ai_container.podman_setup import ...`).
+- **Imports:** use absolute imports (`from ai_container._podman import ...`).
 
 ## Validation before finishing
 
