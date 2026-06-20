@@ -28,8 +28,8 @@ def ai() -> None:
 @click.command("pi")
 @click.argument("path")
 @click.argument("args", nargs=-1)
-@click.option("--rebuild-image", is_flag=True, default=False, help="Rebuild the container image before running.")
-def run_pi(path: str, args: Tuple[str, ...], rebuild_image: bool) -> None:
+@click.option("--rebuild-image", is_flag=True, help="Rebuild the container image before running.")
+def run_pi(path: str, args: Tuple[str, ...], rebuild_image: bool = False) -> None:
     """Run PI coding agent.
     
     PI is a powerful coding agent that helps with code generation,
@@ -47,8 +47,8 @@ def run_pi(path: str, args: Tuple[str, ...], rebuild_image: bool) -> None:
 @click.command("opc")
 @click.argument("path")
 @click.argument("args", nargs=-1)
-@click.option("--rebuild-image", is_flag=True, default=False, help="Rebuild the container image before running.")
-def run_opc(path: str, args: Tuple[str, ...], rebuild_image: bool) -> None:
+@click.option("--rebuild-image", is_flag=True, help="Rebuild the container image before running.")
+def run_opc(path: str, args: Tuple[str, ...], rebuild_image: bool = False) -> None:
     """Run OpenCode coding agent.
     
     OpenCode is an AI-powered coding assistant designed for
@@ -66,8 +66,8 @@ def run_opc(path: str, args: Tuple[str, ...], rebuild_image: bool) -> None:
 @click.command("aic")
 @click.argument("path")
 @click.argument("args", nargs=-1)
-@click.option("--rebuild-image", is_flag=True, default=False, help="Rebuild the container image before running.")
-def run_aic(path: str, args: Tuple[str, ...], rebuild_image: bool) -> None:
+@click.option("--rebuild-image", is_flag=True, help="Rebuild the container image before running.")
+def run_aic(path: str, args: Tuple[str, ...], rebuild_image: bool = False) -> None:
     """Run aichat/aichat-command.
     
     AIChat is an interactive AI chat interface for code assistance
@@ -85,8 +85,8 @@ def run_aic(path: str, args: Tuple[str, ...], rebuild_image: bool) -> None:
 @click.command("llm")
 @click.argument("path")
 @click.argument("args", nargs=-1)
-@click.option("--rebuild-image", is_flag=True, default=False, help="Rebuild the container image before running.")
-def run_llm(path: str, args: Tuple[str, ...], rebuild_image: bool) -> None:
+@click.option("--rebuild-image", is_flag=True, help="Rebuild the container image before running.")
+def run_llm(path: str, args: Tuple[str, ...], rebuild_image: bool = False) -> None:
     """Run llm/llm-command.
     
     LLM is a command-line tool for interacting with large language models
@@ -103,8 +103,8 @@ def run_llm(path: str, args: Tuple[str, ...], rebuild_image: bool) -> None:
 
 @click.command("shell")
 @click.argument("path")
-@click.option("--rebuild-image", is_flag=True, default=False, help="Rebuild the container image before running.")
-def shell(path: str, rebuild_image: bool) -> None:
+@click.option("--rebuild-image", is_flag=True, help="Rebuild the container image before running.")
+def shell(path: str, rebuild_image: bool = False) -> None:
     """Open a shell in the AI container.
     
     Launch an interactive shell session within the AI container
