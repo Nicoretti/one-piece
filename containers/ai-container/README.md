@@ -15,6 +15,12 @@ For this reason, I believe it is essential to implement clear restrictions or a 
 
 - **Podman** (>= 4.0) - Container runtime. [Install](https://podman.io/docs/installation)
 - **Python** (>= 3.13) - Required for the CLI. [Install](https://www.python.org/downloads/)
+- **uv** - Used to install and run the CLI. [Install](https://docs.astral.sh/uv/)
+
+Image builds and volume creation are performed through the
+[Podman Python SDK](https://github.com/containers/podman-py), which talks to
+the Podman service socket. Make sure the socket is running:
+
 
 ## Installation
 
@@ -53,7 +59,9 @@ ai pi /path/to/project --verbose --model claude-3-sonnet
 
 ### Rebuilding the Container Image
 
-The container image is built automatically on first use. When you want to pull in the latest tool versions, you can force a rebuild in two ways:
+The container image is built automatically on first use via the Podman SDK.
+When you want to pull in the latest tool versions, you can force a rebuild in
+two ways:
 
 **Standalone rebuild command** — rebuilds the image without running any tool:
 ```bash

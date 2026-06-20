@@ -5,18 +5,17 @@ description = "AI - Tool/Agent isolation"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "rust-just>=1.46.0",
     "click",
     "rich-click>=1.8.0",
+    "podman>=5.8.0",
 ]
 
-# Include justfile and Containerfile in the package
+# Include the Containerfile in the package
 [tool]
 packages = ["ai_container"]
 
 [project.scripts]
 ai = "ai_container.cli:ai"
-
 
 [build-system]
 requires = ["hatchling"]
