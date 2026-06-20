@@ -19,6 +19,7 @@ RUN uv tool install llm
 # Install OpenCode
 RUN npm i -g opencode-ai
 # Install PI
-RUN npm install -g @mariozechner/pi-coding-agent
+RUN npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+
 
 WORKDIR /workspace
