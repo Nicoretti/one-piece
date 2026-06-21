@@ -7,6 +7,7 @@ more reliably by the CLI than over the REST socket.
 
 from __future__ import annotations
 
+import json
 import importlib.resources
 import logging
 import subprocess
@@ -18,8 +19,10 @@ from pathlib import Path
 
 from podman import PodmanClient
 from podman.errors import APIError, PodmanError
+from rich.console import Console
 
 log = logging.getLogger(__name__)
+stderr = Console(stderr=True)
 
 IMAGE_NAME = "aic"
 CONTAINERFILE = "Containerfile"
@@ -37,18 +40,18 @@ VOLUME_MOUNTS = {
 VOLUMES = tuple(VOLUME_MOUNTS)
 
 SERVICE_HINT = (
-    cleandoc(
+        cleandoc(
+            """
+        Could not reach the Podman service.
+        Start it with:
+          systemctl --user enable --now podman.socket
+        or run it directly:
+          podman system service --time=0
+    
+        Underlying error: {error}
         """
-    Could not reach the Podman service.
-    Start it with:
-      systemctl --user enable --now podman.socket
-    or run it directly:
-      podman system service --time=0
-
-    Underlying error: {error}
-    """
-    )
-    + "\n"
+        )
+        + "\n"
 )
 
 
@@ -90,7 +93,8 @@ def build_image() -> None:
     """Build the ``aic`` image from the packaged Containerfile."""
     context = package_dir()
     log.info("Building image '%s' from %s...", IMAGE_NAME, context)
-    with podman_client() as client:
+    spinner = stderr.status(f"Building image '{IMAGE_NAME}'...", spinner="dots")
+    with podman_client() as client, spinner:
         _, logs = client.images.build(
             path=str(context),
             dockerfile=CONTAINERFILE,
@@ -98,7 +102,9 @@ def build_image() -> None:
             rm=True,
             pull=True,
         )
-        for chunk in (c for c in logs if isinstance(c, dict)):
+        logs = (log.decode() for log in logs)
+        logs = (json.loads(log) for log in logs)
+        for chunk in logs:
             if stream := chunk.get("stream"):
                 if line := stream.strip():
                     log.info(line)
@@ -138,11 +144,11 @@ def _volume_specs(path: str, *, include_pi_volume: bool) -> list[str]:
 
 
 def run_container(
-    path: str,
-    command: Sequence[str],
-    *,
-    include_pi_volume: bool = True,
-    workdir_arg: bool = False,
+        path: str,
+        command: Sequence[str],
+        *,
+        include_pi_volume: bool = True,
+        workdir_arg: bool = False,
 ) -> int:
     """Launch an interactive container.
 
