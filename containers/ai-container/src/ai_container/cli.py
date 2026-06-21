@@ -47,7 +47,13 @@ TOOLS = {
     show_default=True,
     help="Set the logging verbosity.",
 )
-def ai(log_level: str) -> None:
+@click.option(
+    "--dryrun",
+    is_flag=True,
+    help="Print the podman commands that would run instead of executing them.",
+)
+@click.pass_context
+def ai(ctx: click.Context, log_level: str, dryrun: bool) -> None:
     """AI Container Command Tool.
 
     A unified interface for running AI coding agents and tools within a container. 
@@ -60,44 +66,48 @@ def ai(log_level: str) -> None:
         datefmt="[%X]",
         handlers=[RichHandler(console=Console(stderr=True), rich_tracebacks=True)],
     )
+    ctx.obj = dryrun
 
 
-def _prepare() -> None:
+def _prepare(*, dryrun: bool = False) -> None:
     """Ensure the image and persistence volumes are ready before a run."""
-    ensure_image()
-    ensure_volumes()
+    ensure_image(dryrun=dryrun)
+    ensure_volumes(dryrun=dryrun)
 
 
 @click.command("agent")
 @click.argument("tool", type=click.Choice(list(TOOLS)), help="Which registered tool to launch")
 @click.argument("path", help="Directory or file path to work on")
 @click.argument("args", nargs=-1, help="Additional arguments to pass to the tool")
-def agent(tool: str, path: str, args: tuple[str, ...]) -> None:
+@click.pass_obj
+def agent(dryrun: bool, tool: str, path: str, args: tuple[str, ...]) -> None:
     """Start a specific AI-agent/tool.
 
     TOOL is one of: pi, opc (OpenCode), aic (aichat), llm.
     Remaining ARGS are passed straight through to the tool, e.g. ``ai agent pi /path --model x``.
     """
-    _prepare()
+    _prepare(dryrun=dryrun)
     spec = TOOLS[tool]
     run_container(
         path,
         [*spec.command, *args],
         include_pi_volume=spec.include_pi_volume,
         workdir_arg=spec.workdir_arg,
+        dryrun=dryrun,
     )
 
 
 @click.command("shell")
 @click.argument("path", help="Directory or file path to mount in the container")
-def shell(path: str) -> None:
+@click.pass_obj
+def shell(dryrun: bool, path: str) -> None:
     """Open a shell in the AI container.
 
     Launch an interactive shell session within the AI container
     for manual command execution and exploration.
     """
-    _prepare()
-    run_container(path, ["/bin/bash"])
+    _prepare(dryrun=dryrun)
+    run_container(path, ["/bin/bash"], dryrun=dryrun)
 
 
 @click.group("image")
@@ -107,13 +117,14 @@ def image() -> None:
 
 
 @image.command("rebuild")
-def image_rebuild() -> None:
+@click.pass_obj
+def image_rebuild(dryrun: bool) -> None:
     """Rebuild the container image.
 
     Running an image rebuild ensures the latest tool versions are
     persistently installed in the container.
     """
-    build_image()
+    build_image(dryrun=dryrun)
 
 
 ai.add_command(agent)

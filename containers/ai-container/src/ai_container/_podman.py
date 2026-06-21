@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import importlib.resources
 import logging
+import shlex
 import subprocess
 import sys
 from inspect import cleandoc
@@ -23,6 +24,7 @@ from rich.console import Console
 
 log = logging.getLogger(__name__)
 stderr = Console(stderr=True)
+stdout = Console()
 
 IMAGE_NAME = "aic"
 CONTAINERFILE = "Containerfile"
@@ -53,6 +55,11 @@ SERVICE_HINT = (
         )
         + "\n"
 )
+
+
+def _emit(cmd: Sequence[str]) -> None:
+    """Print a podman command instead of executing it (dry run)."""
+    stdout.print(shlex.join(cmd), soft_wrap=True, highlight=False)
 
 
 def package_dir() -> Path:
@@ -89,9 +96,20 @@ def image_exists() -> bool:
         return client.images.exists(IMAGE_NAME)
 
 
-def build_image() -> None:
+def build_image(*, dryrun: bool = False) -> None:
     """Build the ``aic`` image from the packaged Containerfile."""
     context = package_dir()
+    if dryrun:
+        _emit(
+            [
+                "podman", "build",
+                "--tag", IMAGE_NAME,
+                "--rm", "--pull",
+                "--file", CONTAINERFILE,
+                str(context),
+            ]
+        )
+        return
     log.info("Building image '%s' from %s...", IMAGE_NAME, context)
     spinner = stderr.status(f"Building image '{IMAGE_NAME}'...", spinner="dots")
     with podman_client() as client, spinner:
@@ -114,18 +132,21 @@ def build_image() -> None:
     log.info("Image '%s' built.", IMAGE_NAME)
 
 
-def ensure_volumes() -> None:
+def ensure_volumes(*, dryrun: bool = False) -> None:
     """Create the persistence volumes that do not already exist."""
     with podman_client() as client:
         missing = (name for name in VOLUMES if not client.volumes.exists(name))
         for name in missing:
-            client.volumes.create(name=name, labels={VOLUME_LABEL: ""})
+            if dryrun:
+                _emit(["podman", "volume", "create", "--label", f"{VOLUME_LABEL}=", name])
+            else:
+                client.volumes.create(name=name, labels={VOLUME_LABEL: ""})
 
 
-def ensure_image(*, rebuild: bool = False) -> None:
+def ensure_image(*, rebuild: bool = False, dryrun: bool = False) -> None:
     """Ensure the image is available, building it when needed."""
     if rebuild or not image_exists():
-        build_image()
+        build_image(dryrun=dryrun)
 
 
 def _volume_specs(path: str, *, include_pi_volume: bool) -> list[str]:
@@ -149,6 +170,7 @@ def run_container(
         *,
         include_pi_volume: bool = True,
         workdir_arg: bool = False,
+        dryrun: bool = False,
 ) -> int:
     """Launch an interactive container.
 
@@ -157,6 +179,7 @@ def run_container(
         command: Command (and args) to execute inside the container.
         include_pi_volume: Whether to mount the ``pi-config`` volume.
         workdir_arg: If True, append ``.`` after the command (used by opencode).
+        dryrun: If True, print the ``podman run`` command instead of running it.
 
     Returns:
         The container process exit code.
@@ -166,4 +189,7 @@ def run_container(
     trailing = ["."] if workdir_arg else []
 
     cmd = ["podman", "run", *volume_args, "-it", IMAGE_NAME, *command, *trailing]
+    if dryrun:
+        _emit(cmd)
+        return 0
     return subprocess.run(cmd).returncode
