@@ -1,6 +1,9 @@
+import logging
 from dataclasses import dataclass
 
 import rich_click as click
+from rich.console import Console
+from rich.logging import RichHandler
 
 from ai_container._podman import (
     build_image,
@@ -8,6 +11,8 @@ from ai_container._podman import (
     ensure_volumes,
     run_container,
 )
+
+LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL")
 
 
 @dataclass(frozen=True)
@@ -35,14 +40,26 @@ TOOLS = {
 
 
 @click.group()
-def ai() -> None:
+@click.option(
+    "--log-level",
+    type=click.Choice(LOG_LEVELS, case_sensitive=False),
+    default="INFO",
+    show_default=True,
+    help="Set the logging verbosity.",
+)
+def ai(log_level: str) -> None:
     """AI Container Command Tool.
 
     A unified interface for running AI coding agents and tools within a container. 
     Use ``ai agent <tool> <path> [args]`` to invoke a tool, ``ai shell <path>`` for an interactive shell
     or ``ai image rebuild`` to refresh the contaier image.
     """
-    pass
+    logging.basicConfig(
+        level=log_level.upper(),
+        format="%(message)s",
+        datefmt="[%X]",
+        handlers=[RichHandler(console=Console(stderr=True), rich_tracebacks=True)],
+    )
 
 
 def _prepare() -> None:
