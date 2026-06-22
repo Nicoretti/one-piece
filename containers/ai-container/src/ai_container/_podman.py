@@ -36,6 +36,7 @@ VOLUME_MOUNTS = {
     "state": "/root/.local/state",
     "share": "/root/.local/share",
     "config": "/root/.config",
+    "claude": "/root/.claude",
     PI_VOLUME: "/root/.pi",
 }
 

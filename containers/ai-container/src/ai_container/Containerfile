@@ -10,6 +10,17 @@ RUN sudo dnf update -y \
     && sudo dnf upgrade -y \
     && sudo dnf install curl nodejs -y
 
+# Install claude code
+RUN sudo tee /etc/yum.repos.d/claude-code.repo <<'EOF'
+[claude-code]  
+name=Claude Code
+baseurl=https://downloads.claude.ai/claude-code/rpm/stable
+enabled=1
+gpgcheck=1
+gpgkey=https://downloads.claude.ai/keys/claude-code.asc
+EOF
+RUN sudo dnf install -y claude-code
+
 # Install Aichat
 COPY --from=build /workdir/aichat /usr/local/bin/aichat
 # Install UV
@@ -20,6 +31,7 @@ RUN uv tool install llm
 RUN npm i -g opencode-ai
 # Install PI
 RUN npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+RUN pi install npm:@cgaravitoq/pi-claude-code-auth
 
 
 WORKDIR /workspace

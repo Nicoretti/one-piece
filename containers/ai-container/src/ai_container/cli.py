@@ -34,6 +34,7 @@ class Tool:
 TOOLS = {
     "pi": Tool(("pi",), include_pi_volume=True),
     "opc": Tool(("opencode",), workdir_arg=True),
+    "claude": Tool(("claude",)),
     "aic": Tool(("aichat",)),
     "llm": Tool(("uvx", "llm")),
 }
