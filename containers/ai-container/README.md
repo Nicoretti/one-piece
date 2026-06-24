@@ -69,6 +69,50 @@ When you want to pull in the latest tool versions, force a rebuild with the
 ```bash
 ai image rebuild
 ```
+
+### Custom Environments
+
+Need a specific toolchain (Rust, Go, an extra editor, ...)? Define a **custom
+environment**: a thin image built `FROM aic:base` that adds your tooling on top
+of everything the base image already provides.
+
+Select an environment for any command with `-e/--env`:
+
+```bash
+ai -e rust shell .            # shell in the rust environment
+ai -e rust agent pi .         # run pi in the rust environment
+ai -e rust image rebuild      # (re)build the rust image (FROM aic:base)
+```
+
+Manage environment definitions with the `env` group:
+
+```bash
+ai env list                   # show environments and whether images are built
+ai env new rust               # scaffold a Containerfile (FROM aic:base)
+ai env new rust --edit        # scaffold and open it in $EDITOR
+ai env edit rust              # edit the Containerfile
+ai env path rust              # print the Containerfile path
+ai env remove rust --purge    # delete the definition (and its image)
+```
+
+Definitions live under `~/.config/ai-container/environments/<name>/`
+(honoring `XDG_CONFIG_HOME`). The directory is also the build context, so you
+can `COPY` local files into your image. A scaffolded `Containerfile` looks like:
+
+```dockerfile
+# rust environment -- extends the ai-container base image.
+FROM aic:base
+
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+    | sh -s -- -y --default-toolchain stable
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+WORKDIR /workspace
+```
+
+Without `-e`, the default `base` environment is used. Persistence volumes
+(`config`, `state`, `share`, `pi-config`, `claude`) are shared across all
+environments, so credentials and config are entered once and work everywhere.
 ### Provided Tools
 - **[PI](https://shittycodingagent.ai)** - Coding agent for generation, analysis, and refactoring
 - **[OpenCode](https://opencode.ai)** - AI-powered coding assistant
