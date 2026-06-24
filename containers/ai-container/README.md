@@ -13,13 +13,17 @@ For this reason, I believe it is essential to implement clear restrictions or a 
 
 ## Prerequisites
 
-- **Podman** (>= 4.0) - Container runtime. [Install](https://podman.io/docs/installation)
+- **Podman** (>= 5.0) - Container runtime. [Install](https://podman.io/docs/installation)
 - **Python** (>= 3.13) - Required for the CLI. [Install](https://www.python.org/downloads/)
 - **uv** - Used to install and run the CLI. [Install](https://docs.astral.sh/uv/)
 
 Image builds and volume creation are performed through the
 [Podman Python SDK](https://github.com/containers/podman-py), which talks to
 the Podman service socket. Make sure the socket is running:
+
+```bash
+systemctl --user enable --now podman.socket
+```
 
 
 ## Installation
@@ -47,13 +51,14 @@ The `ai` command will then be available.
 ```bash
 ai agent pi /path/to/project        # Run PI coding agent
 ai agent opc /path/to/project       # Run OpenCode coding agent
+ai agent claude /path/to/project    # Run Claude Code
 ai agent aic /path/to/project       # Run aichat
 ai agent llm /path/to/project       # Run llm
 ai shell /path/to/project           # Interactive shell in container
 ```
 
 `ai agent <tool> <path> [args]` is the single entry point for every tool.
-Valid tools: `pi`, `opc`, `aic`, `llm`.
+Valid tools: `pi`, `opc`, `claude`, `aic`, `llm`.
 
 Pass additional arguments directly to the tool:
 ```bash
@@ -113,6 +118,7 @@ WORKDIR /workspace
 Without `-e`, the default `base` environment is used. Persistence volumes
 (`config`, `state`, `share`, `pi-config`, `claude`) are shared across all
 environments, so credentials and config are entered once and work everywhere.
+
 ### Config Files
 
 Defaults for the global flags (`-e/--env`, `--log-level`, `--dryrun`) can be set
@@ -137,6 +143,7 @@ dryrun = false
 ### Provided Tools
 - **[PI](https://shittycodingagent.ai)** - Coding agent for generation, analysis, and refactoring
 - **[OpenCode](https://opencode.ai)** - AI-powered coding assistant
+- **[Claude Code](https://www.anthropic.com/claude-code)** - Anthropic's official coding agent
 - **[aichat](https://github.com/sigoden/aichat)** - Interactive AI chat interface
 - **[llm](https://github.com/simonw/llm)** - Command-line tool for LLM interaction
 
@@ -149,8 +156,9 @@ dryrun = false
 - llm: `~/.config/llm/` + environment variables
 - PI: `~/.pi/`
 - OpenCode: `~/.config/opencode/`
+- Claude Code: `~/.claude/`
 
-**Configuration persists automatically across all runs and containers** through named Podman volumes (`config`, `state`, `share`, `pi-config`). Configure once, use everywhere:
+**Configuration persists automatically across all runs and containers** through named Podman volumes (`config`, `state`, `share`, `pi-config`, `claude`). Configure once, use everywhere:
 
 ```bash
 # First run: setup credentials
