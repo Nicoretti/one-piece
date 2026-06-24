@@ -4,9 +4,11 @@ import subprocess
 from dataclasses import dataclass
 
 import rich_click as click
+from click.core import ParameterSource
 from rich.console import Console
 from rich.logging import RichHandler
 
+from ai_container._config import ConfigError, load_config
 from ai_container._podman import (
     BASE_ENV,
     build_image,
@@ -24,11 +26,12 @@ from ai_container._podman import (
 
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL")
 
+log = logging.getLogger(__name__)
 stdout = Console()
 
 
 @dataclass(frozen=True)
-class RunContext:
+class Context:
     """State shared across commands via the Click context.
 
     Attributes:
@@ -70,24 +73,28 @@ TOOLS = {
     "--env",
     "-e",
     "env_name",
-    default=BASE_ENV,
-    show_default=True,
-    help="Which environment (customized image) to use.",
+    default=None,
+    help="Which environment (customized image) to use. [config: env]",
 )
 @click.option(
     "--log-level",
     type=click.Choice(LOG_LEVELS, case_sensitive=False),
-    default="INFO",
-    show_default=True,
-    help="Set the logging verbosity.",
+    default=None,
+    help="Set the logging verbosity. [config: log_level]",
 )
 @click.option(
     "--dryrun",
+    default=None,
     is_flag=True,
     help="Print the podman commands that would run instead of executing them.",
 )
 @click.pass_context
-def ai(ctx: click.Context, env_name: str, log_level: str, dryrun: bool) -> None:
+def ai(
+    ctx: click.Context,
+    env_name: str | None,
+    log_level: str | None,
+    dryrun: bool | None,
+) -> None:
     """AI Container Command Tool.
 
     A unified interface for running AI coding agents and tools within a container.
@@ -95,14 +102,37 @@ def ai(ctx: click.Context, env_name: str, log_level: str, dryrun: bool) -> None:
     interactive shell, ``ai env`` to manage custom environments, or
     ``ai image rebuild`` to refresh the container image. Select an environment with
     ``-e/--env`` (e.g. ``ai -e rust shell .``).
+
+    Defaults come from config files (``.ai-container.toml`` in the project,
+    ``~/.config/ai-container/config.toml``, or ``~/.ai-container.toml``); flags
+    override them.
     """
+    # Configure logging up front (CLI flag, else INFO) so config-loading debug
+    # output is visible; the level is refreshed once the config resolves it.
     logging.basicConfig(
-        level=log_level.upper(),
+        level=(log_level or "INFO").upper(),
         format="%(message)s",
         datefmt="[%X]",
         handlers=[RichHandler(console=Console(stderr=True), rich_tracebacks=True)],
     )
-    ctx.obj = RunContext(env=env_name, dryrun=dryrun)
+    try:
+        config = load_config()
+    except ConfigError as exc:
+        raise click.UsageError(str(exc)) from exc
+    env_name = _resolve_option(ctx, "env_name", env_name, config["env"])
+    log_level = _resolve_option(ctx, "log_level", log_level, config["log_level"])
+    dryrun = _resolve_option(ctx, "dryrun", dryrun, config["dryrun"])
+    logging.getLogger().setLevel(log_level.upper())
+    ctx.obj = Context(env=env_name, dryrun=dryrun)
+
+
+def _resolve_option(ctx: click.Context, name: str, value, fallback):
+    """Return the flag value if the user passed it, else the config fallback."""
+    if ctx.get_parameter_source(name) is ParameterSource.COMMANDLINE:
+        log.debug("Option '%s' from command line: %r", name, value)
+        return value
+    log.debug("Option '%s' from config/default: %r", name, fallback)
+    return fallback
 
 
 def _resolve_env(env: str) -> str:
@@ -115,7 +145,7 @@ def _resolve_env(env: str) -> str:
     return env
 
 
-def _prepare(ctx: RunContext) -> None:
+def _prepare(ctx: Context) -> None:
     """Ensure the image and persistence volumes are ready before a run."""
     _resolve_env(ctx.env)
     ensure_image(ctx.env, dryrun=ctx.dryrun)
@@ -127,7 +157,7 @@ def _prepare(ctx: RunContext) -> None:
 @click.argument("path", help="Directory or file path to work on")
 @click.argument("args", nargs=-1, help="Additional arguments to pass to the tool")
 @click.pass_obj
-def agent(ctx: RunContext, tool: str, path: str, args: tuple[str, ...]) -> None:
+def agent(ctx: Context, tool: str, path: str, args: tuple[str, ...]) -> None:
     """Start a specific AI-agent/tool.
 
     TOOL is one of: pi, opc (OpenCode), claude, aic (aichat), llm.
@@ -148,7 +178,7 @@ def agent(ctx: RunContext, tool: str, path: str, args: tuple[str, ...]) -> None:
 @click.command("shell")
 @click.argument("path", help="Directory or file path to mount in the container")
 @click.pass_obj
-def shell(ctx: RunContext, path: str) -> None:
+def shell(ctx: Context, path: str) -> None:
     """Open a shell in the AI container.
 
     Launch an interactive shell session within the AI container
@@ -166,7 +196,7 @@ def image() -> None:
 
 @image.command("rebuild")
 @click.pass_obj
-def image_rebuild(ctx: RunContext) -> None:
+def image_rebuild(ctx: Context) -> None:
     """Rebuild the container image for the selected environment.
 
     Running an image rebuild ensures the latest tool versions are
@@ -226,7 +256,7 @@ def env_edit(name: str) -> None:
 @click.argument("name", help="Name of the environment to remove")
 @click.option("--purge", is_flag=True, help="Also remove the built image.")
 @click.pass_obj
-def env_remove(ctx: RunContext, name: str, purge: bool) -> None:
+def env_remove(ctx: Context, name: str, purge: bool) -> None:
     """Delete an environment definition (and optionally its image)."""
     try:
         remove_environment(name, purge=purge, dryrun=ctx.dryrun)

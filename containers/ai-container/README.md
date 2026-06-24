@@ -113,6 +113,27 @@ WORKDIR /workspace
 Without `-e`, the default `base` environment is used. Persistence volumes
 (`config`, `state`, `share`, `pi-config`, `claude`) are shared across all
 environments, so credentials and config are entered once and work everywhere.
+### Config Files
+
+Defaults for the global flags (`-e/--env`, `--log-level`, `--dryrun`) can be set
+in a TOML config file, so you don't have to repeat them on every invocation.
+Files are merged from several sources, **highest precedence first**:
+
+1. `./.ai-container.toml` — project-local, in the current working directory
+2. `~/.config/ai-container/config.toml` — user config (honors `XDG_CONFIG_HOME`)
+3. `~/.ai-container.toml` — home dotfile
+4. Built-in defaults
+
+Command-line flags always override config files. Each layer only needs to set
+the keys it cares about; the rest fall through to the next layer.
+
+```toml
+# .ai-container.toml
+env = "rust"        # default environment
+log_level = "DEBUG" # one of: DEBUG, INFO, WARNING, ERROR, CRITICAL
+dryrun = false
+```
+
 ### Provided Tools
 - **[PI](https://shittycodingagent.ai)** - Coding agent for generation, analysis, and refactoring
 - **[OpenCode](https://opencode.ai)** - AI-powered coding assistant
