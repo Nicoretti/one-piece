@@ -37,7 +37,7 @@ launches use `podman run -it` via subprocess.
 
 ## Tooling: uv
 
-This is a **uv-managed** Python project. Always use `uv`; never call `pip`,
+This is a **uv-managed** Python project. Always use `uv`, never call `pip`,
 `python`, or a manually activated venv directly.
 
 | Task | Command |
