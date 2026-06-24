@@ -59,7 +59,7 @@ def ai(ctx: click.Context, log_level: str, dryrun: bool) -> None:
 
     A unified interface for running AI coding agents and tools within a container. 
     Use ``ai agent <tool> <path> [args]`` to invoke a tool, ``ai shell <path>`` for an interactive shell
-    or ``ai image rebuild`` to refresh the contaier image.
+    or ``ai image rebuild`` to refresh the container image.
     """
     logging.basicConfig(
         level=log_level.upper(),
@@ -84,7 +84,7 @@ def _prepare(*, dryrun: bool = False) -> None:
 def agent(dryrun: bool, tool: str, path: str, args: tuple[str, ...]) -> None:
     """Start a specific AI-agent/tool.
 
-    TOOL is one of: pi, opc (OpenCode), aic (aichat), llm.
+    TOOL is one of: pi, opc (OpenCode), claude, aic (aichat), llm.
     Remaining ARGS are passed straight through to the tool, e.g. ``ai agent pi /path --model x``.
     """
     _prepare(dryrun=dryrun)

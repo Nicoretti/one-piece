@@ -38,7 +38,9 @@ VOLUME_MOUNTS = {
     "config": "/root/.config",
     "claude": "/root/.claude",
     PI_VOLUME: "/root/.pi",
+
 }
+ANONYMOUS_VOLUME_OVERLAYS = ["/root/.config/nvim"]
 
 VOLUMES = tuple(VOLUME_MOUNTS)
 
@@ -162,7 +164,7 @@ def _volume_specs(path: str, *, include_pi_volume: bool) -> list[str]:
         for name, target in VOLUME_MOUNTS.items()
         if include_pi_volume or name != PI_VOLUME
     )
-    return [f"{host_path}:{WORKSPACE_MOUNT}:rw,z", *named]
+    return [f"{host_path}:{WORKSPACE_MOUNT}:rw,z", *named, *ANONYMOUS_VOLUME_OVERLAYS]
 
 
 def run_container(
