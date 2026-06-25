@@ -20,6 +20,7 @@ from ai_container._podman import (
     environments_dir,
     image_exists,
     list_environments,
+    parent_of,
     remove_environment,
     run_container,
 )
@@ -200,13 +201,26 @@ def image_rebuild(ctx: Context) -> None:
     """Rebuild the container image for the selected environment.
 
     Running an image rebuild ensures the latest tool versions are
-    persistently installed in the container. Non-base environments are rebuilt
-    ``FROM aic:base``; pass ``-e base`` (the default) to rebuild the base image.
+    persistently installed in the container. The image's ``FROM aic:`` parent
+    chain is ensured first; pass ``-e <name>`` to rebuild a specific image.
     """
     _resolve_env(ctx.env)
-    if ctx.env != BASE_ENV:
-        ensure_image(BASE_ENV, dryrun=ctx.dryrun)
+    parent = parent_of(ctx.env)
+    if parent is not None:
+        ensure_image(parent, dryrun=ctx.dryrun)
     build_image(ctx.env, dryrun=ctx.dryrun)
+
+
+@image.command("list")
+def image_list() -> None:
+    """List all images (built-in and user) with parent and built status."""
+    names = list_environments()
+    width = max((len(name) for name in names), default=0)
+    for name in names:
+        parent = parent_of(name)
+        base = f"FROM aic:{parent}" if parent else "base image"
+        built = "built" if image_exists(name) else "not built"
+        stdout.print(f"{name:<{width}}  [{built:<9}]  ({base})")
 
 
 @click.group("env")
@@ -225,18 +239,27 @@ def env_list() -> None:
 
 @env.command("new")
 @click.argument("name", help="Name of the environment to create")
+@click.option(
+    "--from",
+    "-f",
+    "base",
+    default=BASE_ENV,
+    help="Image to inherit from (built-in or user image). [default: base]",
+)
 @click.option("--edit", "open_editor", is_flag=True, help="Open the new Containerfile in $EDITOR.")
-def env_new(name: str, open_editor: bool) -> None:
+def env_new(name: str, base: str, open_editor: bool) -> None:
     """Scaffold a new environment definition.
 
-    Creates ``environments/<name>/Containerfile`` (extending ``aic:base``) under
-    the user config directory. Build it on first use or with ``ai -e <name> image rebuild``.
+    Creates ``environments/<name>/Containerfile`` (extending ``aic:<base>``)
+    under the user config directory. The base may be any built-in image
+    (base, pi, claude, opencode, aichat, llm, full) or another user
+    environment. Build it on first use or with ``ai -e <name> image rebuild``.
     """
     try:
-        containerfile = create_environment(name)
+        containerfile = create_environment(name, base=base)
     except ValueError as exc:
         raise click.UsageError(str(exc)) from exc
-    stdout.print(f"Created environment '{name}' at {containerfile}")
+    stdout.print(f"Created environment '{name}' at {containerfile} (FROM aic:{base})")
     if open_editor:
         _open_in_editor(containerfile)
 

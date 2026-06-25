@@ -1,0 +1,11 @@
+# aichat on top of the lean base.
+FROM aic:base AS build
+
+WORKDIR /workdir
+ADD https://github.com/sigoden/aichat/releases/download/v0.30.0/aichat-v0.30.0-i686-unknown-linux-musl.tar.gz aichat.tar.gz
+RUN tar xvf aichat.tar.gz
+
+FROM aic:base
+COPY --from=build /workdir/aichat /usr/local/bin/aichat
+
+WORKDIR /workspace

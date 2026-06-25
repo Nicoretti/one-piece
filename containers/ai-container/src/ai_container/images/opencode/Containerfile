@@ -1,0 +1,10 @@
+# OpenCode on top of the lean base.
+FROM aic:base
+
+RUN dnf update -y \
+    && dnf upgrade -y \
+    && dnf install nodejs -y \
+
+RUN npm i -g opencode-ai
+
+WORKDIR /workspace

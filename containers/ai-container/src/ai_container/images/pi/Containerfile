@@ -1,0 +1,13 @@
+# PI coding agent. Inherits from the claude image because the claude CLI is
+# required for PI's authentication for claude subscription auth flow.
+FROM aic:claude
+
+RUN dnf update -y \
+    && dnf upgrade -y \
+    && dnf install nodejs -y
+
+RUN npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+
+RUN pi install npm:@cgaravitoq/pi-claude-code-auth
+
+WORKDIR /workspace

@@ -1,0 +1,8 @@
+# Simon Willison's llm on top of the lean base.
+FROM aic:base
+
+RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="/usr/local/bin" sh
+
+RUN uv tool install llm
+
+WORKDIR /workspace

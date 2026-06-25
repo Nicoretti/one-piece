@@ -1,0 +1,6 @@
+# Python development on top of the PI image.
+FROM aic:pi
+
+RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="/usr/local/bin" sh
+
+WORKDIR /workspace

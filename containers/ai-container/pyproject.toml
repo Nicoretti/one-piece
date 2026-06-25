@@ -1,6 +1,6 @@
 [project]
 name = "ai-container"
-version = "0.14.0"
+version = "0.15.0"
 description = "AI - Tool/Agent isolation"
 readme = "README.md"
 requires-python = ">=3.13"
@@ -11,7 +11,8 @@ dependencies = [
     "rich>=14.3.1",
 ]
 
-# Include the Containerfile in the package
+# The packaged container files under src/ai_container/images/ ships automatically
+# as package data (hatchling includes everything under the package directory).
 [tool]
 packages = ["ai_container"]
 

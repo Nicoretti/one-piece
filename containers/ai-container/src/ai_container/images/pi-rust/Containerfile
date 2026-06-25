@@ -1,0 +1,11 @@
+# Rust toolchain on top of the PI image.
+FROM aic:pi
+
+# Install Rust via rustup (stable toolchain, cargo on PATH).
+ENV CARGO_HOME="/usr/local/cargo"
+ENV RUSTUP_HOME="/usr/local/rustup"
+ENV PATH="${CARGO_HOME}/bin:${PATH}"
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+    | sh -s -- -y --no-modify-path --profile default
+
+WORKDIR /workspace

@@ -1,0 +1,34 @@
+# Kitchen-sink image: every supported tool in one place.
+# Reproduces the original all-in-one image for convenience / back-compat.
+FROM aic:base AS build
+
+# Prepare AI-Chat binary
+WORKDIR /workdir
+ADD https://github.com/sigoden/aichat/releases/download/v0.30.0/aichat-v0.30.0-i686-unknown-linux-musl.tar.gz aichat.tar.gz
+RUN tar xvf aichat.tar.gz
+
+FROM aic:base
+
+# Install claude code
+RUN tee /etc/yum.repos.d/claude-code.repo <<'EOF'
+[claude-code]
+name=Claude Code
+baseurl=https://downloads.claude.ai/claude-code/rpm/stable
+enabled=1
+gpgcheck=1
+gpgkey=https://downloads.claude.ai/keys/claude-code.asc
+EOF
+RUN dnf install -y claude-code
+
+# Install aichat
+COPY --from=build /workdir/aichat /usr/local/bin/aichat
+
+# Install llm
+RUN uv tool install llm
+# Install OpenCode
+RUN npm i -g opencode-ai
+# Install PI
+RUN npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+RUN pi install npm:@cgaravitoq/pi-claude-code-auth
+
+WORKDIR /workspace

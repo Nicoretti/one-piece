@@ -32,11 +32,14 @@ stdout = Console()
 IMAGE_REPO = "aic"
 BASE_ENV = "base"
 CONTAINERFILE = "Containerfile"
+PACKAGED_IMAGES = "images"
+#: Matches the ``FROM aic:<parent>`` line that links an image to its parent.
+FROM_AIC_RE = re.compile(rf"^\s*FROM\s+{IMAGE_REPO}:(\S+)", re.MULTILINE)
 ENV_NAME_RE = re.compile(r"^[a-z0-9][a-z0-9_.-]*$")
 ENV_TEMPLATE = cleandoc(
     """
-    # {name} environment -- extends the ai-container base image.
-    FROM {base}
+    # {name} environment -- extends the ai-container '{base}' image.
+    FROM {base_tag}
 
     # Add your tooling below, e.g.:
     # RUN dnf install -y <packages>
@@ -48,13 +51,13 @@ VOLUME_LABEL = "aic"
 WORKSPACE_MOUNT = "/workspace"
 PI_VOLUME = "pi-config"
 
+# Note: In the long run we might wanna separate credentials and state per container/image type
 VOLUME_MOUNTS = {
     "state": "/root/.local/state",
     "share": "/root/.local/share",
     "config": "/root/.config",
     "claude": "/root/.claude",
     PI_VOLUME: "/root/.pi",
-
 }
 ANONYMOUS_VOLUME_OVERLAYS = ["/root/.config/nvim"]
 
@@ -82,9 +85,19 @@ def _emit(cmd: Sequence[str]) -> None:
 
 
 def package_dir() -> Path:
-    """Return the directory that holds the packaged Containerfile."""
-    with importlib.resources.path("ai_container", CONTAINERFILE) as path:
+    """Return the directory that holds the packaged image graph."""
+    with importlib.resources.path("ai_container", "__init__.py") as path:
         return path.resolve().parent
+
+
+def packaged_images() -> list[str]:
+    """Return the names of the built-in images shipped with the package."""
+    root = package_dir() / PACKAGED_IMAGES
+    return sorted(
+        path.name
+        for path in root.iterdir()
+        if path.is_dir() and (path / CONTAINERFILE).is_file()
+    ) if root.is_dir() else []
 
 
 def image_tag(env: str) -> str:
@@ -108,22 +121,43 @@ def environment_context(env: str) -> Path:
     return environments_dir() / env
 
 
+def image_context(env: str) -> Path | None:
+    """Return the build context for ``env`` (user env shadows packaged image)."""
+    user = environment_context(env)
+    if (user / CONTAINERFILE).is_file():
+        return user
+    packaged = package_dir() / PACKAGED_IMAGES / env
+    return packaged if (packaged / CONTAINERFILE).is_file() else None
+
+
 def environment_exists(env: str) -> bool:
-    """Return True if a definition exists for ``env`` (``base`` always does)."""
-    if env == BASE_ENV:
-        return True
-    return (environment_context(env) / CONTAINERFILE).is_file()
+    """Return True if a packaged image or user definition exists for ``env``."""
+    return image_context(env) is not None
+
+
+def parent_of(env: str) -> str | None:
+    """Return the ``aic:`` parent of ``env``, or None if it has no such parent.
+
+    Raises:
+        ValueError: If ``env`` has no known definition.
+    """
+    context = image_context(env)
+    if context is None:
+        raise ValueError(f"Unknown image '{env}'.")
+    match = FROM_AIC_RE.search((context / CONTAINERFILE).read_text())
+    return match.group(1) if match else None
 
 
 def list_environments() -> list[str]:
-    """Return all known environments: ``base`` plus discovered definitions."""
-    root = environments_dir()
-    discovered = (
+    """Return all known images: ``base`` first, then the rest sorted by name."""
+    user = (
         path.name
-        for path in sorted(root.iterdir())
+        for path in environments_dir().iterdir()
         if path.is_dir() and (path / CONTAINERFILE).is_file()
-    ) if root.is_dir() else ()
-    return [BASE_ENV, *discovered]
+    ) if environments_dir().is_dir() else ()
+    names = dict.fromkeys([*packaged_images(), *user])
+    rest = sorted(name for name in names if name != BASE_ENV)
+    return [BASE_ENV, *rest]
 
 
 @contextmanager
@@ -155,18 +189,16 @@ def image_exists(env: str = BASE_ENV) -> bool:
 
 
 def build_image(env: str = BASE_ENV, *, dryrun: bool = False) -> None:
-    """Build the image for ``env``.
+    """Build the image for ``env`` from its definition.
 
-    The ``base`` environment is built from the packaged Containerfile; other
-    environments are built from ``environments/<env>/Containerfile`` and are
-    expected to start ``FROM aic:base``.
+    The context is resolved from the built-in image graph or a user
+    environment. Images with an ``aic:`` parent assume it is already built;
+    images on a non-aic base (e.g. ``FROM fedora``) pull that base.
     """
-    if env == BASE_ENV:
-        context = package_dir()
-        pull = True
-    else:
-        context = environment_context(env)
-        pull = False
+    context = image_context(env)
+    if context is None:
+        raise ValueError(f"Unknown image '{env}'.")
+    pull = parent_of(env) is None
     tag = image_tag(env)
     if dryrun:
         _emit(
@@ -212,14 +244,27 @@ def ensure_volumes(*, dryrun: bool = False) -> None:
                 client.volumes.create(name=name, labels={VOLUME_LABEL: ""})
 
 
-def ensure_image(env: str = BASE_ENV, *, rebuild: bool = False, dryrun: bool = False) -> None:
+def ensure_image(
+    env: str = BASE_ENV,
+    *,
+    rebuild: bool = False,
+    dryrun: bool = False,
+    _seen: frozenset[str] = frozenset(),
+) -> None:
     """Ensure the image for ``env`` is available, building it when needed.
 
-    For non-base environments the base image is ensured first, since the
-    environment layer is built ``FROM aic:base``.
+    The image's ``aic:`` parent (if any) is ensured first, so the whole
+    ``FROM`` chain is built from the bottom up.
+
+    Raises:
+        ValueError: If the ``FROM aic:`` chain contains a cycle.
     """
-    if env != BASE_ENV:
-        ensure_image(BASE_ENV, dryrun=dryrun)
+    if env in _seen:
+        chain = " -> ".join([*_seen, env])
+        raise ValueError(f"Cyclic image inheritance detected: {chain}.")
+    parent = parent_of(env)
+    if parent is not None:
+        ensure_image(parent, dryrun=dryrun, _seen=_seen | {env})
     if rebuild or dryrun or not image_exists(env):
         build_image(env, dryrun=dryrun)
 
@@ -244,24 +289,33 @@ def valid_env_name(env: str) -> bool:
     return bool(ENV_NAME_RE.match(env))
 
 
-def create_environment(env: str) -> Path:
+def create_environment(env: str, *, base: str = BASE_ENV) -> Path:
     """Scaffold a new environment definition and return its Containerfile path.
 
+    Args:
+        env: Name of the environment to create.
+        base: Existing image to inherit from (any built-in or user image).
+
     Raises:
-        ValueError: If the name is invalid or the definition already exists.
+        ValueError: If the name is invalid, the base is unknown, or the
+            definition already exists.
     """
     if not valid_env_name(env):
         raise ValueError(
             f"Invalid environment name '{env}'. Use lowercase letters, digits, "
             "'.', '_' or '-' (must start with a letter or digit)."
         )
-    if env == BASE_ENV:
-        raise ValueError("'base' is reserved; rebuild it with 'ai image rebuild'.")
+    if env in packaged_images():
+        raise ValueError(f"'{env}' is a built-in image, pick another name.")
+    if not environment_exists(base):
+        raise ValueError(f"Unknown base image '{base}'.")
     containerfile = environment_context(env) / CONTAINERFILE
     if containerfile.exists():
         raise ValueError(f"Environment '{env}' already exists at {containerfile}.")
     containerfile.parent.mkdir(parents=True, exist_ok=True)
-    containerfile.write_text(ENV_TEMPLATE.format(name=env, base=image_tag(BASE_ENV)))
+    containerfile.write_text(
+        ENV_TEMPLATE.format(name=env, base=base, base_tag=image_tag(base))
+    )
     return containerfile
 
 
