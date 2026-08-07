@@ -15,7 +15,7 @@ categories:
 ip -c a
 ```
 
-![Learning Python Care Package](../../../images/DDOC/show-ips.png)
+![show ip addresses](../../../images/DDOC/show-ips.png)
 
 !!! Tip "Kudos"
 
