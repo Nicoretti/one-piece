@@ -23,6 +23,9 @@ RUN dnf install -y claude-code
 # Install aichat
 COPY --from=build /workdir/aichat /usr/local/bin/aichat
 
+# Install python
+RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="/usr/local/bin" sh
+
 # Install llm
 RUN uv tool install llm
 # Install OpenCode
