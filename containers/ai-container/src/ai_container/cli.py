@@ -11,9 +11,9 @@ from rich.logging import RichHandler
 from ai_container._config import ConfigError, load_config
 from ai_container._podman import (
     BASE_ENV,
-    build_image,
     create_environment,
     ensure_image,
+    ensure_images,
     ensure_volumes,
     environment_context,
     environment_exists,
@@ -36,11 +36,11 @@ class Context:
     """State shared across commands via the Click context.
 
     Attributes:
-        env: The selected environment (image ``aic:<env>``).
+        default_env: Environment used when a command gets no ``-e/--env``.
         dryrun: Whether to print podman commands instead of executing them.
     """
 
-    env: str
+    default_env: str
     dryrun: bool
 
 
@@ -69,14 +69,17 @@ TOOLS = {
 }
 
 
-@click.group()
-@click.option(
+# Shared ``-e/--env`` option for commands that run or build an environment.
+env_option = click.option(
     "--env",
     "-e",
     "env_name",
     default=None,
     help="Which environment (customized image) to use. [config: env]",
 )
+
+
+@click.group()
 @click.option(
     "--log-level",
     type=click.Choice(LOG_LEVELS, case_sensitive=False),
@@ -92,7 +95,6 @@ TOOLS = {
 @click.pass_context
 def ai(
     ctx: click.Context,
-    env_name: str | None,
     log_level: str | None,
     dryrun: bool | None,
 ) -> None:
@@ -101,8 +103,8 @@ def ai(
     A unified interface for running AI coding agents and tools within a container.
     Use ``ai agent <tool> <path> [args]`` to invoke a tool, ``ai shell <path>`` for an
     interactive shell, ``ai env`` to manage custom environments, or
-    ``ai image rebuild`` to refresh the container image. Select an environment with
-    ``-e/--env`` (e.g. ``ai -e rust shell .``).
+    ``ai image rebuild`` to refresh the container image. Select an environment per
+    command with ``-e/--env`` (e.g. ``ai shell -e rust .``).
 
     Defaults come from config files (``.ai-container.toml`` in the project,
     ``~/.config/ai-container/config.toml``, or ``~/.ai-container.toml``); flags
@@ -120,11 +122,10 @@ def ai(
         config = load_config()
     except ConfigError as exc:
         raise click.UsageError(str(exc)) from exc
-    env_name = _resolve_option(ctx, "env_name", env_name, config["env"])
     log_level = _resolve_option(ctx, "log_level", log_level, config["log_level"])
     dryrun = _resolve_option(ctx, "dryrun", dryrun, config["dryrun"])
     logging.getLogger().setLevel(log_level.upper())
-    ctx.obj = Context(env=env_name, dryrun=dryrun)
+    ctx.obj = Context(default_env=config["env"], dryrun=dryrun)
 
 
 def _resolve_option(ctx: click.Context, name: str, value, fallback):
@@ -136,8 +137,10 @@ def _resolve_option(ctx: click.Context, name: str, value, fallback):
     return fallback
 
 
-def _resolve_env(env: str) -> str:
-    """Validate that an environment exists, aborting with a helpful message."""
+def _resolve_env(ctx: Context, env_name: str | None) -> str:
+    """Pick the command's environment (flag, else config) and validate it exists."""
+    env = env_name or ctx.default_env
+    log.debug("Using environment %r", env)
     if not environment_exists(env):
         raise click.UsageError(
             f"Unknown environment '{env}'.\n"
@@ -146,30 +149,46 @@ def _resolve_env(env: str) -> str:
     return env
 
 
-def _prepare(ctx: Context) -> None:
-    """Ensure the image and persistence volumes are ready before a run."""
-    _resolve_env(ctx.env)
-    ensure_image(ctx.env, dryrun=ctx.dryrun)
+def _prepare(ctx: Context, env_name: str | None) -> str:
+    """Ensure the image and persistence volumes are ready before a run.
+
+    Returns:
+        The resolved environment name.
+    """
+    env = _resolve_env(ctx, env_name)
+    try:
+        ensure_image(env, dryrun=ctx.dryrun)
+    except ValueError as exc:
+        raise click.UsageError(str(exc)) from exc
     ensure_volumes(dryrun=ctx.dryrun)
+    return env
 
 
-@click.command("agent")
+@click.command(
+    "agent",
+    # Options must precede TOOL; everything after it is passed to the tool.
+    context_settings={"ignore_unknown_options": True, "allow_interspersed_args": False},
+)
 @click.argument("tool", type=click.Choice(list(TOOLS)), help="Which registered tool to launch")
 @click.argument("path", help="Directory or file path to work on")
 @click.argument("args", nargs=-1, help="Additional arguments to pass to the tool")
+@env_option
 @click.pass_obj
-def agent(ctx: Context, tool: str, path: str, args: tuple[str, ...]) -> None:
+def agent(
+    ctx: Context, tool: str, path: str, args: tuple[str, ...], env_name: str | None
+) -> None:
     """Start a specific AI-agent/tool.
 
     TOOL is one of: pi, opc (OpenCode), claude, aic (aichat), llm.
     Remaining ARGS are passed straight through to the tool, e.g. ``ai agent pi /path --model x``.
+    Select the environment with ``-e/--env`` before the tool, e.g. ``ai agent -e rust pi .``.
     """
-    _prepare(ctx)
+    env = _prepare(ctx, env_name)
     spec = TOOLS[tool]
     run_container(
         path,
         [*spec.command, *args],
-        env=ctx.env,
+        env=env,
         include_pi_volume=spec.include_pi_volume,
         workdir_arg=spec.workdir_arg,
         dryrun=ctx.dryrun,
@@ -178,15 +197,16 @@ def agent(ctx: Context, tool: str, path: str, args: tuple[str, ...]) -> None:
 
 @click.command("shell")
 @click.argument("path", help="Directory or file path to mount in the container")
+@env_option
 @click.pass_obj
-def shell(ctx: Context, path: str) -> None:
+def shell(ctx: Context, path: str, env_name: str | None) -> None:
     """Open a shell in the AI container.
 
     Launch an interactive shell session within the AI container
     for manual command execution and exploration.
     """
-    _prepare(ctx)
-    run_container(path, ["/bin/bash"], env=ctx.env, dryrun=ctx.dryrun)
+    env = _prepare(ctx, env_name)
+    run_container(path, ["/bin/bash"], env=env, dryrun=ctx.dryrun)
 
 
 @click.group("image")
@@ -195,20 +215,46 @@ def image() -> None:
     pass
 
 
+def _split_names(
+    ctx: click.Context, param: click.Parameter, values: tuple[str, ...]
+) -> tuple[str, ...]:
+    """Flatten arguments so ``pi,pi-python rust`` yields ``pi``, ``pi-python``, ``rust``."""
+    names = (name.strip() for value in values for name in value.split(","))
+    return tuple(name for name in names if name)
+
+
+def _complete_names(
+    ctx: click.Context, param: click.Parameter, incomplete: str
+) -> list[str]:
+    """Shell-complete image/environment names (built-in and user-defined)."""
+    return [name for name in list_environments() if name.startswith(incomplete)]
+
+
 @image.command("rebuild")
+@click.argument(
+    "names",
+    nargs=-1,
+    callback=_split_names,
+    shell_complete=_complete_names,
+    help="Images/environments to rebuild, space- or comma-separated [default: config env]",
+)
 @click.pass_obj
-def image_rebuild(ctx: Context) -> None:
-    """Rebuild the container image for the selected environment.
+def image_rebuild(ctx: Context, names: tuple[str, ...]) -> None:
+    """Rebuild one or more container images.
 
     Running an image rebuild ensures the latest tool versions are
-    persistently installed in the container. The image's ``FROM aic:`` parent
-    chain is ensured first; pass ``-e <name>`` to rebuild a specific image.
+    persistently installed in the container. NAMES may be built-in images or
+    user environments (``ai env list``), e.g. ``ai image rebuild pi,pi-python rust``.
+    Without NAMES the configured default environment is rebuilt.
+
+    Requested images are rebuilt parents first; any other ``FROM aic:``
+    parent is only built if it is missing.
     """
-    _resolve_env(ctx.env)
-    parent = parent_of(ctx.env)
-    if parent is not None:
-        ensure_image(parent, dryrun=ctx.dryrun)
-    build_image(ctx.env, dryrun=ctx.dryrun)
+    envs = [_resolve_env(ctx, name) for name in names or [None]]
+    try:
+        ensure_images(envs, dryrun=ctx.dryrun)
+    except ValueError as exc:
+        raise click.UsageError(str(exc)) from exc
 
 
 @image.command("list")
@@ -253,7 +299,7 @@ def env_new(name: str, base: str, open_editor: bool) -> None:
     Creates ``environments/<name>/Containerfile`` (extending ``aic:<base>``)
     under the user config directory. The base may be any built-in image
     (base, pi, claude, opencode, aichat, llm, full) or another user
-    environment. Build it on first use or with ``ai -e <name> image rebuild``.
+    environment. Build it on first use or with ``ai image rebuild <name>``.
     """
     try:
         containerfile = create_environment(name, base=base)

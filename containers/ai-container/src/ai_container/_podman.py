@@ -17,7 +17,8 @@ import shutil
 import subprocess
 import sys
 from inspect import cleandoc
-from collections.abc import Iterator, Sequence
+from collections.abc import Iterable, Iterator, Sequence
+from graphlib import CycleError, TopologicalSorter
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -148,6 +149,30 @@ def parent_of(env: str) -> str | None:
     return match.group(1) if match else None
 
 
+def build_order(envs: Iterable[str]) -> list[str]:
+    """Return ``envs`` plus all their ``aic:`` ancestors, parents first.
+
+    Raises:
+        ValueError: If an image is unknown or the ``FROM aic:`` graph has a cycle.
+    """
+    graph: dict[str, set[str]] = {}
+    pending = list(envs)
+    while pending:
+        env = pending.pop()
+        if env in graph:
+            continue
+        parent = parent_of(env)
+        graph[env] = {parent} if parent else set()
+        pending.extend(graph[env])
+    try:
+        return list(TopologicalSorter(graph).static_order())
+    except CycleError as exc:
+        _, cycle = exc.args
+        raise ValueError(
+            f"Cyclic image inheritance detected: {' -> '.join(cycle)}."
+        ) from exc
+
+
 def list_environments() -> list[str]:
     """Return all known images: ``base`` first, then the rest sorted by name."""
     user = (
@@ -249,24 +274,36 @@ def ensure_image(
     *,
     rebuild: bool = False,
     dryrun: bool = False,
-    _seen: frozenset[str] = frozenset(),
 ) -> None:
     """Ensure the image for ``env`` is available, building it when needed.
 
-    The image's ``aic:`` parent (if any) is ensured first, so the whole
-    ``FROM`` chain is built from the bottom up.
+    Missing ``aic:`` ancestors are built first, so the whole ``FROM`` chain
+    is built from the bottom up. ``rebuild`` forces a build of ``env`` only.
 
     Raises:
         ValueError: If the ``FROM aic:`` chain contains a cycle.
     """
-    if env in _seen:
-        chain = " -> ".join([*_seen, env])
-        raise ValueError(f"Cyclic image inheritance detected: {chain}.")
-    parent = parent_of(env)
-    if parent is not None:
-        ensure_image(parent, dryrun=dryrun, _seen=_seen | {env})
-    if rebuild or dryrun or not image_exists(env):
-        build_image(env, dryrun=dryrun)
+    ensure_images([env] if rebuild else [], dryrun=dryrun, extra=[env])
+
+
+def ensure_images(
+    rebuild: Iterable[str],
+    *,
+    dryrun: bool = False,
+    extra: Iterable[str] = (),
+) -> None:
+    """Rebuild ``rebuild`` images and make sure all their ancestors exist.
+
+    Images are processed parents first. Requested images are always built;
+    ancestors (and ``extra`` images) are only built when missing.
+
+    Raises:
+        ValueError: If an image is unknown or the ``FROM aic:`` graph has a cycle.
+    """
+    forced = set(rebuild)
+    for env in build_order([*forced, *extra]):
+        if env in forced or dryrun or not image_exists(env):
+            build_image(env, dryrun=dryrun)
 
 
 def _volume_specs(path: str, *, include_pi_volume: bool) -> list[str]:

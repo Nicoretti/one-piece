@@ -72,7 +72,9 @@ When you want to pull in the latest tool versions, force a rebuild with the
 `image rebuild` command:
 
 ```bash
-ai image rebuild
+ai image rebuild                  # rebuild the default (configured) image
+ai image rebuild pi pi-python     # rebuild several images, parents first
+ai image rebuild pi,pi-python     # same, comma-separated
 ```
 
 ### Custom Environments
@@ -81,12 +83,14 @@ Need a specific toolchain (Rust, Go, an extra editor, ...)? Define a **custom
 environment**: a thin image built `FROM aic:base` that adds your tooling on top
 of everything the base image already provides.
 
-Select an environment for any command with `-e/--env`:
+Select an environment with the `-e/--env` option of `shell` and `agent`;
+`image rebuild` takes image names as arguments:
 
 ```bash
-ai -e rust shell .            # shell in the rust environment
-ai -e rust agent pi .         # run pi in the rust environment
-ai -e rust image rebuild      # (re)build the rust image (FROM aic:base)
+ai shell -e rust .            # shell in the rust environment
+ai agent -e rust pi .         # run pi in the rust environment
+ai image rebuild rust         # (re)build the rust image (FROM aic:base)
+ai image rebuild rust,go pi   # environments and built-in images can be mixed
 ```
 
 Manage environment definitions with the `env` group:
@@ -121,7 +125,7 @@ environments, so credentials and config are entered once and work everywhere.
 
 ### Config Files
 
-Defaults for the global flags (`-e/--env`, `--log-level`, `--dryrun`) can be set
+Defaults for `-e/--env` and the global flags (`--log-level`, `--dryrun`) can be set
 in a TOML config file, so you don't have to repeat them on every invocation.
 Files are merged from several sources, **highest precedence first**:
 
