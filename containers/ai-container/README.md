@@ -75,6 +75,7 @@ When you want to pull in the latest tool versions, force a rebuild with the
 ai image rebuild                  # rebuild the default (configured) image
 ai image rebuild pi pi-python     # rebuild several images, parents first
 ai image rebuild pi,pi-python     # same, comma-separated
+ai image rebuild --all            # rebuild every image, parents first
 ```
 
 ### Custom Environments

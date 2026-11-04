@@ -237,19 +237,31 @@ def _complete_names(
     shell_complete=_complete_names,
     help="Images/environments to rebuild, space- or comma-separated [default: config env]",
 )
+@click.option(
+    "--all",
+    "rebuild_all",
+    is_flag=True,
+    help="Rebuild every image (built-in and user environments).",
+)
 @click.pass_obj
-def image_rebuild(ctx: Context, names: tuple[str, ...]) -> None:
+def image_rebuild(ctx: Context, names: tuple[str, ...], rebuild_all: bool) -> None:
     """Rebuild one or more container images.
 
     Running an image rebuild ensures the latest tool versions are
     persistently installed in the container. NAMES may be built-in images or
     user environments (``ai env list``), e.g. ``ai image rebuild pi,pi-python rust``.
-    Without NAMES the configured default environment is rebuilt.
+    Without NAMES the configured default environment is rebuilt; with
+    ``--all`` every image listed by ``ai image list`` is rebuilt.
 
     Requested images are rebuilt parents first; any other ``FROM aic:``
     parent is only built if it is missing.
     """
-    envs = [_resolve_env(ctx, name) for name in names or [None]]
+    if rebuild_all and names:
+        raise click.UsageError("Pass either NAMES or --all, not both.")
+    if rebuild_all:
+        envs = list_environments()
+    else:
+        envs = [_resolve_env(ctx, name) for name in names or [None]]
     try:
         ensure_images(envs, dryrun=ctx.dryrun)
     except ValueError as exc:
