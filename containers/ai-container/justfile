@@ -1,5 +1,10 @@
 DEFAULT_ENV := 'base'
 DEFAULT_TOOL := 'pi'
+GIT_REMOTE := 'origin'
+# release tags look like ai-container/<version>
+TAG_PREFIX := 'ai-container/'
+# keychain service for the PyPI token, stored under the fixed user '__token__'
+PYPI_URL := 'https://upload.pypi.org/legacy/'
 
 alias bi := build-image
 alias rb := build-image
@@ -107,3 +112,72 @@ install:
 clean:
     rm -rf dist .ruff_cache
     find . -type d -name __pycache__ -not -path './.venv/*' -exec rm -rf {} +
+
+[private]
+require-clean:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if ! git diff --quiet || ! git diff --cached --quiet; then
+        echo "error: the working tree has uncommitted changes -- commit or stash them first" >&2
+        exit 1
+    fi
+
+[private]
+require-new-tag VERSION:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if git rev-parse --quiet --verify "refs/tags/{{ TAG_PREFIX }}{{ VERSION }}" >/dev/null; then
+        echo "error: tag '{{ TAG_PREFIX }}{{ VERSION }}' already exists" >&2
+        exit 1
+    fi
+
+[private]
+require-token:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ -n "${UV_PUBLISH_TOKEN:-}" ]; then
+        exit 0
+    fi
+    if ! uv run keyring get {{ PYPI_URL }} __token__ >/dev/null 2>&1; then
+        echo "error: no PyPI token in the keychain and UV_PUBLISH_TOKEN is not set" >&2
+        echo "       store it with: just token-store" >&2
+        exit 1
+    fi
+
+# usage: just release 0.19.0
+# bump the version, then commit, tag, push and publish it to PyPI
+[group: 'release']
+release VERSION: require-token (bump VERSION) (push VERSION) publish
+
+# set the version with uv, then commit and tag it
+[group: 'release']
+bump VERSION: require-clean (require-new-tag VERSION)
+    uv version {{ VERSION }}
+    git add pyproject.toml uv.lock
+    git commit -m "Bump ai-container version to {{ VERSION }}"
+    git tag -a {{ TAG_PREFIX }}{{ VERSION }} -m "Release ai-container {{ VERSION }}"
+
+# push the current branch and the release tag to the central repo
+[group: 'release']
+push VERSION:
+    git push --atomic {{ GIT_REMOTE }} HEAD refs/tags/{{ TAG_PREFIX }}{{ VERSION }}
+
+# clean dist/, build the package and publish it (token: UV_PUBLISH_TOKEN, else keychain)
+[group: 'release']
+publish: require-token
+    #!/usr/bin/env bash
+    set -euo pipefail
+    export UV_PUBLISH_TOKEN="${UV_PUBLISH_TOKEN:-$(uv run keyring get {{ PYPI_URL }} __token__)}"
+    rm -rf dist
+    uv build
+    uv publish
+
+# store the PyPI token in the local keychain (prompts, input is hidden)
+[group: 'release']
+token-store:
+    uv run keyring set {{ PYPI_URL }} __token__
+
+# remove the PyPI token from the local keychain
+[group: 'release']
+token-remove:
+    uv run keyring del {{ PYPI_URL }} __token__

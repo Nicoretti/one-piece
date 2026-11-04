@@ -25,6 +25,7 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
+    "keyring>=25.7.0",
     "ruff>=0.17.3",
     "ty>=0.0.97",
 ]
