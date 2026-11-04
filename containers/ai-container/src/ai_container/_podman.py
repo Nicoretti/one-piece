@@ -7,8 +7,8 @@ more reliably by the CLI than over the REST socket.
 
 from __future__ import annotations
 
-import json
 import importlib.resources
+import json
 import logging
 import os
 import re
@@ -16,10 +16,10 @@ import shlex
 import shutil
 import subprocess
 import sys
-from inspect import cleandoc
 from collections.abc import Iterable, Iterator, Sequence
-from graphlib import CycleError, TopologicalSorter
 from contextlib import contextmanager
+from graphlib import CycleError, TopologicalSorter
+from inspect import cleandoc
 from pathlib import Path
 
 from podman import PodmanClient

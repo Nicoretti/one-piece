@@ -212,7 +212,6 @@ def shell(ctx: Context, path: str, env_name: str | None) -> None:
 @click.group("image")
 def image() -> None:
     """Manage the AI container image."""
-    pass
 
 
 def _split_names(
@@ -272,7 +271,6 @@ def image_list() -> None:
 @click.group("env")
 def env() -> None:
     """Manage custom environments (customized images)."""
-    pass
 
 
 @env.command("list")
