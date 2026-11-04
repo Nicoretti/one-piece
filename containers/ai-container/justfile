@@ -1,0 +1,109 @@
+DEFAULT_ENV := 'base'
+DEFAULT_TOOL := 'pi'
+
+alias bi := build-image
+alias rb := build-image
+alias il := image-list
+alias el := env-list
+alias sh := shell
+alias ag := agent
+alias dry := agent-dryrun
+
+# list all available recipes
+default:
+    just --list
+
+[private]
+require-podman:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if ! command -v podman >/dev/null; then
+        echo "error: podman is not installed -- see https://podman.io/docs/installation" >&2
+        exit 1
+    fi
+    if ! uv run python -c "import sys; from podman import PodmanClient; sys.exit(not PodmanClient().ping())" 2>/dev/null; then
+        echo "error: the podman service socket is not reachable" >&2
+        echo "       start it with: systemctl --user enable --now podman.socket" >&2
+        exit 1
+    fi
+
+# (re)build one or more images, parents first (e.g. just build-image pi pi-python)
+[group: 'image']
+build-image *NAMES=DEFAULT_ENV: require-podman
+    uv run ai image rebuild {{ NAMES }}
+
+# list the packaged images and whether they are built
+[group: 'image']
+image-list: require-podman
+    uv run ai image list
+
+# list custom environments and whether their images are built
+[group: 'image']
+env-list:
+    uv run ai env list
+
+# usage: just shell                 -> base env, current directory
+#        just shell . rust          -> rust env
+# open an interactive shell in the container with PATH mounted
+[group: 'container']
+shell PATH='.' ENV=DEFAULT_ENV: require-podman
+    uv run ai shell -e {{ ENV }} {{ PATH }}
+
+# usage: just agent                         -> pi on the current directory
+#        just agent claude . base --verbose  -> extra args go to the tool
+# run an agent/tool against PATH (tools: pi, opc, claude, aic, llm)
+[group: 'container']
+agent TOOL=DEFAULT_TOOL PATH='.' ENV=DEFAULT_ENV *ARGS: require-podman
+    uv run ai agent -e {{ ENV }} {{ TOOL }} {{ PATH }} {{ ARGS }}
+
+# print the podman commands an agent run would execute, without running them
+[group: 'container']
+agent-dryrun TOOL=DEFAULT_TOOL PATH='.' ENV=DEFAULT_ENV *ARGS: require-podman
+    uv run ai --dryrun agent -e {{ ENV }} {{ TOOL }} {{ PATH }} {{ ARGS }}
+
+# lint and check formatting and types (what CI should run)
+[group: 'check']
+check: lint format-check typecheck
+
+# lint with ruff
+[group: 'check']
+lint *ARGS:
+    uv run ruff check . {{ ARGS }}
+
+# check formatting with ruff, without changing files
+[group: 'check']
+format-check:
+    uv run ruff format --check .
+
+# usage: just fix                   -> apply safe fixes
+#        just fix --unsafe-fixes    -> also apply unsafe fixes
+# apply ruff lint fixes
+[group: 'check']
+fix *ARGS:
+    uv run ruff check --fix . {{ ARGS }}
+
+# format with ruff and apply safe lint fixes
+[group: 'check']
+fmt: fix
+    uv run ruff format .
+
+# type check with ty
+[group: 'check']
+typecheck *ARGS:
+    uv run ty check {{ ARGS }}
+
+# build the sdist and wheel into dist/
+[group: 'build']
+build:
+    uv build
+
+# install the CLI as a uv tool from this checkout
+[group: 'build']
+install:
+    uv tool install --force --reinstall .
+
+# remove build artifacts and caches
+[group: 'build']
+clean:
+    rm -rf dist .ruff_cache
+    find . -type d -name __pycache__ -not -path './.venv/*' -exec rm -rf {} +

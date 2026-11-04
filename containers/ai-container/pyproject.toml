@@ -22,3 +22,9 @@ ai = "ai_container.cli:ai"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.17.3",
+    "ty>=0.0.97",
+]
