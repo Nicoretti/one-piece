@@ -7,7 +7,7 @@ RUN dnf update -y \
     && dnf install nodejs -y
 
 RUN npm install -g --ignore-scripts @earendil-works/pi-coding-agent
-
 RUN pi install npm:@cgaravitoq/pi-claude-code-auth
+RUN pi install npm:pi-model-scout
 
 WORKDIR /workspace
