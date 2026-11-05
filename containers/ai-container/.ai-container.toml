@@ -1,4 +1,4 @@
 env = "base"
-log_level = "DEBUG"
+log_level = "INFO"
 dryrun = false
 
