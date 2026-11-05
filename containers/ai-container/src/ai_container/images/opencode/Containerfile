@@ -3,8 +3,8 @@ FROM aic:base
 
 RUN dnf update -y \
     && dnf upgrade -y \
-    && dnf install nodejs -y \
+    && dnf install nodejs -y
 
-RUN npm i -g opencode-ai
+RUN npm install -g @opencode/cli
 
 WORKDIR /workspace
