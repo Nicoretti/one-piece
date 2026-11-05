@@ -293,8 +293,25 @@ def _complete_names(
     is_flag=True,
     help="Rebuild every image (built-in and user environments).",
 )
+@click.option(
+    "--deep",
+    is_flag=True,
+    help="Also rebuild all parent images of NAMES, down to the base image.",
+)
+@click.option(
+    "--no-cache",
+    "no_cache",
+    is_flag=True,
+    help="Ignore the layer cache so every step re-runs and fetches the latest tools.",
+)
 @click.pass_obj
-def image_rebuild(ctx: Context, names: tuple[str, ...], rebuild_all: bool) -> None:
+def image_rebuild(
+    ctx: Context,
+    names: tuple[str, ...],
+    rebuild_all: bool,
+    deep: bool,
+    no_cache: bool,
+) -> None:
     """Rebuild one or more container images.
 
     Running an image rebuild ensures the latest tool versions are
@@ -304,7 +321,12 @@ def image_rebuild(ctx: Context, names: tuple[str, ...], rebuild_all: bool) -> No
     ``--all`` every image listed by ``ai image list`` is rebuilt.
 
     Requested images are rebuilt parents first; any other ``FROM aic:``
-    parent is only built if it is missing.
+    parent is only built if it is missing, unless ``--deep`` is given, which
+    rebuilds the whole parent chain too.
+
+    Unchanged build steps are taken from the layer cache, so tools installed
+    via e.g. ``npm install -g`` are not updated. Pass ``--no-cache`` to re-run
+    every step, e.g. ``ai image rebuild --no-cache pi`` for the latest PI.
     """
     if rebuild_all and names:
         raise click.UsageError("Pass either NAMES or --all, not both.")
@@ -313,7 +335,7 @@ def image_rebuild(ctx: Context, names: tuple[str, ...], rebuild_all: bool) -> No
     else:
         envs = [_resolve_env(ctx, name) for name in names or [None]]
     try:
-        ensure_images(envs, dryrun=ctx.dryrun)
+        ensure_images(envs, deep=deep, no_cache=no_cache, dryrun=ctx.dryrun)
     except ValueError as exc:
         raise click.UsageError(str(exc)) from exc
 

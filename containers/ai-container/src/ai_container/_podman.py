@@ -214,12 +214,21 @@ def image_exists(env: str = BASE_ENV) -> bool:
         return client.images.exists(image_tag(env))
 
 
-def build_image(env: str = BASE_ENV, *, dryrun: bool = False) -> None:
+def build_image(
+    env: str = BASE_ENV, *, no_cache: bool = False, dryrun: bool = False
+) -> None:
     """Build the image for ``env`` from its definition.
 
     The context is resolved from the built-in image graph or a user
     environment. Images with an ``aic:`` parent assume it is already built;
     images on a non-aic base (e.g. ``FROM fedora``) pull that base.
+
+    Args:
+        env: Image/environment to build.
+        no_cache: Re-run every build step instead of reusing cached layers, so
+            unchanged instructions (e.g. ``npm install -g ...``) fetch the
+            latest versions.
+        dryrun: If True, print the ``podman build`` command instead.
     """
     context = image_context(env)
     if context is None:
@@ -232,6 +241,7 @@ def build_image(env: str = BASE_ENV, *, dryrun: bool = False) -> None:
                 "podman", "build",
                 "--tag", tag,
                 "--rm", *(["--pull"] if pull else []),
+                *(["--no-cache"] if no_cache else []),
                 "--file", CONTAINERFILE,
                 str(context),
             ]
@@ -246,6 +256,7 @@ def build_image(env: str = BASE_ENV, *, dryrun: bool = False) -> None:
             tag=tag,
             rm=True,
             pull=pull,
+            nocache=no_cache,
         )
         logs = (log.decode() for log in logs)
         logs = (json.loads(log) for log in logs)
@@ -290,6 +301,8 @@ def ensure_image(
 def ensure_images(
     rebuild: Iterable[str],
     *,
+    deep: bool = False,
+    no_cache: bool = False,
     dryrun: bool = False,
     extra: Iterable[str] = (),
 ) -> None:
@@ -298,13 +311,22 @@ def ensure_images(
     Images are processed parents first. Requested images are always built;
     ancestors (and ``extra`` images) are only built when missing.
 
+    Args:
+        rebuild: Images to (re)build unconditionally.
+        deep: Also rebuild every ``aic:`` ancestor of ``rebuild``, so the
+            whole ``FROM`` chain down to the base image is refreshed.
+        no_cache: Build without the layer cache (see :func:`build_image`).
+        dryrun: If True, print the podman commands instead of running them.
+        extra: Images that only need to exist (built when missing).
+
     Raises:
         ValueError: If an image is unknown or the ``FROM aic:`` graph has a cycle.
     """
-    forced = set(rebuild)
+    requested = list(rebuild)
+    forced = set(build_order(requested) if deep else requested)
     for env in build_order([*forced, *extra]):
         if env in forced or dryrun or not image_exists(env):
-            build_image(env, dryrun=dryrun)
+            build_image(env, no_cache=no_cache, dryrun=dryrun)
 
 
 def workspace_mounts(paths: Sequence[str]) -> dict[Path, str]:

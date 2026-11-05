@@ -90,7 +90,16 @@ ai image rebuild                  # rebuild the default (configured) image
 ai image rebuild pi pi-python     # rebuild several images, parents first
 ai image rebuild pi,pi-python     # same, comma-separated
 ai image rebuild --all            # rebuild every image, parents first
+ai image rebuild --deep pi        # also rebuild parents (claude, base)
+ai image rebuild --no-cache pi    # ignore the layer cache, fetch latest tools
 ```
+
+By default, build steps whose instructions did not change are reused from the
+layer cache, so tools installed by e.g. `npm install -g` are **not** updated.
+Use `--no-cache` to re-run every step. Only the named images are rebuilt,
+their parent images are built only if missing. Add `--deep` to rebuild the
+whole parent chain as well (combine both for a complete refresh:
+`ai image rebuild --deep --no-cache pi-python`).
 
 ### Custom Environments
 
