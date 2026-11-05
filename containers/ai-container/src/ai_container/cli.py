@@ -23,6 +23,7 @@ from ai_container._podman import (
     parent_of,
     remove_environment,
     run_container,
+    workspace_mounts,
 )
 
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL")
@@ -78,6 +79,55 @@ env_option = click.option(
     help="Which environment (customized image) to use. [config: env]",
 )
 
+def _check_mounts(
+    ctx: click.Context, param: click.Parameter, values: tuple[str, ...]
+) -> tuple[str, ...]:
+    """Reject mount combinations that would collide inside ``/workspace``."""
+    try:
+        workspace_mounts(values)
+    except ValueError as exc:
+        raise click.BadParameter(str(exc), ctx=ctx, param=param) from exc
+    return values
+
+
+# Shared optional ``PATHS`` argument: zero, one or many host paths for /workspace.
+paths_argument = click.argument(
+    "paths",
+    nargs=-1,
+    type=click.Path(exists=True),
+    callback=_check_mounts,
+    help=(
+        "Host paths to mount into /workspace. One path is mounted as /workspace, "
+        "several as /workspace/<name>, none gives an empty workspace."
+    ),
+)
+
+
+class PassthroughCommand(click.RichCommand):
+    """Command that hands everything after ``--`` to the tool untouched.
+
+    Click silently drops ``--``, so the tool arguments are split off before
+    parsing and stored in ``ctx.meta["tool_args"]``.
+    """
+
+    def parse_args(self, ctx: click.Context, args: list[str]) -> list[str]:
+        """Split ``args`` at the first ``--`` and parse only the part before it."""
+        own, separator, tool_args = _split_at(args, "--")
+        ctx.meta["tool_args"] = tuple(tool_args) if separator else ()
+        return super().parse_args(ctx, own)
+
+    def collect_usage_pieces(self, ctx: click.Context) -> list[str]:
+        """Show the ``-- ARGS`` passthrough in the usage line."""
+        return [*super().collect_usage_pieces(ctx), "[-- ARGS]..."]
+
+
+def _split_at(args: list[str], separator: str) -> tuple[list[str], bool, list[str]]:
+    """Split ``args`` at the first ``separator`` into ``(before, found, after)``."""
+    if separator not in args:
+        return args, False, []
+    index = args.index(separator)
+    return args[:index], True, args[index + 1 :]
+
 
 @click.group()
 @click.option(
@@ -101,10 +151,10 @@ def ai(
     """AI Container Command Tool.
 
     A unified interface for running AI coding agents and tools within a container.
-    Use ``ai agent <tool> <path> [args]`` to invoke a tool, ``ai shell <path>`` for an
-    interactive shell, ``ai env`` to manage custom environments, or
-    ``ai image rebuild`` to refresh the container image. Select an environment per
-    command with ``-e/--env`` (e.g. ``ai shell -e rust .``).
+    Use ``ai agent <tool> [paths...] [-- args]`` to invoke a tool, ``ai shell
+    [paths...]`` for an interactive shell, ``ai env`` to manage custom
+    environments, or ``ai image rebuild`` to refresh the container image. Select an
+    environment per command with ``-e/--env`` (e.g. ``ai shell -e rust .``).
 
     Defaults come from config files (``.ai-container.toml`` in the project,
     ``~/.config/ai-container/config.toml``, or ``~/.ai-container.toml``); flags
@@ -164,30 +214,30 @@ def _prepare(ctx: Context, env_name: str | None) -> str:
     return env
 
 
-@click.command(
-    "agent",
-    # Options must precede TOOL; everything after it is passed to the tool.
-    context_settings={"ignore_unknown_options": True, "allow_interspersed_args": False},
-)
+@click.command("agent", cls=PassthroughCommand)
 @click.argument("tool", type=click.Choice(list(TOOLS)), help="Which registered tool to launch")
-@click.argument("path", help="Directory or file path to work on")
-@click.argument("args", nargs=-1, help="Additional arguments to pass to the tool")
+@paths_argument
 @env_option
-@click.pass_obj
+@click.pass_context
 def agent(
-    ctx: Context, tool: str, path: str, args: tuple[str, ...], env_name: str | None
+    click_ctx: click.Context,
+    tool: str,
+    paths: tuple[str, ...],
+    env_name: str | None,
 ) -> None:
     """Start a specific AI-agent/tool.
 
     TOOL is one of: pi, opc (OpenCode), claude, aic (aichat), llm.
-    Remaining ARGS are passed straight through to the tool, e.g. ``ai agent pi /path --model x``.
-    Select the environment with ``-e/--env`` before the tool, e.g. ``ai agent -e rust pi .``.
+    PATHS are mounted into /workspace, e.g. ``ai agent pi ./app ./lib``.
+    ARGS after ``--`` are passed straight through to the tool, e.g.
+    ``ai agent pi . -- --model x``.
     """
+    ctx: Context = click_ctx.obj
     env = _prepare(ctx, env_name)
     spec = TOOLS[tool]
     run_container(
-        path,
-        [*spec.command, *args],
+        paths,
+        [*spec.command, *click_ctx.meta["tool_args"]],
         env=env,
         include_pi_volume=spec.include_pi_volume,
         workdir_arg=spec.workdir_arg,
@@ -196,17 +246,17 @@ def agent(
 
 
 @click.command("shell")
-@click.argument("path", help="Directory or file path to mount in the container")
+@paths_argument
 @env_option
 @click.pass_obj
-def shell(ctx: Context, path: str, env_name: str | None) -> None:
+def shell(ctx: Context, paths: tuple[str, ...], env_name: str | None) -> None:
     """Open a shell in the AI container.
 
     Launch an interactive shell session within the AI container
-    for manual command execution and exploration.
+    for manual command execution and exploration, e.g. ``ai shell ./app ./lib``.
     """
     env = _prepare(ctx, env_name)
-    run_container(path, ["/bin/bash"], env=env, dryrun=ctx.dryrun)
+    run_container(paths, ["/bin/bash"], env=env, dryrun=ctx.dryrun)
 
 
 @click.group("image")

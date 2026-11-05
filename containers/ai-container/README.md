@@ -57,13 +57,27 @@ ai agent llm /path/to/project       # Run llm
 ai shell /path/to/project           # Interactive shell in container
 ```
 
-`ai agent <tool> <path> [args]` is the single entry point for every tool.
-Valid tools: `pi`, `opc`, `claude`, `aic`, `llm`.
+`ai agent <tool> [paths...] [-- args...]` is the single entry point for every
+tool. Valid tools: `pi`, `opc`, `claude`, `aic`, `llm`.
 
-Pass additional arguments directly to the tool:
+Pass additional arguments to the tool after `--`:
 ```bash
-ai agent pi /path/to/project --verbose --model claude-3-sonnet
+ai agent pi /path/to/project -- --verbose --model claude-3-sonnet
 ```
+
+### Mounting Folders
+
+The paths you pass decide what the container sees in `/workspace`:
+
+```bash
+ai shell                           # nothing mounted, empty /workspace
+ai shell ./app                     # contents of ./app  -> /workspace
+ai shell ./mount1 ../mount2        # ./mount1           -> /workspace/mount1
+                                   # ../mount2          -> /workspace/mount2
+```
+
+When you pass several paths, each folder is mounted under its own name, so
+folder names must be distinct.
 
 ### Rebuilding the Container Image
 

@@ -59,12 +59,12 @@ shell PATH='.' ENV=DEFAULT_ENV: require-podman
 # run an agent/tool against PATH (tools: pi, opc, claude, aic, llm)
 [group: 'container']
 agent TOOL=DEFAULT_TOOL PATH='.' ENV=DEFAULT_ENV *ARGS: require-podman
-    uv run ai agent -e {{ ENV }} {{ TOOL }} {{ PATH }} {{ ARGS }}
+    uv run ai agent -e {{ ENV }} {{ TOOL }} {{ PATH }} -- {{ ARGS }}
 
 # print the podman commands an agent run would execute, without running them
 [group: 'container']
 agent-dryrun TOOL=DEFAULT_TOOL PATH='.' ENV=DEFAULT_ENV *ARGS: require-podman
-    uv run ai --dryrun agent -e {{ ENV }} {{ TOOL }} {{ PATH }} {{ ARGS }}
+    uv run ai --dryrun agent -e {{ ENV }} {{ TOOL }} {{ PATH }} -- {{ ARGS }}
 
 # lint and check formatting and types (what CI should run)
 [group: 'check']

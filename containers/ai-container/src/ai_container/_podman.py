@@ -16,6 +16,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+from collections import Counter
 from collections.abc import Iterable, Iterator, Sequence
 from contextlib import contextmanager
 from graphlib import CycleError, TopologicalSorter
@@ -306,19 +307,42 @@ def ensure_images(
             build_image(env, dryrun=dryrun)
 
 
-def _volume_specs(path: str, *, include_pi_volume: bool) -> list[str]:
-    """Return ``name:target`` volume specs for a container run.
+def workspace_mounts(paths: Sequence[str]) -> dict[Path, str]:
+    """Map host paths to their mount targets inside the container.
+
+    A single path is mounted at ``/workspace`` itself, multiple paths are
+    mounted side by side at ``/workspace/<basename>``. No paths yields an
+    empty mapping (the container gets an empty workspace).
+
+    Raises:
+        ValueError: If two paths share the same basename.
+    """
+    hosts = list(dict.fromkeys(Path(path).resolve() for path in paths))
+    if len(hosts) == 1:
+        return {hosts[0]: WORKSPACE_MOUNT}
+    names = Counter(host.name for host in hosts)
+    if clashes := sorted(name for name, count in names.items() if count > 1):
+        raise ValueError(
+            f"Mounts must have distinct folder names, got duplicates: {', '.join(clashes)}."
+        )
+    return {host: f"{WORKSPACE_MOUNT}/{host.name}" for host in hosts}
+
+
+def _volume_specs(paths: Sequence[str], *, include_pi_volume: bool) -> list[str]:
+    """Return ``source:target`` volume specs for a container run.
 
     Selection (which volumes to mount) is kept separate from the host
-    workspace bind mount.
+    workspace bind mounts.
     """
-    host_path = str(Path(path).resolve())
+    binds = (
+        f"{host}:{target}:rw,z" for host, target in workspace_mounts(paths).items()
+    )
     named = (
         f"{name}:{target}"
         for name, target in VOLUME_MOUNTS.items()
         if include_pi_volume or name != PI_VOLUME
     )
-    return [f"{host_path}:{WORKSPACE_MOUNT}:rw,z", *named, *ANONYMOUS_VOLUME_OVERLAYS]
+    return [*binds, *named, *ANONYMOUS_VOLUME_OVERLAYS]
 
 
 def valid_env_name(env: str) -> bool:
@@ -380,7 +404,7 @@ def remove_environment(env: str, *, purge: bool = False, dryrun: bool = False) -
 
 
 def run_container(
-        path: str,
+        paths: Sequence[str],
         command: Sequence[str],
         *,
         env: str = BASE_ENV,
@@ -391,7 +415,8 @@ def run_container(
     """Launch an interactive container.
 
     Args:
-        path: Host directory to mount at ``/workspace``.
+        paths: Host paths to mount into ``/workspace`` (see
+            :func:`workspace_mounts`); may be empty.
         command: Command (and args) to execute inside the container.
         env: Environment whose image (``aic:<env>``) to run.
         include_pi_volume: Whether to mount the ``pi-config`` volume.
@@ -400,8 +425,11 @@ def run_container(
 
     Returns:
         The container process exit code.
+
+    Raises:
+        ValueError: If two mounted paths share the same basename.
     """
-    specs = _volume_specs(path, include_pi_volume=include_pi_volume)
+    specs = _volume_specs(paths, include_pi_volume=include_pi_volume)
     volume_args = [arg for spec in specs for arg in ("--volume", spec)]
     trailing = ["."] if workdir_arg else []
 
