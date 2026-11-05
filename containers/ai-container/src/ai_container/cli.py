@@ -163,7 +163,7 @@ def ai(
     # Configure logging up front (CLI flag, else INFO) so config-loading debug
     # output is visible; the level is refreshed once the config resolves it.
     logging.basicConfig(
-        level=(log_level or "INFO").upper(),
+        level=(log_level or "WARNING").upper(),
         format="%(message)s",
         datefmt="[%X]",
         handlers=[RichHandler(console=Console(stderr=True), rich_tracebacks=True)],
